@@ -13,6 +13,7 @@ message Credentials {
 
 message AuthenticateRequest {
         string identity = 1;
+        string salt = 2;
 }
 
 message AuthenticateResponse {
