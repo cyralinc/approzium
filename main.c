@@ -9,7 +9,7 @@ static void exit_nicely(PGconn *conn) {
 
 int main() {
     char *connstring = "usedbauth=no host=pc-testing-2.cd6z0yimd7qu.us-west-2.rds.amazonaws.com password=password user=bob dbname=finance";
-    PGconn *conn = DBAconnectdb(connstring);
+    PGconn *conn = PQconnectdb(connstring);
     if (PQstatus(conn) != CONNECTION_OK) {
         fprintf(stderr, "Connection to database failed: %s\n", PQerrorMessage(conn));
         exit_nicely(conn);
