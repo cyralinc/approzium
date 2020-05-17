@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package dbauth.authenticator.messages;
+
+service Authenticator {
+        rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+}
+
+message Credentials {
+        string user = 1;
+        string password = 2;
+}
+
+message AuthenticateRequest {
+        string identity = 1;
+}
+
+message AuthenticateResponse {
+        enum Status {
+                ERROR = 0;
+                SUCCESS = 1;
+        }
+        string status = 1;
+        string message = 2;
+        Credentials credentials = 3;
+}

@@ -29,3 +29,6 @@ build-env:
 
 run-env:
 	docker run -it -v "$(PWD)":/usr/src/dbauth --rm --name dbauth-dev dbauth-dev bash
+
+gen-proto:
+	protoc --c_out:. authenticator/messages/authenticator.proto
