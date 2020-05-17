@@ -2,8 +2,19 @@
 #include <stdlib.h>
 #include "dbauth.h"
 
+static void exit_nicely(PGconn *conn) {
+    PQfinish(conn);
+    exit(1);
+}
+
 int main() {
-    printf("hello\n");
-    PGconn *conn = DBAconnectdb(""); // dummy struct
-    printf("%d\n", conn->auth_req_received); // can query struct fields
+    char *connstring = "usedbauth=no host=pc-testing-2.cd6z0yimd7qu.us-west-2.rds.amazonaws.com password=password user=bob dbname=finance";
+    PGconn *conn = DBAconnectdb(connstring);
+    if (PQstatus(conn) != CONNECTION_OK) {
+        fprintf(stderr, "Connection to database failed: %s\n", PQerrorMessage(conn));
+        exit_nicely(conn);
+    }
+    fprintf(stderr, "Connection established\n");
+    PQfinish(conn);
+    return 0;
 }
