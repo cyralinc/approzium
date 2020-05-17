@@ -20,7 +20,7 @@ message AuthenticateResponse {
                 ERROR = 0;
                 SUCCESS = 1;
         }
-        string status = 1;
+        Status status = 1;
         string message = 2;
         Credentials credentials = 3;
 }
