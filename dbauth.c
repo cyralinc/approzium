@@ -1,6 +1,6 @@
 #include "dbauth.h"
 
-
 PGconn *DBAconnectdb(const char *conninfo) {
-    return PQconnectdb(conninfo);
-}
+    PGconn *conn = PQconnectdb(conninfo);
+    return conn;
+} 

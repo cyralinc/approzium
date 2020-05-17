@@ -1,14 +1,14 @@
-PGDIR = /root/postgresql
+PGDIR = ~/postgresql
 LIBPQDIR = $(PGDIR)/src/interfaces/libpq
 
 EXECUTABLES = main
 
 INCLUDES = dbauth.h
 CC = gcc
-IFLAGS =  -I $(LIBPQDIR) -I $(PGDIR)/src/include 
+IFLAGS =  -I $(LIBPQDIR) -I $(PGDIR)/src/include -I $(PGDIR)/src/include/libpq
 
 CFLAGS = -g -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-variable $(IFLAGS)
-LDFLAGS = -L $(PGDIR)/src/port/
+LDFLAGS = -L $(PGDIR)/src/port/ -L $(PGDIR)/src/interfaces/libpq/
 LDLIBS = -lpgport -lpq
 
 
@@ -20,8 +20,9 @@ clean:
 %.o:%.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
 
+
 main: main.o dbauth.o
-	$(CC) $(LDFLAGS) -o main main.o dbauth.o $(LDLIBS)
+	$(CC) -o main main.o dbauth.o $(LDFLAGS) $(LDLIBS)
 
 build-env:
 	docker build -t dbauth-dev .
