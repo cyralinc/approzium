@@ -1,4 +1,4 @@
-AUTHMSGSDIR = authenticator/messages/
+AUTHMSGSDIR = authenticator/messages
 PGDIR = ~/postgresql
 LIBPQDIR = $(PGDIR)/src/interfaces/libpq
 
