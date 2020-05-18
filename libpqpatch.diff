@@ -1,15 +1,42 @@
+diff --git src/interfaces/libpq/dbauth.h src/interfaces/libpq/dbauth.h
+new file mode 100644
+index 0000000000..55e3448e66
+--- /dev/null
++++ src/interfaces/libpq/dbauth.h
+@@ -0,0 +1,14 @@
++/* DBAuth functions that connect to an Authenticator service to retrieve
++ * hashed password */
++#include <stdio.h>
++#include "postgres_fe.h"
++#include "libpq-int.h"
++
++/* PROTOTYPES */
++char *dbauth_get_hashed_password(PGconn *conn, char *md5Salt);
++
++char *dbauth_get_hashed_password(PGconn *conn, char *md5Salt) {
++	fprintf(stdout, "dbauth_get_hashed_password\n");
++	fprintf(stdout, "MD5 Salt: %u\n", *(uint32_t *)md5Salt);
++	return NULL;
++}
 diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
-index 9f5403d74c..25691dae28 100644
+index 9f5403d74c..6d75186d19 100644
 --- src/interfaces/libpq/fe-auth.c
 +++ src/interfaces/libpq/fe-auth.c
-@@ -762,6 +762,10 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+@@ -20,6 +20,7 @@
+  *								of the authentication system
+  */
+ 
++#include "dbauth.h"
+ #include "postgres_fe.h"
+ 
+ #ifdef WIN32
+@@ -762,6 +763,9 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
  			{
  				char	   *crypt_pwd2;
  
 +				if (strcmp(conn->usedbauth, "yes") == 0) {
-+					fprintf(stderr, "pg_password_sendauth: conn->usedbauth=yes\n");
-+					fprintf(stderr, "MD5 Salt: %u\n", *(uint32_t *)md5Salt);
-+				}
++					pwd_to_send = dbauth_get_hashed_password(conn, md5Salt);
++				} /* once fully implemented, add an else clause here */
  				/* Allocate enough space for two MD5 hashes */
  				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
  				if (!crypt_pwd)
