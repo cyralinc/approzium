@@ -6,6 +6,22 @@ RUN apt-get install -y git
 RUN apt-get install -y libpq-dev
 # dependencies for compiling postgresql
 RUN apt-get install -y libreadline-dev libssl-dev bison flex
+RUN apt-get install -y libprotobuf-c-dev libprotoc-dev protobuf-compiler
+
+# install protobuf-c from source
+WORKDIR $HOME/protobuf-c
+Run apt-get install -y pkg-config dh-autoreconf
+RUN git clone https://github.com/protobuf-c/protobuf-c.git .
+RUN ./autogen.sh
+RUN ./configure
+RUN make && make install
+
+# install protobuf-c-rpc from source
+WORKDIR $HOME/protobuf-c-rpc
+RUN git clone https://github.com/protobuf-c/protobuf-c-rpc.git .
+RUN ./autogen.sh
+RUN ./configure
+RUN make && make install
 
 # install postgresql from source
 WORKDIR $HOME/postgresql
@@ -24,15 +40,5 @@ ENV PATH="/usr/local/pgsql/bin:${PATH}"
 RUN apt-get install -y python3-dev
 RUN apt-get install -y python3-pip
 RUN pip3 install psycopg2
-
-RUN apt-get install -y libprotobuf-c-dev libprotoc-dev protobuf-compiler
-
-# install protobuf-c from source
-WORKDIR $HOME/protobuf-c
-Run apt-get install -y pkg-config dh-autoreconf
-RUN git clone https://github.com/protobuf-c/protobuf-c.git .
-RUN ./autogen.sh
-RUN ./configure
-RUN make && make install
 
 WORKDIR /usr/src/dbauth
