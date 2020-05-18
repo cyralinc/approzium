@@ -8,7 +8,7 @@ service Authenticator {
 
 message Credentials {
         string user = 1;
-        string hashed_password = 2;
+        string hashedPassword = 2;
 }
 
 message AuthenticateRequest {
