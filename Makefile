@@ -26,6 +26,9 @@ main: main.o dbauth.o
 gen-proto:
 	protoc --c_out=. $(AUTHMSGSDIR)/authenticator.proto
 
+gen-libpqpatch:
+	(cd $(PGDIR) && git diff --no-prefix -u .) > libpqpatch.diff
+
 build-env:
 	docker build -t dbauth-dev .
 
