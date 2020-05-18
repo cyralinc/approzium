@@ -27,7 +27,9 @@ gen-proto:
 	protoc --c_out=. $(AUTHMSGSDIR)/authenticator.proto
 
 gen-libpqpatch:
-	(cd $(PGDIR) && git diff --no-prefix -u .) > libpqpatch.diff
+	# following has to be done to ensure new files are included in patch
+	(cd $(PGDIR) && git add -A && git diff --staged HEAD --no-prefix -u .) > libpqpatch.diff
+	cd $(PGDIR) && git reset
 
 build-env:
 	docker build -t dbauth-dev .
