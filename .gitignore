@@ -1,10 +1,5 @@
-# authenticator proto generated c code
-authenticator/messages/authenticator.pb-c.c
-authenticator/messages/authenticator.pb-c.h
-
 # executables
 main
-authenticator
 
 # Prerequisites
 *.d
