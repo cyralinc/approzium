@@ -2,6 +2,10 @@
 authenticator/messages/authenticator.pb-c.c
 authenticator/messages/authenticator.pb-c.h
 
+# executables
+main
+authenticator
+
 # Prerequisites
 *.d
 
@@ -53,6 +57,3 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-
-# Executables
-main
