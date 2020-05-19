@@ -26,12 +26,9 @@ index d4919970f8..99d8304417 100644
  all: all-lib
  
  # Shared library stuff
-diff --git src/interfaces/libpq/authenticator/messages/.authenticator.pb-c.h.swp src/interfaces/libpq/authenticator/messages/.authenticator.pb-c.h.swp
-new file mode 100644
-index 0000000000..e69de29bb2
 diff --git src/interfaces/libpq/authenticator/messages/authenticator.pb-c.c src/interfaces/libpq/authenticator/messages/authenticator.pb-c.c
 new file mode 100644
-index 0000000000..96f95bed19
+index 0000000000..bfd48a4a1c
 --- /dev/null
 +++ src/interfaces/libpq/authenticator/messages/authenticator.pb-c.c
 @@ -0,0 +1,371 @@
@@ -194,12 +191,12 @@ index 0000000000..96f95bed19
 +    0,NULL,NULL    /* reserved1,reserved2, etc */
 +  },
 +  {
-+    "hashed_password",
++    "hashedPassword",
 +    2,
 +    PROTOBUF_C_LABEL_NONE,
 +    PROTOBUF_C_TYPE_STRING,
 +    0,   /* quantifier_offset */
-+    offsetof(Dbauth__Authenticator__Messages__Credentials, hashed_password),
++    offsetof(Dbauth__Authenticator__Messages__Credentials, hashedpassword),
 +    NULL,
 +    &protobuf_c_empty_string,
 +    0,             /* flags */
@@ -207,7 +204,7 @@ index 0000000000..96f95bed19
 +  },
 +};
 +static const unsigned dbauth__authenticator__messages__credentials__field_indices_by_name[] = {
-+  1,   /* field[1] = hashed_password */
++  1,   /* field[1] = hashedPassword */
 +  0,   /* field[0] = user */
 +};
 +static const ProtobufCIntRange dbauth__authenticator__messages__credentials__number_ranges[1 + 1] =
@@ -408,7 +405,7 @@ index 0000000000..96f95bed19
 +}
 diff --git src/interfaces/libpq/authenticator/messages/authenticator.pb-c.h src/interfaces/libpq/authenticator/messages/authenticator.pb-c.h
 new file mode 100644
-index 0000000000..c73bfba9ce
+index 0000000000..26ff0258b2
 --- /dev/null
 +++ src/interfaces/libpq/authenticator/messages/authenticator.pb-c.h
 @@ -0,0 +1,171 @@
@@ -448,7 +445,7 @@ index 0000000000..c73bfba9ce
 +{
 +  ProtobufCMessage base;
 +  char *user;
-+  char *hashed_password;
++  char *hashedpassword;
 +};
 +#define DBAUTH__AUTHENTICATOR__MESSAGES__CREDENTIALS__INIT \
 + { PROTOBUF_C_MESSAGE_INIT (&dbauth__authenticator__messages__credentials__descriptor) \
@@ -583,45 +580,12 @@ index 0000000000..c73bfba9ce
 +
 +
 +#endif  /* PROTOBUF_C_authenticator_2fmessages_2fauthenticator_2eproto__INCLUDED */
-diff --git src/interfaces/libpq/authenticator/messages/authenticator.proto src/interfaces/libpq/authenticator/messages/authenticator.proto
-new file mode 100644
-index 0000000000..247fd6b0d1
---- /dev/null
-+++ src/interfaces/libpq/authenticator/messages/authenticator.proto
-@@ -0,0 +1,27 @@
-+syntax = "proto3";
-+
-+package dbauth.authenticator.messages;
-+
-+service Authenticator {
-+        rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
-+}
-+
-+message Credentials {
-+        string user = 1;
-+        string hashed_password = 2;
-+}
-+
-+message AuthenticateRequest {
-+        string identity = 1;
-+        string salt = 2;
-+}
-+
-+message AuthenticateResponse {
-+        enum Status {
-+                ERROR = 0;
-+                SUCCESS = 1;
-+        }
-+        Status status = 1;
-+        string message = 2;
-+        Credentials credentials = 3;
-+}
 diff --git src/interfaces/libpq/dbauth.h src/interfaces/libpq/dbauth.h
 new file mode 100644
-index 0000000000..a4071350d1
+index 0000000000..8d2cd35a3d
 --- /dev/null
 +++ src/interfaces/libpq/dbauth.h
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,62 @@
 +/* DBAuth functions that connect to an Authenticator service to retrieve
 + * hashed password */
 +#include <ctype.h>
@@ -638,46 +602,51 @@ index 0000000000..a4071350d1
 +
 +/* PROTOTYPES */
 +char *dbauth_get_hashed_password(PGconn *conn, char *md5Salt);
++void handle_query_response(const  Dbauth__Authenticator__Messages__AuthenticateResponse *result, void *hashedpassword);
 +
-+void handle_query_response(const  Dbauth__Authenticator__Messages__AuthenticateResponse *result, void *hashed_password) {
++void handle_query_response(const  Dbauth__Authenticator__Messages__AuthenticateResponse *result, void *hashedpassword) {
 +	if (result == NULL) {
 +		fprintf(stderr, "Error processing request\n");
-+		*(char **) hashed_password = NULL;
++		*(char **) hashedpassword = NULL;
 +		return;
 +	}
 +
 +	if (result->status != DBAUTH__AUTHENTICATOR__MESSAGES__AUTHENTICATE_RESPONSE__STATUS__SUCCESS) {
 +		fprintf(stderr, "Authenticate request failed\n");
-+		*(char **) hashed_password = NULL;
++		*(char **) hashedpassword = NULL;
 +		return;
 +	}
-+	*(char **) hashed_password = result->credentials->hashed_password;
++	*(char **) hashedpassword = result->credentials->hashedpassword;
 +}
 +
 +char *dbauth_get_hashed_password(PGconn *conn, char *md5Salt) {
-+	fprintf(stderr, "dbauth_get_hashed_password\n");
-+	fprintf(stderr, "MD5 Salt: %u\n", *(uint32_t *)md5Salt);
 +	ProtobufCService *service;
 +	ProtobufC_RPC_Client *client;
-+	service = protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, "",
-+			&dbauth__authenticator__messages__authenticator__descriptor, NULL);
++	char *unset; 
++	char *hashedpassword;
++
++	fprintf(stderr, "dbauth_get_hashed_password\n");
++	fprintf(stderr, "MD5 Salt: %u\n", *(uint32_t *)md5Salt);
++	service = protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, "172.18.0.2:1234", &dbauth__authenticator__messages__authenticator__descriptor, NULL);
++	if (service == NULL) {
++		fprintf(stderr, "could not create service\n");
++		return NULL;
++	}
 +	client = (ProtobufC_RPC_Client *) service;
 +	fprintf(stderr, "connecting...\n");
-+	while (!protobuf_c_rpc_client_is_connected(client)) {
++	while (!protobuf_c_rpc_client_is_connected(client))
 +		protobuf_c_rpc_dispatch_run(protobuf_c_rpc_dispatch_default());
-+		break; /* testing */
-+	}
 +	fprintf(stderr, "done.\n");
 +
 +	Dbauth__Authenticator__Messages__AuthenticateRequest query = DBAUTH__AUTHENTICATOR__MESSAGES__AUTHENTICATE_REQUEST__INIT;
 +	query.identity = "diobrando";
 +	query.salt = md5Salt;
-+	char *unset = "unset";
-+	char *hashed_password = unset;
-+	dbauth__authenticator__messages__authenticator__authenticate(service, &query, handle_query_response, &hashed_password); 
-+	while (hashed_password == unset)
++	unset = "unset";
++	hashedpassword = unset;
++	dbauth__authenticator__messages__authenticator__authenticate(service, &query, handle_query_response, &hashedpassword); 
++	while (hashedpassword == unset)
 +		protobuf_c_rpc_dispatch_run(protobuf_c_rpc_dispatch_default());
-+	return hashed_password;
++	return hashedpassword;
 +}
 diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
 index 9f5403d74c..6d75186d19 100644

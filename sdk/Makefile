@@ -1,8 +1,11 @@
+MY_PATH = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+DBAUTHDIR= $(realpath $(MK_PATH)../)
+
 AUTHMSGSDIR = authenticator/messages
 PGDIR = ~/postgresql
 LIBPQDIR = $(PGDIR)/src/interfaces/libpq
 
-INCLUDES = dbauth.h
+INCLUDES =
 CC = gcc
 IFLAGS =  -I $(LIBPQDIR) -I $(PGDIR)/src/include -I $(PGDIR)/src/include/libpq
 
@@ -20,11 +23,11 @@ clean:
 %.o:%.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
 
-main: main.o dbauth.o
-	$(CC) -o main main.o dbauth.o $(LDFLAGS) $(LDLIBS)
+main: main.o
+	$(CC) -o main main.o $(LDFLAGS) $(LDLIBS)
 
 gen-proto:
-	protoc --c_out=. $(AUTHMSGSDIR)/authenticator.proto
+	cd .. && protoc --c_out=. $(AUTHMSGSDIR)/authenticator.proto
 
 gen-libpqpatch:
 	# following has to be done to ensure new files are included in patch
@@ -32,10 +35,10 @@ gen-libpqpatch:
 	cd $(PGDIR) && git reset
 
 build-env:
-	docker build -t dbauth-dev .
+	docker build -t dbauth-sdk .
 
 run-env:
-	docker run -it -v "$(PWD)":/usr/src/dbauth --network dbauthnet --rm --name dbauth-dev dbauth-dev bash
+	docker run -it -v "$(DBAUTHDIR)":/usr/src/dbauth --network dbauthnet --rm --name dbauth-sdk dbauth-sdk bash
 
 docker-network:
-	docker network create dbauthnet	
+	docker network create dbauthnet
