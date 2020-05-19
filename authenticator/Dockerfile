@@ -6,7 +6,6 @@ ENV GO111MODULE on
 # Install grpc
 # Install protoc-gen-go protoc-gen-grpc-gateway and protoc-gen-swagger
 RUN go get -u github.com/golang/protobuf/protoc-gen-go@v1.3.2
-# RUN go get google.golang.org/grpc@v1.28.1
 
 # Install protobuf compiler
 RUN apt-get update && apt-get install -y unzip
