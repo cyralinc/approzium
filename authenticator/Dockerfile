@@ -1,5 +1,7 @@
 FROM golang:1.13
 
+ENV GOPATH /usr
+
 # enable GOMODULES
 ENV GO111MODULE on
 
