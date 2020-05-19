@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"io"
 
 	pb "dbauth/authenticator/messages"
 )
@@ -73,5 +76,9 @@ func newCreds() map[string]credentials {
 }
 
 func computeMD5(s, salt string) string {
-	return fmt.Sprintf("%s, but hashed", s)
+	hasher := md5.New()
+	io.WriteString(hasher, s)
+	io.WriteString(hasher, salt)
+	hashedBytes := hasher.Sum(nil)
+	return hex.EncodeToString(hashedBytes)
 }
