@@ -38,4 +38,4 @@ run-env:
 	docker run -it -v "$(PWD)":/usr/src/dbauth --network dbauthnet --rm --name dbauth-dev dbauth-dev bash
 
 docker-network:
-	docker network rm dbauthnet && docker network create dbauthnet	
+	docker network create dbauthnet	
