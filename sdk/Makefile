@@ -33,12 +33,3 @@ gen-libpqpatch:
 	# following has to be done to ensure new files are included in patch
 	(cd $(PGDIR) && git add -A && git diff --staged HEAD --no-prefix -u .) > libpqpatch.diff
 	cd $(PGDIR) && git reset
-
-build-env:
-	docker build -t dbauth-sdk .
-
-run-env:
-	docker run -it -v "$(DBAUTHDIR)":/usr/src/dbauth --network dbauthnet --rm --name dbauth-sdk dbauth-sdk bash
-
-docker-network:
-	docker network create dbauthnet
