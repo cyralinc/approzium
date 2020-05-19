@@ -3,8 +3,7 @@ FROM golang:1.13
 # enable GOMODULES
 ENV GO111MODULE on
 
-# Install grpc
-# Install protoc-gen-go protoc-gen-grpc-gateway and protoc-gen-swagger
+# Install protoc-gen-go
 RUN go get -u github.com/golang/protobuf/protoc-gen-go@v1.3.2
 
 # Install protobuf compiler
