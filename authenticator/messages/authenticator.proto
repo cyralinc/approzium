@@ -8,12 +8,12 @@ service Authenticator {
 
 message Credentials {
         string user = 1;
-        string hashedPassword = 2;
+        bytes hashedPassword = 2;
 }
 
 message AuthenticateRequest {
         string identity = 1;
-        string salt = 2;
+        bytes salt = 2;
 }
 
 message AuthenticateResponse {
