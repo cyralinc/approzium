@@ -15,7 +15,7 @@ index d4919970f8..2cb8111d23 100644
  endif
  SHLIB_PREREQS = submake-libpgport
  
-+SHLIB_LINK := -L/usr/src/dbauth/sdk/internal/ -ldbauthlibpq $(SHLIB_LINK)
++SHLIB_LINK := -L/usr/src/dbauth/sdk/internal/ -Wl,-rpath=/usr/src/dbauth/sdk/internal/ -ldbauthlibpq $(SHLIB_LINK)
 +
  SHLIB_EXPORTS = exports.txt
  

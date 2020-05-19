@@ -15,7 +15,7 @@ LDLIBS = -lpgport -lpq
 
 EXECUTABLES = main
 
-all: $(EXECUTABLES) gen-proto
+all: $(EXECUTABLES)
 
 clean:
 	rm -f $(EXECUTABLES) *.o $(AUTHMSGSDIR)/*.h $(AUTHMSGSDIR)/*.c
@@ -25,9 +25,6 @@ clean:
 
 main: main.o
 	$(CC) -o main main.o $(LDFLAGS) $(LDLIBS)
-
-gen-proto:
-	cd .. && protoc --c_out=. $(AUTHMSGSDIR)/authenticator.proto
 
 gen-libpqpatch:
 	# following has to be done to ensure new files are included in patch
