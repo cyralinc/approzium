@@ -35,4 +35,7 @@ build-env:
 	docker build -t dbauth-dev .
 
 run-env:
-	docker run -it -v "$(PWD)":/usr/src/dbauth --rm --name dbauth-dev dbauth-dev bash
+	docker run -it -v "$(PWD)":/usr/src/dbauth --network dbauthnet --rm --name dbauth-dev dbauth-dev bash
+
+docker-network:
+	docker network rm dbauthnet && docker network create dbauthnet	
