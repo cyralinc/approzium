@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	serviceAddress = "localhost:1234"
+	serviceAddress = ":1234"
 )
 
 func main() {
