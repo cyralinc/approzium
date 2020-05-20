@@ -193,7 +193,7 @@ class Credentials : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::std::string* release_user();
   void set_allocated_user(::std::string* user);
 
-  // string hashedPassword = 2;
+  // bytes hashedPassword = 2;
   void clear_hashedpassword();
   static const int kHashedPasswordFieldNumber = 2;
   const ::std::string& hashedpassword() const;
@@ -202,7 +202,7 @@ class Credentials : public ::google::protobuf::Message /* @@protoc_insertion_poi
   void set_hashedpassword(::std::string&& value);
   #endif
   void set_hashedpassword(const char* value);
-  void set_hashedpassword(const char* value, size_t size);
+  void set_hashedpassword(const void* value, size_t size);
   ::std::string* mutable_hashedpassword();
   ::std::string* release_hashedpassword();
   void set_allocated_hashedpassword(::std::string* hashedpassword);
@@ -315,7 +315,7 @@ class AuthenticateRequest : public ::google::protobuf::Message /* @@protoc_inser
   ::std::string* release_identity();
   void set_allocated_identity(::std::string* identity);
 
-  // string salt = 2;
+  // bytes salt = 2;
   void clear_salt();
   static const int kSaltFieldNumber = 2;
   const ::std::string& salt() const;
@@ -324,7 +324,7 @@ class AuthenticateRequest : public ::google::protobuf::Message /* @@protoc_inser
   void set_salt(::std::string&& value);
   #endif
   void set_salt(const char* value);
-  void set_salt(const char* value, size_t size);
+  void set_salt(const void* value, size_t size);
   ::std::string* mutable_salt();
   ::std::string* release_salt();
   void set_allocated_salt(::std::string* salt);
@@ -553,7 +553,7 @@ inline void Credentials::set_allocated_user(::std::string* user) {
   // @@protoc_insertion_point(field_set_allocated:dbauth.authenticator.messages.Credentials.user)
 }
 
-// string hashedPassword = 2;
+// bytes hashedPassword = 2;
 inline void Credentials::clear_hashedpassword() {
   hashedpassword_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -580,7 +580,7 @@ inline void Credentials::set_hashedpassword(const char* value) {
   hashedpassword_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:dbauth.authenticator.messages.Credentials.hashedPassword)
 }
-inline void Credentials::set_hashedpassword(const char* value, size_t size) {
+inline void Credentials::set_hashedpassword(const void* value, size_t size) {
   
   hashedpassword_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -663,7 +663,7 @@ inline void AuthenticateRequest::set_allocated_identity(::std::string* identity)
   // @@protoc_insertion_point(field_set_allocated:dbauth.authenticator.messages.AuthenticateRequest.identity)
 }
 
-// string salt = 2;
+// bytes salt = 2;
 inline void AuthenticateRequest::clear_salt() {
   salt_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -690,7 +690,7 @@ inline void AuthenticateRequest::set_salt(const char* value) {
   salt_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:dbauth.authenticator.messages.AuthenticateRequest.salt)
 }
-inline void AuthenticateRequest::set_salt(const char* value, size_t size) {
+inline void AuthenticateRequest::set_salt(const void* value, size_t size) {
   
   salt_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));

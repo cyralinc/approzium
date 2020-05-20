@@ -168,8 +168,8 @@ void AddDescriptorsImpl() {
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
       "\n\023authenticator.proto\022\035dbauth.authentica"
       "tor.messages\"3\n\013Credentials\022\014\n\004user\030\001 \001("
-      "\t\022\026\n\016hashedPassword\030\002 \001(\t\"5\n\023Authenticat"
-      "eRequest\022\020\n\010identity\030\001 \001(\t\022\014\n\004salt\030\002 \001(\t"
+      "\t\022\026\n\016hashedPassword\030\002 \001(\014\"5\n\023Authenticat"
+      "eRequest\022\020\n\010identity\030\001 \001(\t\022\014\n\004salt\030\002 \001(\014"
       "\"\326\001\n\024AuthenticateResponse\022J\n\006status\030\001 \001("
       "\0162:.dbauth.authenticator.messages.Authen"
       "ticateResponse.Status\022\017\n\007message\030\002 \001(\t\022\?"
@@ -332,16 +332,12 @@ bool Credentials::MergePartialFromCodedStream(
         break;
       }
 
-      // string hashedPassword = 2;
+      // bytes hashedPassword = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_hashedpassword()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.Credentials.hashedPassword"));
         } else {
           goto handle_unusual;
         }
@@ -384,13 +380,9 @@ void Credentials::SerializeWithCachedSizes(
       1, this->user(), output);
   }
 
-  // string hashedPassword = 2;
+  // bytes hashedPassword = 2;
   if (this->hashedpassword().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.hashedPassword");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
       2, this->hashedpassword(), output);
   }
 
@@ -419,14 +411,10 @@ void Credentials::SerializeWithCachedSizes(
         1, this->user(), target);
   }
 
-  // string hashedPassword = 2;
+  // bytes hashedPassword = 2;
   if (this->hashedpassword().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.hashedPassword");
     target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->hashedpassword(), target);
   }
 
@@ -454,10 +442,10 @@ size_t Credentials::ByteSizeLong() const {
         this->user());
   }
 
-  // string hashedPassword = 2;
+  // bytes hashedPassword = 2;
   if (this->hashedpassword().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
+      ::google::protobuf::internal::WireFormatLite::BytesSize(
         this->hashedpassword());
   }
 
@@ -645,16 +633,12 @@ bool AuthenticateRequest::MergePartialFromCodedStream(
         break;
       }
 
-      // string salt = 2;
+      // bytes salt = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_salt()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->salt().data(), static_cast<int>(this->salt().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.AuthenticateRequest.salt"));
         } else {
           goto handle_unusual;
         }
@@ -697,13 +681,9 @@ void AuthenticateRequest::SerializeWithCachedSizes(
       1, this->identity(), output);
   }
 
-  // string salt = 2;
+  // bytes salt = 2;
   if (this->salt().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->salt().data(), static_cast<int>(this->salt().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateRequest.salt");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
       2, this->salt(), output);
   }
 
@@ -732,14 +712,10 @@ void AuthenticateRequest::SerializeWithCachedSizes(
         1, this->identity(), target);
   }
 
-  // string salt = 2;
+  // bytes salt = 2;
   if (this->salt().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->salt().data(), static_cast<int>(this->salt().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateRequest.salt");
     target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
         2, this->salt(), target);
   }
 
@@ -767,10 +743,10 @@ size_t AuthenticateRequest::ByteSizeLong() const {
         this->identity());
   }
 
-  // string salt = 2;
+  // bytes salt = 2;
   if (this->salt().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
+      ::google::protobuf::internal::WireFormatLite::BytesSize(
         this->salt());
   }
 
