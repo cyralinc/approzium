@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -31,7 +30,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 	fmt.Printf("received request to return hashed credentials for identity %s given salt %s",
 		identity, salt)
 
-	if salt == "" {
+	if len(salt) == 0 {
 		msg := fmt.Errorf("salt not received")
 		return &pb.AuthenticateResponse{
 			Status:  pb.AuthenticateResponse_ERROR,
@@ -49,7 +48,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 
 	hashedCreds := pb.Credentials{
 		User:           creds.user,
-		HashedPassword: computeMD5(creds.password, salt),
+		HashedPassword: computeMD5(creds.password, string(salt)),
 	}
 
 	return &pb.AuthenticateResponse{
@@ -75,10 +74,9 @@ func newCreds() map[string]credentials {
 	return creds
 }
 
-func computeMD5(s, salt string) string {
+func computeMD5(s, salt string) []byte {
 	hasher := md5.New()
 	io.WriteString(hasher, s)
 	io.WriteString(hasher, salt)
-	hashedBytes := hasher.Sum(nil)
-	return hex.EncodeToString(hashedBytes)
+	return hasher.Sum(nil)
 }
