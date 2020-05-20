@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
+	"io"
 	"time"
 
 	pb "dbauth/authenticator/messages"
@@ -39,7 +41,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 	log.Printf("received request to return hashed credentials for identity %s given salt %s\n",
 		identity, salt)
 
-	if salt == "" {
+	if len(salt) == 0 {
 		msg := fmt.Errorf("salt not received")
 		log.Error(msg)
 		return &pb.AuthenticateResponse{
@@ -59,7 +61,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 
 	hashedCreds := pb.Credentials{
 		User:           creds.user,
-		HashedPassword: computeMD5(creds.password, salt),
+		HashedPassword: computeMD5(creds.password, string(salt)),
 	}
 
 	return &pb.AuthenticateResponse{
@@ -86,6 +88,9 @@ func newCreds() map[string]credentials {
 	return creds
 }
 
-func computeMD5(s, salt string) string {
-	return fmt.Sprintf("%s, but hashed", s)
+func computeMD5(s, salt string) []byte {
+	hasher := md5.New()
+	io.WriteString(hasher, s)
+	io.WriteString(hasher, salt)
+	return hasher.Sum(nil)
 }
