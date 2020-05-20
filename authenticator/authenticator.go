@@ -86,13 +86,17 @@ func newCreds() map[string]credentials {
 		user:     "bob",
 		password: "password",
 	}
+	creds["bob"] = credentials{
+		user:     "bob",
+		password: "password",
+	}
 	return creds
 }
 
 func computeMD5(s string, salt []byte) string {
 	hasher := md5.New()
 	io.WriteString(hasher, s)
-	hasher.Write(salt[:4])
+	hasher.Write(salt)
 	hashedBytes := hasher.Sum(nil)
 	return hex.EncodeToString(hashedBytes)
 }
