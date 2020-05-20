@@ -11,7 +11,7 @@ import (
 func main() {
 	fmt.Printf("enter client test\n")
 
-	conn, err := grpc.Dial("localhost:1234", grpc.WithInsecure())
+	conn, err := grpc.Dial("authenticator:1234", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +21,7 @@ func main() {
 	ctx := context.Background()
 	req := pb.AuthenticateRequest{
 		Identity: "diotim",
-		Salt:     "swag",
+		Salt:     []byte("swag"),
 	}
 	resp, err := client.Authenticate(ctx, &req)
 	if err != nil {
