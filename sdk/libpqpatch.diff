@@ -21,7 +21,7 @@ index d4919970f8..070ac74780 100644
  
  all: all-lib
 diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
-index 9f5403d74c..a2e0fc5f2c 100644
+index 9f5403d74c..c11ac45ddd 100644
 --- src/interfaces/libpq/fe-auth.c
 +++ src/interfaces/libpq/fe-auth.c
 @@ -20,6 +20,7 @@
@@ -32,7 +32,17 @@ index 9f5403d74c..a2e0fc5f2c 100644
  #include "postgres_fe.h"
  
  #ifdef WIN32
-@@ -761,9 +762,20 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+@@ -544,8 +545,7 @@ pg_SASL_init(PGconn *conn, int payloadlen)
+ 	password = conn->connhost[conn->whichhost].password;
+ 	if (password == NULL)
+ 		password = conn->pgpass;
+-	if (password == NULL || password[0] == '\0')
+-	{
++	if ((password == NULL || password[0] == '\0') && (strcmp(conn->usedbauth, "yes") != 0)) {
+ 		printfPQExpBuffer(&conn->errorMessage,
+ 						  PQnoPasswordSupplied);
+ 		goto error;
+@@ -761,9 +761,21 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
  		case AUTH_REQ_MD5:
  			{
  				char	   *crypt_pwd2;
@@ -47,6 +57,7 @@ index 9f5403d74c..a2e0fc5f2c 100644
 +						return STATUS_ERROR;
 +					}
 +					pwd_to_send = crypt_pwd;
++					fprintf(stderr, "[DBA] received hash:  %s\n", pwd_to_send);
 +					break;
 +				}
  				/* Allocate enough space for two MD5 hashes */
@@ -70,6 +81,16 @@ index 9f5403d74c..a2e0fc5f2c 100644
  				break;
  			}
  		case AUTH_REQ_PASSWORD:
+@@ -1000,8 +1014,7 @@ pg_fe_sendauth(AuthRequest areq, int payloadlen, PGconn *conn)
+ 				password = conn->connhost[conn->whichhost].password;
+ 				if (password == NULL)
+ 					password = conn->pgpass;
+-				if (password == NULL || password[0] == '\0')
+-				{
++				if ((password == NULL || password[0] == '\0') && (strcmp(conn->usedbauth, "yes") != 0)) {
+ 					printfPQExpBuffer(&conn->errorMessage,
+ 									  PQnoPasswordSupplied);
+ 					return STATUS_ERROR;
 diff --git src/interfaces/libpq/fe-connect.c src/interfaces/libpq/fe-connect.c
 index d5da6dce1e..bc3a37123a 100644
 --- src/interfaces/libpq/fe-connect.c
