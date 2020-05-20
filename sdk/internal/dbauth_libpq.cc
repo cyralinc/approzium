@@ -36,7 +36,6 @@ int dbauth_get_hashed_password(char *user, char *md5Salt, int saltlen, char *res
             return 0;
         }
         auto hash = reply.credentials().hashedpassword();
-	cout << "[DBA] received hash:  " << hash << endl;
         strcpy(result_buffer, hash.c_str());
         return 1;
     } else {
