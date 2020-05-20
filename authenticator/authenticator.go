@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"time"
@@ -61,7 +62,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 
 	hashedCreds := pb.Credentials{
 		User:           creds.user,
-		HashedPassword: computeMD5(creds.password, string(salt)),
+		HashedPassword: computePGMD5(identity, creds.password, salt),
 	}
 
 	return &pb.AuthenticateResponse{
@@ -88,9 +89,16 @@ func newCreds() map[string]credentials {
 	return creds
 }
 
-func computeMD5(s, salt string) []byte {
+func computeMD5(s string, salt []byte) string {
 	hasher := md5.New()
 	io.WriteString(hasher, s)
-	io.WriteString(hasher, salt)
-	return hasher.Sum(nil)
+	hasher.Write(salt[:4])
+	hashedBytes := hasher.Sum(nil)
+	return hex.EncodeToString(hashedBytes)
+}
+
+func computePGMD5(user, password string, salt []byte) string {
+	first_hash := computeMD5(password, []byte(user))
+	second_hash := computeMD5(first_hash, salt)
+	return "md5" + second_hash
 }
