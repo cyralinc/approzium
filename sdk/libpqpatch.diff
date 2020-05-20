@@ -1,5 +1,5 @@
 diff --git src/interfaces/libpq/Makefile src/interfaces/libpq/Makefile
-index d4919970f8..2cb8111d23 100644
+index d4919970f8..070ac74780 100644
 --- src/interfaces/libpq/Makefile
 +++ src/interfaces/libpq/Makefile
 @@ -21,7 +21,7 @@ NAME= pq
@@ -21,7 +21,7 @@ index d4919970f8..2cb8111d23 100644
  
  all: all-lib
 diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
-index 9f5403d74c..1606a14057 100644
+index 9f5403d74c..a2e0fc5f2c 100644
 --- src/interfaces/libpq/fe-auth.c
 +++ src/interfaces/libpq/fe-auth.c
 @@ -20,6 +20,7 @@
@@ -32,16 +32,44 @@ index 9f5403d74c..1606a14057 100644
  #include "postgres_fe.h"
  
  #ifdef WIN32
-@@ -762,6 +763,9 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+@@ -761,9 +762,20 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 		case AUTH_REQ_MD5:
  			{
  				char	   *crypt_pwd2;
++				int         dbauth_status_code;
++				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
  
 +				if (strcmp(conn->usedbauth, "yes") == 0) {
-+					pwd_to_send = dbauth_get_hashed_password(md5Salt);
-+				} /* once fully implemented, add an else clause here */
++					dbauth_status_code = dbauth_get_hashed_password(conn->pguser, md5Salt, 4, crypt_pwd);
++					if (dbauth_status_code != 1) {
++						printfPQExpBuffer(&conn->errorMessage,
++										  libpq_gettext("dbauth failed\n"));
++						return STATUS_ERROR;
++					}
++					pwd_to_send = crypt_pwd;
++					break;
++				}
  				/* Allocate enough space for two MD5 hashes */
- 				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
+-				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
  				if (!crypt_pwd)
+ 				{
+ 					printfPQExpBuffer(&conn->errorMessage,
+@@ -778,6 +790,7 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 					free(crypt_pwd);
+ 					return STATUS_ERROR;
+ 				}
++
+ 				if (!pg_md5_encrypt(crypt_pwd2 + strlen("md5"), md5Salt,
+ 									4, crypt_pwd))
+ 				{
+@@ -786,6 +799,7 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 				}
+ 
+ 				pwd_to_send = crypt_pwd;
++				fprintf(stderr, "[PG] computed hash:   %s\n", crypt_pwd);
+ 				break;
+ 			}
+ 		case AUTH_REQ_PASSWORD:
 diff --git src/interfaces/libpq/fe-connect.c src/interfaces/libpq/fe-connect.c
 index d5da6dce1e..bc3a37123a 100644
 --- src/interfaces/libpq/fe-connect.c
