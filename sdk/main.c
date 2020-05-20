@@ -8,7 +8,7 @@ static void exit_nicely(PGconn *conn) {
 }
 
 int main() {
-    ***REMOVED***
+    char *connstring = "usedbauth=yes host=db user=bob dbname=db";
     PGconn *conn = PQconnectdb(connstring);
     if (PQstatus(conn) != CONNECTION_OK) {
         fprintf(stderr, "Connection to database failed: %s\n", PQerrorMessage(conn));
