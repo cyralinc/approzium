@@ -36,6 +36,8 @@ RUN git clone -b ${GRPC_RELEASE_TAG} https://github.com/grpc/grpc /var/local/git
 
 # copy over dbauth libpq sdk because it is needed to compile modified postgreql
 ADD internal /usr/src/dbauth/sdk/internal
+WORKDIR /usr/src/dbauth/sdk/internal
+RUN make
 
 # install postgresql from source
 WORKDIR $HOME/postgresql
@@ -47,10 +49,10 @@ RUN ./configure --with-openssl --without-zlib --enable-thread-safety
 RUN make -C src/bin install && \
 make -C src/include install && \
 make -C src/interfaces install
+RUN cd src/interfaces/libpq && ln -s libpq.so dbauth_libpq.so
 ENV PATH="/usr/local/pgsql/bin:${PATH}"
 RUN apt-get install -y python3-dev
 RUN apt-get install -y python3-pip
 RUN pip3 install psycopg2
 
-
-WORKDIR /usr/src/dbauth
+WORKDIR /usr/src/dbauth/sdk
