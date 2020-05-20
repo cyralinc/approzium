@@ -7,7 +7,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-char *dbauth_get_hashed_password(char *md5Salt);
+    /* this function connects to the authenticator service and gets the MD5 hash
+     * using the given salt. If the request succeeds, the hash is stored into the
+     * result_buffer and a status code of 1 is returned. if the request fails, a 
+     * status code of 0 is returned. */
+int dbauth_get_hashed_password(char *user, char *md5Salt, int saltlen, char *result_buffer);
 #ifdef __cplusplus
 }
 #endif
