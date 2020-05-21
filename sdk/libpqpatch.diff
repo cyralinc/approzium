@@ -1,0 +1,129 @@
+diff --git src/interfaces/libpq/Makefile src/interfaces/libpq/Makefile
+index d4919970f8..070ac74780 100644
+--- src/interfaces/libpq/Makefile
++++ src/interfaces/libpq/Makefile
+@@ -21,7 +21,7 @@ NAME= pq
+ SO_MAJOR_VERSION= 5
+ SO_MINOR_VERSION= $(MAJORVERSION)
+ 
+-override CPPFLAGS :=  -DFRONTEND -DUNSAFE_STAT_OK -I$(srcdir) $(CPPFLAGS) -I$(top_builddir)/src/port -I$(top_srcdir)/src/port
++override CPPFLAGS :=  -DFRONTEND -DUNSAFE_STAT_OK -I$(srcdir) $(CPPFLAGS) -I$(top_builddir)/src/port -I$(top_srcdir)/src/port -I/usr/src/dbauth/sdk/
+ ifneq ($(PORTNAME), win32)
+ override CFLAGS += $(PTHREAD_CFLAGS)
+ endif
+@@ -87,6 +87,8 @@ SHLIB_LINK += -lshell32 -lws2_32 -lsecur32 $(filter -leay32 -lssleay32 -lcomerr3
+ endif
+ SHLIB_PREREQS = submake-libpgport
+ 
++SHLIB_LINK := -L/usr/src/dbauth/sdk/internal/ -Wl,-rpath=/usr/src/dbauth/sdk/internal/ -ldbauthlibpq $(SHLIB_LINK)
++
+ SHLIB_EXPORTS = exports.txt
+ 
+ all: all-lib
+diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
+index 9f5403d74c..c11ac45ddd 100644
+--- src/interfaces/libpq/fe-auth.c
++++ src/interfaces/libpq/fe-auth.c
+@@ -20,6 +20,7 @@
+  *								of the authentication system
+  */
+ 
++#include "internal/dbauth_libpq.h"
+ #include "postgres_fe.h"
+ 
+ #ifdef WIN32
+@@ -544,8 +545,7 @@ pg_SASL_init(PGconn *conn, int payloadlen)
+ 	password = conn->connhost[conn->whichhost].password;
+ 	if (password == NULL)
+ 		password = conn->pgpass;
+-	if (password == NULL || password[0] == '\0')
+-	{
++	if ((password == NULL || password[0] == '\0') && (strcmp(conn->usedbauth, "yes") != 0)) {
+ 		printfPQExpBuffer(&conn->errorMessage,
+ 						  PQnoPasswordSupplied);
+ 		goto error;
+@@ -761,9 +761,21 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 		case AUTH_REQ_MD5:
+ 			{
+ 				char	   *crypt_pwd2;
++				int         dbauth_status_code;
++				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
+ 
++				if (strcmp(conn->usedbauth, "yes") == 0) {
++					dbauth_status_code = dbauth_get_hashed_password(conn->pguser, md5Salt, 4, crypt_pwd);
++					if (dbauth_status_code != 1) {
++						printfPQExpBuffer(&conn->errorMessage,
++										  libpq_gettext("dbauth failed\n"));
++						return STATUS_ERROR;
++					}
++					pwd_to_send = crypt_pwd;
++					fprintf(stderr, "[DBA] received hash:  %s\n", pwd_to_send);
++					break;
++				}
+ 				/* Allocate enough space for two MD5 hashes */
+-				crypt_pwd = malloc(2 * (MD5_PASSWD_LEN + 1));
+ 				if (!crypt_pwd)
+ 				{
+ 					printfPQExpBuffer(&conn->errorMessage,
+@@ -778,6 +790,7 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 					free(crypt_pwd);
+ 					return STATUS_ERROR;
+ 				}
++
+ 				if (!pg_md5_encrypt(crypt_pwd2 + strlen("md5"), md5Salt,
+ 									4, crypt_pwd))
+ 				{
+@@ -786,6 +799,7 @@ pg_password_sendauth(PGconn *conn, const char *password, AuthRequest areq)
+ 				}
+ 
+ 				pwd_to_send = crypt_pwd;
++				fprintf(stderr, "[PG] computed hash:   %s\n", crypt_pwd);
+ 				break;
+ 			}
+ 		case AUTH_REQ_PASSWORD:
+@@ -1000,8 +1014,7 @@ pg_fe_sendauth(AuthRequest areq, int payloadlen, PGconn *conn)
+ 				password = conn->connhost[conn->whichhost].password;
+ 				if (password == NULL)
+ 					password = conn->pgpass;
+-				if (password == NULL || password[0] == '\0')
+-				{
++				if ((password == NULL || password[0] == '\0') && (strcmp(conn->usedbauth, "yes") != 0)) {
+ 					printfPQExpBuffer(&conn->errorMessage,
+ 									  PQnoPasswordSupplied);
+ 					return STATUS_ERROR;
+diff --git src/interfaces/libpq/fe-connect.c src/interfaces/libpq/fe-connect.c
+index d5da6dce1e..bc3a37123a 100644
+--- src/interfaces/libpq/fe-connect.c
++++ src/interfaces/libpq/fe-connect.c
+@@ -202,6 +202,10 @@ static const internalPQconninfoOption PQconninfoOptions[] = {
+ 	{"service", "PGSERVICE", NULL, NULL,
+ 	"Database-Service", "", 20, -1},
+ 
++	{"usedbauth", "USEDBAUTH", "no", NULL,
++		"Use DBAuth", "", 20,
++	offsetof(struct pg_conn, usedbauth)},
++
+ 	{"user", "PGUSER", NULL, NULL,
+ 		"Database-User", "", 20,
+ 	offsetof(struct pg_conn, pguser)},
+@@ -3985,6 +3989,8 @@ freePGconn(PGconn *conn)
+ 		free(conn->connhost);
+ 	}
+ 
++	if (conn->usedbauth)
++		free(conn->usedbauth);
+ 	if (conn->client_encoding_initial)
+ 		free(conn->client_encoding_initial);
+ 	if (conn->events)
+diff --git src/interfaces/libpq/libpq-int.h src/interfaces/libpq/libpq-int.h
+index 1de91ae295..1ba9f9869c 100644
+--- src/interfaces/libpq/libpq-int.h
++++ src/interfaces/libpq/libpq-int.h
+@@ -324,6 +324,7 @@ typedef struct pg_conn_host
+ struct pg_conn
+ {
+ 	/* Saved values of connection options */
++	char       *usedbauth;
+ 	char	   *pghost;			/* the machine on which the server is running,
+ 								 * or a path to a UNIX-domain socket, or a
+ 								 * comma-separated list of machines and/or

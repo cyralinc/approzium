@@ -1,0 +1,27 @@
+version: '3'
+services:
+    db:
+        image: postgres
+        environment:
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_USER=bob
+            - POSTGRES_DB=db
+    authenticator:
+        build: authenticator
+        image: dbauth_authenticator
+        volumes:
+            - .:/usr/src/dbauth
+        entrypoint: ./authenticator
+    goclient:
+        build: authenticator
+        image: dbauth_authenticator
+        volumes:
+            - .:/usr/src/dbauth
+        entrypoint: go run client.go
+        depends_on:
+            - authenticator
+    sdk:
+        build: sdk
+        image: dbauth_sdk
+        volumes:
+            - .:/usr/src/dbauth

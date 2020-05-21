@@ -1,6 +1,6 @@
-# authenticator proto generated c code
-authenticator/messages/authenticator.pb-c.c
-authenticator/messages/authenticator.pb-c.h
+# executables
+authenticator/authenticator
+main
 
 # Prerequisites
 *.d
@@ -53,6 +53,3 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-
-# Executables
-main

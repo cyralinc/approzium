@@ -8,11 +8,11 @@ service Authenticator {
 
 message Credentials {
         string user = 1;
-        bytes hashedPassword = 2;
+        string hashedPassword = 2;
 }
 
 message AuthenticateRequest {
-        string identity = 1;
+        string identity = 1; /* used as database username for now */
         bytes salt = 2;
 }
 

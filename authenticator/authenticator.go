@@ -3,14 +3,18 @@ package main
 import (
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io"
+	"time"
 
 	pb "dbauth/authenticator/messages"
+	log "github.com/sirupsen/logrus"
 )
 
 type Authenticator struct {
-	creds map[string]credentials
+	creds   map[string]credentials
+	counter int
 }
 
 type credentials struct {
@@ -24,14 +28,23 @@ func NewAuthenticator() *Authenticator {
 	}
 }
 
+func (a *Authenticator) run() {
+	for {
+		log.Printf("authenticator running. %d requests received\n", a.counter)
+		time.Sleep(2 * time.Second)
+	}
+}
+
 func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
+	a.counter++
 	identity := req.GetIdentity()
 	salt := req.GetSalt()
-	fmt.Printf("received request to return hashed credentials for identity %s given salt %s",
+	log.Printf("received request to return hashed credentials for identity %s given salt %s\n",
 		identity, salt)
 
 	if len(salt) == 0 {
 		msg := fmt.Errorf("salt not received")
+		log.Error(msg)
 		return &pb.AuthenticateResponse{
 			Status:  pb.AuthenticateResponse_ERROR,
 			Message: fmt.Sprintf("%s", msg),
@@ -40,6 +53,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 
 	creds, err := a.getCreds(identity)
 	if err != nil {
+		log.Error(err)
 		return &pb.AuthenticateResponse{
 			Status:  pb.AuthenticateResponse_ERROR,
 			Message: fmt.Sprintf("%s", err),
@@ -48,7 +62,7 @@ func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRe
 
 	hashedCreds := pb.Credentials{
 		User:           creds.user,
-		HashedPassword: computeMD5(creds.password, string(salt)),
+		HashedPassword: computePGMD5(identity, creds.password, salt),
 	}
 
 	return &pb.AuthenticateResponse{
@@ -62,6 +76,7 @@ func (a *Authenticator) getCreds(identity string) (credentials, error) {
 		return creds, nil
 	}
 	msg := fmt.Errorf("credentials not found for identity %s", identity)
+	log.Error(msg)
 	return credentials{}, msg
 }
 
@@ -71,12 +86,23 @@ func newCreds() map[string]credentials {
 		user:     "bob",
 		password: "password",
 	}
+	creds["bob"] = credentials{
+		user:     "bob",
+		password: "password",
+	}
 	return creds
 }
 
-func computeMD5(s, salt string) []byte {
+func computeMD5(s string, salt []byte) string {
 	hasher := md5.New()
 	io.WriteString(hasher, s)
-	io.WriteString(hasher, salt)
-	return hasher.Sum(nil)
+	hasher.Write(salt)
+	hashedBytes := hasher.Sum(nil)
+	return hex.EncodeToString(hashedBytes)
+}
+
+func computePGMD5(user, password string, salt []byte) string {
+	first_hash := computeMD5(password, []byte(user))
+	second_hash := computeMD5(first_hash, salt)
+	return "md5" + second_hash
 }
