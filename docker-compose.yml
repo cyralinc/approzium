@@ -11,13 +11,13 @@ services:
         image: dbauth_authenticator
         volumes:
             - .:/usr/src/dbauth
-        entrypoint: ./authenticator
+        command: ./authenticator
     goclient:
         build: authenticator
         image: dbauth_authenticator
         volumes:
             - .:/usr/src/dbauth
-        entrypoint: go run client.go
+        command: go run client.go
         depends_on:
             - authenticator
     sdk:
