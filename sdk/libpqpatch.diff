@@ -1,5 +1,5 @@
 diff --git src/interfaces/libpq/Makefile src/interfaces/libpq/Makefile
-index d4919970f8..070ac74780 100644
+index d4919970f8..3142a4aa29 100644
 --- src/interfaces/libpq/Makefile
 +++ src/interfaces/libpq/Makefile
 @@ -21,7 +21,7 @@ NAME= pq
@@ -15,20 +15,20 @@ index d4919970f8..070ac74780 100644
  endif
  SHLIB_PREREQS = submake-libpgport
  
-+SHLIB_LINK := -L/usr/src/dbauth/sdk/internal/ -Wl,-rpath=/usr/src/dbauth/sdk/internal/ -ldbauthlibpq $(SHLIB_LINK)
++SHLIB_LINK := -L/usr/src/dbauth/sdk/ -Wl,-rpath=/usr/src/dbauth/sdk/ -ldbauthlibpq $(SHLIB_LINK)
 +
  SHLIB_EXPORTS = exports.txt
  
  all: all-lib
 diff --git src/interfaces/libpq/fe-auth.c src/interfaces/libpq/fe-auth.c
-index 9f5403d74c..c11ac45ddd 100644
+index 9f5403d74c..7128443a78 100644
 --- src/interfaces/libpq/fe-auth.c
 +++ src/interfaces/libpq/fe-auth.c
 @@ -20,6 +20,7 @@
   *								of the authentication system
   */
  
-+#include "internal/dbauth_libpq.h"
++#include "dbauth_libpq.h"
  #include "postgres_fe.h"
  
  #ifdef WIN32
@@ -92,7 +92,7 @@ index 9f5403d74c..c11ac45ddd 100644
  									  PQnoPasswordSupplied);
  					return STATUS_ERROR;
 diff --git src/interfaces/libpq/fe-connect.c src/interfaces/libpq/fe-connect.c
-index d5da6dce1e..bc3a37123a 100644
+index ae4a32e45b..138c0b8d61 100644
 --- src/interfaces/libpq/fe-connect.c
 +++ src/interfaces/libpq/fe-connect.c
 @@ -202,6 +202,10 @@ static const internalPQconninfoOption PQconninfoOptions[] = {
