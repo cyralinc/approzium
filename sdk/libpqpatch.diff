@@ -15,7 +15,7 @@ index d4919970f8..3142a4aa29 100644
  endif
  SHLIB_PREREQS = submake-libpgport
  
-+SHLIB_LINK := -L/usr/src/dbauth/sdk/ -Wl,-rpath=/usr/src/dbauth/sdk/ -ldbauthlibpq $(SHLIB_LINK)
++SHLIB_LINK := -L/usr/src/dbauth/sdk/ -Wl,-rpath=/usr/src/dbauth/sdk/ -ldbauthclient $(SHLIB_LINK)
 +
  SHLIB_EXPORTS = exports.txt
  
@@ -28,7 +28,7 @@ index 9f5403d74c..7128443a78 100644
   *								of the authentication system
   */
  
-+#include "dbauth_libpq.h"
++#include "dbauth_client.h"
  #include "postgres_fe.h"
  
  #ifdef WIN32

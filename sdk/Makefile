@@ -1,6 +1,6 @@
 PGDIR = ~/postgresql
 
-all: libdbauthlibpq.so
+all: libdbauthclient.so
 
 CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc++`
@@ -8,7 +8,7 @@ CXXFLAGS += -std=c++11 -fPIC
 SHEESH = -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
 		   -lgrpc++_reflection -ldl
 
-libdbauthlibpq.so: authenticator.pb.o authenticator.grpc.pb.o dbauth_libpq.o
+libdbauthclient.so: authenticator.pb.o authenticator.grpc.pb.o dbauth_client.o
 	$(CXX) -shared -o $@ $^ $(SHEESH)
 
 deps:

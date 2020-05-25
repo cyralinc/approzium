@@ -1,5 +1,5 @@
 #include <iostream>
-#include "dbauth_libpq.h"
+#include "dbauth_client.h"
 #include <cstddef>
 #include <grpcpp/grpcpp.h>
 #include "authenticator.grpc.pb.h"
