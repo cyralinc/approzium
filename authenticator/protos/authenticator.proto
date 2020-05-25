@@ -1,27 +1,25 @@
 syntax = "proto3";
 
-package dbauth.authenticator.messages;
+package dbauth.authenticator.protos;
 
 service Authenticator {
-        rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+        rpc GetDBUser(DBUserRequest) returns (DBUserResponse) {}
+        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
 }
 
-message Credentials {
-        string user = 1;
-        string hashedPassword = 2;
+message DBUserRequest {
+        string identity = 1;
 }
 
-message AuthenticateRequest {
-        string identity = 1; /* used as database username for now */
+message DBHashRequest {
+        string identity = 1;
         bytes salt = 2;
 }
 
-message AuthenticateResponse {
-        enum Status {
-                ERROR = 0;
-                SUCCESS = 1;
-        }
-        Status status = 1;
-        string message = 2;
-        Credentials credentials = 3;
+message DBUserResponse {
+        string dbuser = 1;
+}
+
+message DBHashResponse {
+        string hash = 1;
 }

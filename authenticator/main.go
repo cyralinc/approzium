@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "dbauth/authenticator/messages"
+	pb "dbauth/authenticator/protos"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	pb "dbauth/authenticator/messages"
+	pb "dbauth/authenticator/protos"
 	"fmt"
 
 	"google.golang.org/grpc"
@@ -19,20 +19,36 @@ func main() {
 
 	client := pb.NewAuthenticatorClient(conn)
 	ctx := context.Background()
-	req := pb.AuthenticateRequest{
+	req := pb.DBUserRequest{
 		Identity: "diotim",
-		Salt:     []byte("swag"),
 	}
-	resp, err := client.Authenticate(ctx, &req)
+	resp, err := client.GetDBUser(ctx, &req)
 	if err != nil {
-		panic(fmt.Sprintf("failed to authenticate: %v", err))
+		panic(fmt.Sprintf("failed to execute GetDBUser: %v", err))
 	}
-	fmt.Printf("made grpc request\n")
+	fmt.Printf("made GetDBUser request\n")
 
-	creds := resp.GetCredentials()
-	if creds == nil {
-		panic("no credentials returned")
+	user := resp.GetDbuser()
+	if user == "" {
+		panic("no dbuser received")
 	}
 
-	fmt.Printf("\nuser: %s\thashedPassword: %s\n", creds.User, creds.HashedPassword)
+	fmt.Printf("\nuser: %s\n", resp.Dbuser)
+
+    req1 := pb.DBHashRequest{
+		Identity: "diotim",
+        Salt: []byte{0, 1, 0, 1},
+	}
+    resp1, err := client.GetDBHash(ctx, &req1)
+	if err != nil {
+		panic(fmt.Sprintf("failed to execute GetHashUser: %v", err))
+	}
+	fmt.Printf("made GetDBHash request\n")
+
+	hash := resp1.GetHash()
+	if hash == "" {
+		panic("no hash received")
+	}
+
+	fmt.Printf("hash: %s\n", hash)
 }

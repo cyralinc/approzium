@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"io"
 	"time"
+    "google.golang.org/grpc/codes"
+    "google.golang.org/grpc/status"
 
-	pb "dbauth/authenticator/messages"
+	pb "dbauth/authenticator/protos"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,40 +37,37 @@ func (a *Authenticator) run() {
 	}
 }
 
-func (a *Authenticator) Authenticate(ctx context.Context, req *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
+func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*pb.DBUserResponse, error) {
 	a.counter++
 	identity := req.GetIdentity()
-	salt := req.GetSalt()
-	log.Printf("received request to return hashed credentials for identity %s given salt %s\n",
-		identity, salt)
-
-	if len(salt) == 0 {
-		msg := fmt.Errorf("salt not received")
-		log.Error(msg)
-		return &pb.AuthenticateResponse{
-			Status:  pb.AuthenticateResponse_ERROR,
-			Message: fmt.Sprintf("%s", msg),
-		}, msg
-	}
+	log.Printf("received DBUserRequest for identity %s\n", identity)
 
 	creds, err := a.getCreds(identity)
 	if err != nil {
 		log.Error(err)
-		return &pb.AuthenticateResponse{
-			Status:  pb.AuthenticateResponse_ERROR,
-			Message: fmt.Sprintf("%s", err),
-		}, err
-	}
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+    }
+    return &pb.DBUserResponse{Dbuser: creds.user}, nil
+}
 
-	hashedCreds := pb.Credentials{
-		User:           creds.user,
-		HashedPassword: computePGMD5(identity, creds.password, salt),
-	}
+func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*pb.DBHashResponse, error) {
+	a.counter++
+	identity := req.GetIdentity()
+    salt := req.GetSalt()
+	log.Printf("received DBUserRequest for identity %s given salt %s\n", identity, salt)
 
-	return &pb.AuthenticateResponse{
-		Status:      pb.AuthenticateResponse_SUCCESS,
-		Credentials: &hashedCreds,
-	}, nil
+    if (len(salt) == 0) {
+		msg := "salt not received"
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+    }
+
+	creds, err := a.getCreds(identity)
+	if err != nil {
+		log.Error(err)
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+    }
+    return &pb.DBHashResponse{Hash: computePGMD5(identity, creds.password, salt)}, nil
 }
 
 func (a *Authenticator) getCreds(identity string) (credentials, error) {
@@ -83,10 +82,6 @@ func (a *Authenticator) getCreds(identity string) (credentials, error) {
 func newCreds() map[string]credentials {
 	creds := make(map[string]credentials)
 	creds["diotim"] = credentials{
-		user:     "bob",
-		password: "password",
-	}
-	creds["bob"] = credentials{
 		user:     "bob",
 		password: "password",
 	}
