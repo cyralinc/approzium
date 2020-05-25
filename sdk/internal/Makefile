@@ -1,4 +1,4 @@
-all: libdbauthlibpq.so main
+all: libdbauthlibpq.so
 
 CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc++`

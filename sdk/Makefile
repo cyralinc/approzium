@@ -13,7 +13,7 @@ CFLAGS = -g -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-variable $(IFLAGS)
 LDFLAGS = -L $(PGDIR)/src/port/ -L $(PGDIR)/src/interfaces/libpq/
 LDLIBS = -lpgport -lpq
 
-EXECUTABLES = main
+EXECUTABLES =
 
 all: $(EXECUTABLES)
 
@@ -22,9 +22,6 @@ clean:
 
 %.o:%.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c $<
-
-main: main.o
-	$(CC) -o main main.o $(LDFLAGS) $(LDLIBS)
 
 gen-libpqpatch:
 	# following has to be done to ensure new files are included in patch
