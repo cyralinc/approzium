@@ -25,43 +25,62 @@ class ServerContext;
 
 namespace dbauth {
 namespace authenticator {
-namespace messages {
+namespace protos {
 
 class Authenticator final {
  public:
   static constexpr char const* service_full_name() {
-    return "dbauth.authenticator.messages.Authenticator";
+    return "dbauth.authenticator.protos.Authenticator";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status Authenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::dbauth::authenticator::messages::AuthenticateResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>> AsyncAuthenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>>(AsyncAuthenticateRaw(context, request, cq));
+    virtual ::grpc::Status GetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::dbauth::authenticator::protos::DBUserResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>> AsyncGetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>>(AsyncGetDBUserRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>> PrepareAsyncAuthenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>>(PrepareAsyncAuthenticateRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>> PrepareAsyncGetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>>(PrepareAsyncGetDBUserRaw(context, request, cq));
+    }
+    virtual ::grpc::Status GetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::dbauth::authenticator::protos::DBHashResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>> AsyncGetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>>(AsyncGetDBHashRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>> PrepareAsyncGetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>>(PrepareAsyncGetDBHashRaw(context, request, cq));
     }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>* AsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::messages::AuthenticateResponse>* PrepareAsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>* AsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBUserResponse>* PrepareAsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>* AsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::dbauth::authenticator::protos::DBHashResponse>* PrepareAsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
-    ::grpc::Status Authenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::dbauth::authenticator::messages::AuthenticateResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>> AsyncAuthenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>>(AsyncAuthenticateRaw(context, request, cq));
+    ::grpc::Status GetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::dbauth::authenticator::protos::DBUserResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>> AsyncGetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>>(AsyncGetDBUserRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>> PrepareAsyncAuthenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>>(PrepareAsyncAuthenticateRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>> PrepareAsyncGetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>>(PrepareAsyncGetDBUserRaw(context, request, cq));
+    }
+    ::grpc::Status GetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::dbauth::authenticator::protos::DBHashResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>> AsyncGetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>>(AsyncGetDBHashRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>> PrepareAsyncGetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>>(PrepareAsyncGetDBHashRaw(context, request, cq));
     }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
-    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>* AsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>* PrepareAsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_Authenticate_;
+    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>* AsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>* PrepareAsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>* AsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>* PrepareAsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_GetDBUser_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetDBHash_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -69,72 +88,130 @@ class Authenticator final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status Authenticate(::grpc::ServerContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest* request, ::dbauth::authenticator::messages::AuthenticateResponse* response);
+    virtual ::grpc::Status GetDBUser(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBUserRequest* request, ::dbauth::authenticator::protos::DBUserResponse* response);
+    virtual ::grpc::Status GetDBHash(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBHashRequest* request, ::dbauth::authenticator::protos::DBHashResponse* response);
   };
   template <class BaseClass>
-  class WithAsyncMethod_Authenticate : public BaseClass {
+  class WithAsyncMethod_GetDBUser : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_Authenticate() {
+    WithAsyncMethod_GetDBUser() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_Authenticate() override {
+    ~WithAsyncMethod_GetDBUser() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Authenticate(::grpc::ServerContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest* request, ::dbauth::authenticator::messages::AuthenticateResponse* response) final override {
+    ::grpc::Status GetDBUser(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBUserRequest* request, ::dbauth::authenticator::protos::DBUserResponse* response) final override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestAuthenticate(::grpc::ServerContext* context, ::dbauth::authenticator::messages::AuthenticateRequest* request, ::grpc::ServerAsyncResponseWriter< ::dbauth::authenticator::messages::AuthenticateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestGetDBUser(::grpc::ServerContext* context, ::dbauth::authenticator::protos::DBUserRequest* request, ::grpc::ServerAsyncResponseWriter< ::dbauth::authenticator::protos::DBUserResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Authenticate<Service > AsyncService;
   template <class BaseClass>
-  class WithGenericMethod_Authenticate : public BaseClass {
+  class WithAsyncMethod_GetDBHash : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_Authenticate() {
-      ::grpc::Service::MarkMethodGeneric(0);
+    WithAsyncMethod_GetDBHash() {
+      ::grpc::Service::MarkMethodAsync(1);
     }
-    ~WithGenericMethod_Authenticate() override {
+    ~WithAsyncMethod_GetDBHash() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Authenticate(::grpc::ServerContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest* request, ::dbauth::authenticator::messages::AuthenticateResponse* response) final override {
+    ::grpc::Status GetDBHash(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBHashRequest* request, ::dbauth::authenticator::protos::DBHashResponse* response) final override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetDBHash(::grpc::ServerContext* context, ::dbauth::authenticator::protos::DBHashRequest* request, ::grpc::ServerAsyncResponseWriter< ::dbauth::authenticator::protos::DBHashResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_GetDBUser<WithAsyncMethod_GetDBHash<Service > > AsyncService;
+  template <class BaseClass>
+  class WithGenericMethod_GetDBUser : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetDBUser() {
+      ::grpc::Service::MarkMethodGeneric(0);
+    }
+    ~WithGenericMethod_GetDBUser() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDBUser(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBUserRequest* request, ::dbauth::authenticator::protos::DBUserResponse* response) final override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_Authenticate : public BaseClass {
+  class WithGenericMethod_GetDBHash : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithStreamedUnaryMethod_Authenticate() {
-      ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::dbauth::authenticator::messages::AuthenticateRequest, ::dbauth::authenticator::messages::AuthenticateResponse>(std::bind(&WithStreamedUnaryMethod_Authenticate<BaseClass>::StreamedAuthenticate, this, std::placeholders::_1, std::placeholders::_2)));
+    WithGenericMethod_GetDBHash() {
+      ::grpc::Service::MarkMethodGeneric(1);
     }
-    ~WithStreamedUnaryMethod_Authenticate() override {
+    ~WithGenericMethod_GetDBHash() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDBHash(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBHashRequest* request, ::dbauth::authenticator::protos::DBHashResponse* response) final override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetDBUser : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetDBUser() {
+      ::grpc::Service::MarkMethodStreamed(0,
+        new ::grpc::internal::StreamedUnaryHandler< ::dbauth::authenticator::protos::DBUserRequest, ::dbauth::authenticator::protos::DBUserResponse>(std::bind(&WithStreamedUnaryMethod_GetDBUser<BaseClass>::StreamedGetDBUser, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetDBUser() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Authenticate(::grpc::ServerContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest* request, ::dbauth::authenticator::messages::AuthenticateResponse* response) final override {
+    ::grpc::Status GetDBUser(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBUserRequest* request, ::dbauth::authenticator::protos::DBUserResponse* response) final override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedAuthenticate(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::dbauth::authenticator::messages::AuthenticateRequest,::dbauth::authenticator::messages::AuthenticateResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedGetDBUser(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::dbauth::authenticator::protos::DBUserRequest,::dbauth::authenticator::protos::DBUserResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Authenticate<Service > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetDBHash : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetDBHash() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler< ::dbauth::authenticator::protos::DBHashRequest, ::dbauth::authenticator::protos::DBHashResponse>(std::bind(&WithStreamedUnaryMethod_GetDBHash<BaseClass>::StreamedGetDBHash, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetDBHash() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetDBHash(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBHashRequest* request, ::dbauth::authenticator::protos::DBHashResponse* response) final override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetDBHash(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::dbauth::authenticator::protos::DBHashRequest,::dbauth::authenticator::protos::DBHashResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_GetDBUser<WithStreamedUnaryMethod_GetDBHash<Service > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Authenticate<Service > StreamedService;
+  typedef WithStreamedUnaryMethod_GetDBUser<WithStreamedUnaryMethod_GetDBHash<Service > > StreamedService;
 };
 
-}  // namespace messages
+}  // namespace protos
 }  // namespace authenticator
 }  // namespace dbauth
 

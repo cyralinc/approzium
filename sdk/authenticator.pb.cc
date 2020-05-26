@@ -21,27 +21,32 @@
 // @@protoc_insertion_point(includes)
 namespace dbauth {
 namespace authenticator {
-namespace messages {
-class CredentialsDefaultTypeInternal {
+namespace protos {
+class DBUserRequestDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Credentials>
+  ::google::protobuf::internal::ExplicitlyConstructed<DBUserRequest>
       _instance;
-} _Credentials_default_instance_;
-class AuthenticateRequestDefaultTypeInternal {
+} _DBUserRequest_default_instance_;
+class DBHashRequestDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AuthenticateRequest>
+  ::google::protobuf::internal::ExplicitlyConstructed<DBHashRequest>
       _instance;
-} _AuthenticateRequest_default_instance_;
-class AuthenticateResponseDefaultTypeInternal {
+} _DBHashRequest_default_instance_;
+class DBUserResponseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<AuthenticateResponse>
+  ::google::protobuf::internal::ExplicitlyConstructed<DBUserResponse>
       _instance;
-} _AuthenticateResponse_default_instance_;
-}  // namespace messages
+} _DBUserResponse_default_instance_;
+class DBHashResponseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<DBHashResponse>
+      _instance;
+} _DBHashResponse_default_instance_;
+}  // namespace protos
 }  // namespace authenticator
 }  // namespace dbauth
 namespace protobuf_authenticator_2eproto {
-void InitDefaultsCredentialsImpl() {
+void InitDefaultsDBUserRequestImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 #ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
@@ -50,19 +55,19 @@ void InitDefaultsCredentialsImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
-    void* ptr = &::dbauth::authenticator::messages::_Credentials_default_instance_;
-    new (ptr) ::dbauth::authenticator::messages::Credentials();
+    void* ptr = &::dbauth::authenticator::protos::_DBUserRequest_default_instance_;
+    new (ptr) ::dbauth::authenticator::protos::DBUserRequest();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::dbauth::authenticator::messages::Credentials::InitAsDefaultInstance();
+  ::dbauth::authenticator::protos::DBUserRequest::InitAsDefaultInstance();
 }
 
-void InitDefaultsCredentials() {
+void InitDefaultsDBUserRequest() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsCredentialsImpl);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsDBUserRequestImpl);
 }
 
-void InitDefaultsAuthenticateRequestImpl() {
+void InitDefaultsDBHashRequestImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 #ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
@@ -71,19 +76,19 @@ void InitDefaultsAuthenticateRequestImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
-    void* ptr = &::dbauth::authenticator::messages::_AuthenticateRequest_default_instance_;
-    new (ptr) ::dbauth::authenticator::messages::AuthenticateRequest();
+    void* ptr = &::dbauth::authenticator::protos::_DBHashRequest_default_instance_;
+    new (ptr) ::dbauth::authenticator::protos::DBHashRequest();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::dbauth::authenticator::messages::AuthenticateRequest::InitAsDefaultInstance();
+  ::dbauth::authenticator::protos::DBHashRequest::InitAsDefaultInstance();
 }
 
-void InitDefaultsAuthenticateRequest() {
+void InitDefaultsDBHashRequest() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAuthenticateRequestImpl);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsDBHashRequestImpl);
 }
 
-void InitDefaultsAuthenticateResponseImpl() {
+void InitDefaultsDBUserResponseImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 #ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
@@ -91,57 +96,81 @@ void InitDefaultsAuthenticateResponseImpl() {
 #else
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_authenticator_2eproto::InitDefaultsCredentials();
   {
-    void* ptr = &::dbauth::authenticator::messages::_AuthenticateResponse_default_instance_;
-    new (ptr) ::dbauth::authenticator::messages::AuthenticateResponse();
+    void* ptr = &::dbauth::authenticator::protos::_DBUserResponse_default_instance_;
+    new (ptr) ::dbauth::authenticator::protos::DBUserResponse();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::dbauth::authenticator::messages::AuthenticateResponse::InitAsDefaultInstance();
+  ::dbauth::authenticator::protos::DBUserResponse::InitAsDefaultInstance();
 }
 
-void InitDefaultsAuthenticateResponse() {
+void InitDefaultsDBUserResponse() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAuthenticateResponseImpl);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsDBUserResponseImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[3];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[1];
+void InitDefaultsDBHashResponseImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  {
+    void* ptr = &::dbauth::authenticator::protos::_DBHashResponse_default_instance_;
+    new (ptr) ::dbauth::authenticator::protos::DBHashResponse();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::dbauth::authenticator::protos::DBHashResponse::InitAsDefaultInstance();
+}
+
+void InitDefaultsDBHashResponse() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsDBHashResponseImpl);
+}
+
+::google::protobuf::Metadata file_level_metadata[4];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::Credentials, _internal_metadata_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBUserRequest, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::Credentials, user_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::Credentials, hashedpassword_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBUserRequest, identity_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateRequest, _internal_metadata_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBHashRequest, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateRequest, identity_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateRequest, salt_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBHashRequest, identity_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBHashRequest, salt_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateResponse, _internal_metadata_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBUserResponse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateResponse, status_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateResponse, message_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::messages::AuthenticateResponse, credentials_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBUserResponse, dbuser_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBHashResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dbauth::authenticator::protos::DBHashResponse, hash_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::dbauth::authenticator::messages::Credentials)},
-  { 7, -1, sizeof(::dbauth::authenticator::messages::AuthenticateRequest)},
-  { 14, -1, sizeof(::dbauth::authenticator::messages::AuthenticateResponse)},
+  { 0, -1, sizeof(::dbauth::authenticator::protos::DBUserRequest)},
+  { 6, -1, sizeof(::dbauth::authenticator::protos::DBHashRequest)},
+  { 13, -1, sizeof(::dbauth::authenticator::protos::DBUserResponse)},
+  { 19, -1, sizeof(::dbauth::authenticator::protos::DBHashResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::messages::_Credentials_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::messages::_AuthenticateRequest_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::messages::_AuthenticateResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::protos::_DBUserRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::protos::_DBHashRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::protos::_DBUserResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::dbauth::authenticator::protos::_DBHashResponse_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -149,7 +178,7 @@ void protobuf_AssignDescriptors() {
   ::google::protobuf::MessageFactory* factory = NULL;
   AssignDescriptors(
       "authenticator.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, file_level_enum_descriptors, NULL);
+      file_level_metadata, NULL, NULL);
 }
 
 void protobuf_AssignDescriptorsOnce() {
@@ -160,29 +189,26 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 3);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 4);
 }
 
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\023authenticator.proto\022\035dbauth.authentica"
-      "tor.messages\"3\n\013Credentials\022\014\n\004user\030\001 \001("
-      "\t\022\026\n\016hashedPassword\030\002 \001(\t\"5\n\023Authenticat"
-      "eRequest\022\020\n\010identity\030\001 \001(\t\022\014\n\004salt\030\002 \001(\014"
-      "\"\326\001\n\024AuthenticateResponse\022J\n\006status\030\001 \001("
-      "\0162:.dbauth.authenticator.messages.Authen"
-      "ticateResponse.Status\022\017\n\007message\030\002 \001(\t\022\?"
-      "\n\013credentials\030\003 \001(\0132*.dbauth.authenticat"
-      "or.messages.Credentials\" \n\006Status\022\t\n\005ERR"
-      "OR\020\000\022\013\n\007SUCCESS\020\0012\212\001\n\rAuthenticator\022y\n\014A"
-      "uthenticate\0222.dbauth.authenticator.messa"
-      "ges.AuthenticateRequest\0323.dbauth.authent"
-      "icator.messages.AuthenticateResponse\"\000b\006"
-      "proto3"
+      "\n\023authenticator.proto\022\033dbauth.authentica"
+      "tor.protos\"!\n\rDBUserRequest\022\020\n\010identity\030"
+      "\001 \001(\t\"/\n\rDBHashRequest\022\020\n\010identity\030\001 \001(\t"
+      "\022\014\n\004salt\030\002 \001(\014\" \n\016DBUserResponse\022\016\n\006dbus"
+      "er\030\001 \001(\t\"\036\n\016DBHashResponse\022\014\n\004hash\030\001 \001(\t"
+      "2\337\001\n\rAuthenticator\022f\n\tGetDBUser\022*.dbauth"
+      ".authenticator.protos.DBUserRequest\032+.db"
+      "auth.authenticator.protos.DBUserResponse"
+      "\"\000\022f\n\tGetDBHash\022*.dbauth.authenticator.p"
+      "rotos.DBHashRequest\032+.dbauth.authenticat"
+      "or.protos.DBHashResponse\"\000b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 526);
+      descriptor, 434);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "authenticator.proto", &protobuf_RegisterTypes);
 }
@@ -200,148 +226,103 @@ struct StaticDescriptorInitializer {
 }  // namespace protobuf_authenticator_2eproto
 namespace dbauth {
 namespace authenticator {
-namespace messages {
-const ::google::protobuf::EnumDescriptor* AuthenticateResponse_Status_descriptor() {
-  protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_authenticator_2eproto::file_level_enum_descriptors[0];
-}
-bool AuthenticateResponse_Status_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-      return true;
-    default:
-      return false;
-  }
-}
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const AuthenticateResponse_Status AuthenticateResponse::ERROR;
-const AuthenticateResponse_Status AuthenticateResponse::SUCCESS;
-const AuthenticateResponse_Status AuthenticateResponse::Status_MIN;
-const AuthenticateResponse_Status AuthenticateResponse::Status_MAX;
-const int AuthenticateResponse::Status_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+namespace protos {
 
 // ===================================================================
 
-void Credentials::InitAsDefaultInstance() {
+void DBUserRequest::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Credentials::kUserFieldNumber;
-const int Credentials::kHashedPasswordFieldNumber;
+const int DBUserRequest::kIdentityFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-Credentials::Credentials()
+DBUserRequest::DBUserRequest()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_authenticator_2eproto::InitDefaultsCredentials();
+    ::protobuf_authenticator_2eproto::InitDefaultsDBUserRequest();
   }
   SharedCtor();
-  // @@protoc_insertion_point(constructor:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(constructor:dbauth.authenticator.protos.DBUserRequest)
 }
-Credentials::Credentials(const Credentials& from)
+DBUserRequest::DBUserRequest(const DBUserRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  user_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.user().size() > 0) {
-    user_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.user_);
+  identity_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.identity().size() > 0) {
+    identity_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.identity_);
   }
-  hashedpassword_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.hashedpassword().size() > 0) {
-    hashedpassword_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hashedpassword_);
-  }
-  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.protos.DBUserRequest)
 }
 
-void Credentials::SharedCtor() {
-  user_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  hashedpassword_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void DBUserRequest::SharedCtor() {
+  identity_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _cached_size_ = 0;
 }
 
-Credentials::~Credentials() {
-  // @@protoc_insertion_point(destructor:dbauth.authenticator.messages.Credentials)
+DBUserRequest::~DBUserRequest() {
+  // @@protoc_insertion_point(destructor:dbauth.authenticator.protos.DBUserRequest)
   SharedDtor();
 }
 
-void Credentials::SharedDtor() {
-  user_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  hashedpassword_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void DBUserRequest::SharedDtor() {
+  identity_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void Credentials::SetCachedSize(int size) const {
+void DBUserRequest::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* Credentials::descriptor() {
+const ::google::protobuf::Descriptor* DBUserRequest::descriptor() {
   ::protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
-const Credentials& Credentials::default_instance() {
-  ::protobuf_authenticator_2eproto::InitDefaultsCredentials();
+const DBUserRequest& DBUserRequest::default_instance() {
+  ::protobuf_authenticator_2eproto::InitDefaultsDBUserRequest();
   return *internal_default_instance();
 }
 
-Credentials* Credentials::New(::google::protobuf::Arena* arena) const {
-  Credentials* n = new Credentials;
+DBUserRequest* DBUserRequest::New(::google::protobuf::Arena* arena) const {
+  DBUserRequest* n = new DBUserRequest;
   if (arena != NULL) {
     arena->Own(n);
   }
   return n;
 }
 
-void Credentials::Clear() {
-// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.messages.Credentials)
+void DBUserRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.protos.DBUserRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  user_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  hashedpassword_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  identity_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
-bool Credentials::MergePartialFromCodedStream(
+bool DBUserRequest::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(parse_start:dbauth.authenticator.protos.DBUserRequest)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string user = 1;
+      // string identity = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_user()));
+                input, this->mutable_identity()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->user().data(), static_cast<int>(this->user().length()),
+            this->identity().data(), static_cast<int>(this->identity().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.Credentials.user"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string hashedPassword = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_hashedpassword()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.Credentials.hashedPassword"));
+            "dbauth.authenticator.protos.DBUserRequest.identity"));
         } else {
           goto handle_unusual;
         }
@@ -360,86 +341,65 @@ bool Credentials::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(parse_success:dbauth.authenticator.protos.DBUserRequest)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.protos.DBUserRequest)
   return false;
 #undef DO_
 }
 
-void Credentials::SerializeWithCachedSizes(
+void DBUserRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.protos.DBUserRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string user = 1;
-  if (this->user().size() > 0) {
+  // string identity = 1;
+  if (this->identity().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->user().data(), static_cast<int>(this->user().length()),
+      this->identity().data(), static_cast<int>(this->identity().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.user");
+      "dbauth.authenticator.protos.DBUserRequest.identity");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->user(), output);
-  }
-
-  // string hashedPassword = 2;
-  if (this->hashedpassword().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.hashedPassword");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->hashedpassword(), output);
+      1, this->identity(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
   }
-  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.protos.DBUserRequest)
 }
 
-::google::protobuf::uint8* Credentials::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* DBUserRequest::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.protos.DBUserRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string user = 1;
-  if (this->user().size() > 0) {
+  // string identity = 1;
+  if (this->identity().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->user().data(), static_cast<int>(this->user().length()),
+      this->identity().data(), static_cast<int>(this->identity().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.user");
+      "dbauth.authenticator.protos.DBUserRequest.identity");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->user(), target);
-  }
-
-  // string hashedPassword = 2;
-  if (this->hashedpassword().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->hashedpassword().data(), static_cast<int>(this->hashedpassword().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.Credentials.hashedPassword");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->hashedpassword(), target);
+        1, this->identity(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.protos.DBUserRequest)
   return target;
 }
 
-size_t Credentials::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.messages.Credentials)
+size_t DBUserRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.protos.DBUserRequest)
   size_t total_size = 0;
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -447,18 +407,11 @@ size_t Credentials::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string user = 1;
-  if (this->user().size() > 0) {
+  // string identity = 1;
+  if (this->identity().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->user());
-  }
-
-  // string hashedPassword = 2;
-  if (this->hashedpassword().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->hashedpassword());
+        this->identity());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -468,69 +421,64 @@ size_t Credentials::ByteSizeLong() const {
   return total_size;
 }
 
-void Credentials::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.messages.Credentials)
+void DBUserRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.protos.DBUserRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  const Credentials* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Credentials>(
+  const DBUserRequest* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const DBUserRequest>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.protos.DBUserRequest)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.messages.Credentials)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.protos.DBUserRequest)
     MergeFrom(*source);
   }
 }
 
-void Credentials::MergeFrom(const Credentials& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.messages.Credentials)
+void DBUserRequest::MergeFrom(const DBUserRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.protos.DBUserRequest)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.user().size() > 0) {
+  if (from.identity().size() > 0) {
 
-    user_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.user_);
-  }
-  if (from.hashedpassword().size() > 0) {
-
-    hashedpassword_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hashedpassword_);
+    identity_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.identity_);
   }
 }
 
-void Credentials::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.messages.Credentials)
+void DBUserRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.protos.DBUserRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Credentials::CopyFrom(const Credentials& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.messages.Credentials)
+void DBUserRequest::CopyFrom(const DBUserRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.protos.DBUserRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Credentials::IsInitialized() const {
+bool DBUserRequest::IsInitialized() const {
   return true;
 }
 
-void Credentials::Swap(Credentials* other) {
+void DBUserRequest::Swap(DBUserRequest* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void Credentials::InternalSwap(Credentials* other) {
+void DBUserRequest::InternalSwap(DBUserRequest* other) {
   using std::swap;
-  user_.Swap(&other->user_);
-  hashedpassword_.Swap(&other->hashedpassword_);
+  identity_.Swap(&other->identity_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
 
-::google::protobuf::Metadata Credentials::GetMetadata() const {
+::google::protobuf::Metadata DBUserRequest::GetMetadata() const {
   protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -538,22 +486,22 @@ void Credentials::InternalSwap(Credentials* other) {
 
 // ===================================================================
 
-void AuthenticateRequest::InitAsDefaultInstance() {
+void DBHashRequest::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AuthenticateRequest::kIdentityFieldNumber;
-const int AuthenticateRequest::kSaltFieldNumber;
+const int DBHashRequest::kIdentityFieldNumber;
+const int DBHashRequest::kSaltFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-AuthenticateRequest::AuthenticateRequest()
+DBHashRequest::DBHashRequest()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_authenticator_2eproto::InitDefaultsAuthenticateRequest();
+    ::protobuf_authenticator_2eproto::InitDefaultsDBHashRequest();
   }
   SharedCtor();
-  // @@protoc_insertion_point(constructor:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(constructor:dbauth.authenticator.protos.DBHashRequest)
 }
-AuthenticateRequest::AuthenticateRequest(const AuthenticateRequest& from)
+DBHashRequest::DBHashRequest(const DBHashRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _cached_size_(0) {
@@ -566,50 +514,50 @@ AuthenticateRequest::AuthenticateRequest(const AuthenticateRequest& from)
   if (from.salt().size() > 0) {
     salt_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.salt_);
   }
-  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.protos.DBHashRequest)
 }
 
-void AuthenticateRequest::SharedCtor() {
+void DBHashRequest::SharedCtor() {
   identity_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   salt_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _cached_size_ = 0;
 }
 
-AuthenticateRequest::~AuthenticateRequest() {
-  // @@protoc_insertion_point(destructor:dbauth.authenticator.messages.AuthenticateRequest)
+DBHashRequest::~DBHashRequest() {
+  // @@protoc_insertion_point(destructor:dbauth.authenticator.protos.DBHashRequest)
   SharedDtor();
 }
 
-void AuthenticateRequest::SharedDtor() {
+void DBHashRequest::SharedDtor() {
   identity_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   salt_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void AuthenticateRequest::SetCachedSize(int size) const {
+void DBHashRequest::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* AuthenticateRequest::descriptor() {
+const ::google::protobuf::Descriptor* DBHashRequest::descriptor() {
   ::protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
-const AuthenticateRequest& AuthenticateRequest::default_instance() {
-  ::protobuf_authenticator_2eproto::InitDefaultsAuthenticateRequest();
+const DBHashRequest& DBHashRequest::default_instance() {
+  ::protobuf_authenticator_2eproto::InitDefaultsDBHashRequest();
   return *internal_default_instance();
 }
 
-AuthenticateRequest* AuthenticateRequest::New(::google::protobuf::Arena* arena) const {
-  AuthenticateRequest* n = new AuthenticateRequest;
+DBHashRequest* DBHashRequest::New(::google::protobuf::Arena* arena) const {
+  DBHashRequest* n = new DBHashRequest;
   if (arena != NULL) {
     arena->Own(n);
   }
   return n;
 }
 
-void AuthenticateRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.messages.AuthenticateRequest)
+void DBHashRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.protos.DBHashRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -619,11 +567,11 @@ void AuthenticateRequest::Clear() {
   _internal_metadata_.Clear();
 }
 
-bool AuthenticateRequest::MergePartialFromCodedStream(
+bool DBHashRequest::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(parse_start:dbauth.authenticator.protos.DBHashRequest)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -638,7 +586,7 @@ bool AuthenticateRequest::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->identity().data(), static_cast<int>(this->identity().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.AuthenticateRequest.identity"));
+            "dbauth.authenticator.protos.DBHashRequest.identity"));
         } else {
           goto handle_unusual;
         }
@@ -669,17 +617,17 @@ bool AuthenticateRequest::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(parse_success:dbauth.authenticator.protos.DBHashRequest)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.protos.DBHashRequest)
   return false;
 #undef DO_
 }
 
-void AuthenticateRequest::SerializeWithCachedSizes(
+void DBHashRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.protos.DBHashRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -688,7 +636,7 @@ void AuthenticateRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->identity().data(), static_cast<int>(this->identity().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateRequest.identity");
+      "dbauth.authenticator.protos.DBHashRequest.identity");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->identity(), output);
   }
@@ -703,13 +651,13 @@ void AuthenticateRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
   }
-  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.protos.DBHashRequest)
 }
 
-::google::protobuf::uint8* AuthenticateRequest::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* DBHashRequest::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.protos.DBHashRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -718,7 +666,7 @@ void AuthenticateRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->identity().data(), static_cast<int>(this->identity().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateRequest.identity");
+      "dbauth.authenticator.protos.DBHashRequest.identity");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->identity(), target);
@@ -735,12 +683,12 @@ void AuthenticateRequest::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.protos.DBHashRequest)
   return target;
 }
 
-size_t AuthenticateRequest::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.messages.AuthenticateRequest)
+size_t DBHashRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.protos.DBHashRequest)
   size_t total_size = 0;
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -769,23 +717,23 @@ size_t AuthenticateRequest::ByteSizeLong() const {
   return total_size;
 }
 
-void AuthenticateRequest::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.messages.AuthenticateRequest)
+void DBHashRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.protos.DBHashRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  const AuthenticateRequest* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const AuthenticateRequest>(
+  const DBHashRequest* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const DBHashRequest>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.protos.DBHashRequest)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.messages.AuthenticateRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.protos.DBHashRequest)
     MergeFrom(*source);
   }
 }
 
-void AuthenticateRequest::MergeFrom(const AuthenticateRequest& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.messages.AuthenticateRequest)
+void DBHashRequest::MergeFrom(const DBHashRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.protos.DBHashRequest)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -801,29 +749,29 @@ void AuthenticateRequest::MergeFrom(const AuthenticateRequest& from) {
   }
 }
 
-void AuthenticateRequest::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.messages.AuthenticateRequest)
+void DBHashRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.protos.DBHashRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void AuthenticateRequest::CopyFrom(const AuthenticateRequest& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.messages.AuthenticateRequest)
+void DBHashRequest::CopyFrom(const DBHashRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.protos.DBHashRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool AuthenticateRequest::IsInitialized() const {
+bool DBHashRequest::IsInitialized() const {
   return true;
 }
 
-void AuthenticateRequest::Swap(AuthenticateRequest* other) {
+void DBHashRequest::Swap(DBHashRequest* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void AuthenticateRequest::InternalSwap(AuthenticateRequest* other) {
+void DBHashRequest::InternalSwap(DBHashRequest* other) {
   using std::swap;
   identity_.Swap(&other->identity_);
   salt_.Swap(&other->salt_);
@@ -831,7 +779,7 @@ void AuthenticateRequest::InternalSwap(AuthenticateRequest* other) {
   swap(_cached_size_, other->_cached_size_);
 }
 
-::google::protobuf::Metadata AuthenticateRequest::GetMetadata() const {
+::google::protobuf::Metadata DBHashRequest::GetMetadata() const {
   protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -839,145 +787,99 @@ void AuthenticateRequest::InternalSwap(AuthenticateRequest* other) {
 
 // ===================================================================
 
-void AuthenticateResponse::InitAsDefaultInstance() {
-  ::dbauth::authenticator::messages::_AuthenticateResponse_default_instance_._instance.get_mutable()->credentials_ = const_cast< ::dbauth::authenticator::messages::Credentials*>(
-      ::dbauth::authenticator::messages::Credentials::internal_default_instance());
+void DBUserResponse::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int AuthenticateResponse::kStatusFieldNumber;
-const int AuthenticateResponse::kMessageFieldNumber;
-const int AuthenticateResponse::kCredentialsFieldNumber;
+const int DBUserResponse::kDbuserFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-AuthenticateResponse::AuthenticateResponse()
+DBUserResponse::DBUserResponse()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
   if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_authenticator_2eproto::InitDefaultsAuthenticateResponse();
+    ::protobuf_authenticator_2eproto::InitDefaultsDBUserResponse();
   }
   SharedCtor();
-  // @@protoc_insertion_point(constructor:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(constructor:dbauth.authenticator.protos.DBUserResponse)
 }
-AuthenticateResponse::AuthenticateResponse(const AuthenticateResponse& from)
+DBUserResponse::DBUserResponse(const DBUserResponse& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.message().size() > 0) {
-    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
+  dbuser_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.dbuser().size() > 0) {
+    dbuser_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.dbuser_);
   }
-  if (from.has_credentials()) {
-    credentials_ = new ::dbauth::authenticator::messages::Credentials(*from.credentials_);
-  } else {
-    credentials_ = NULL;
-  }
-  status_ = from.status_;
-  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.protos.DBUserResponse)
 }
 
-void AuthenticateResponse::SharedCtor() {
-  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&credentials_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&status_) -
-      reinterpret_cast<char*>(&credentials_)) + sizeof(status_));
+void DBUserResponse::SharedCtor() {
+  dbuser_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _cached_size_ = 0;
 }
 
-AuthenticateResponse::~AuthenticateResponse() {
-  // @@protoc_insertion_point(destructor:dbauth.authenticator.messages.AuthenticateResponse)
+DBUserResponse::~DBUserResponse() {
+  // @@protoc_insertion_point(destructor:dbauth.authenticator.protos.DBUserResponse)
   SharedDtor();
 }
 
-void AuthenticateResponse::SharedDtor() {
-  message_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete credentials_;
+void DBUserResponse::SharedDtor() {
+  dbuser_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void AuthenticateResponse::SetCachedSize(int size) const {
+void DBUserResponse::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* AuthenticateResponse::descriptor() {
+const ::google::protobuf::Descriptor* DBUserResponse::descriptor() {
   ::protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
 }
 
-const AuthenticateResponse& AuthenticateResponse::default_instance() {
-  ::protobuf_authenticator_2eproto::InitDefaultsAuthenticateResponse();
+const DBUserResponse& DBUserResponse::default_instance() {
+  ::protobuf_authenticator_2eproto::InitDefaultsDBUserResponse();
   return *internal_default_instance();
 }
 
-AuthenticateResponse* AuthenticateResponse::New(::google::protobuf::Arena* arena) const {
-  AuthenticateResponse* n = new AuthenticateResponse;
+DBUserResponse* DBUserResponse::New(::google::protobuf::Arena* arena) const {
+  DBUserResponse* n = new DBUserResponse;
   if (arena != NULL) {
     arena->Own(n);
   }
   return n;
 }
 
-void AuthenticateResponse::Clear() {
-// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.messages.AuthenticateResponse)
+void DBUserResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.protos.DBUserResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && credentials_ != NULL) {
-    delete credentials_;
-  }
-  credentials_ = NULL;
-  status_ = 0;
+  dbuser_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
-bool AuthenticateResponse::MergePartialFromCodedStream(
+bool DBUserResponse::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(parse_start:dbauth.authenticator.protos.DBUserResponse)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .dbauth.authenticator.messages.AuthenticateResponse.Status status = 1;
+      // string dbuser = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_status(static_cast< ::dbauth::authenticator::messages::AuthenticateResponse_Status >(value));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string message = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_message()));
+                input, this->mutable_dbuser()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->message().data(), static_cast<int>(this->message().length()),
+            this->dbuser().data(), static_cast<int>(this->dbuser().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "dbauth.authenticator.messages.AuthenticateResponse.message"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .dbauth.authenticator.messages.Credentials credentials = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_credentials()));
+            "dbauth.authenticator.protos.DBUserResponse.dbuser"));
         } else {
           goto handle_unusual;
         }
@@ -996,90 +898,65 @@ bool AuthenticateResponse::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(parse_success:dbauth.authenticator.protos.DBUserResponse)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.protos.DBUserResponse)
   return false;
 #undef DO_
 }
 
-void AuthenticateResponse::SerializeWithCachedSizes(
+void DBUserResponse::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.protos.DBUserResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .dbauth.authenticator.messages.AuthenticateResponse.Status status = 1;
-  if (this->status() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      1, this->status(), output);
-  }
-
-  // string message = 2;
-  if (this->message().size() > 0) {
+  // string dbuser = 1;
+  if (this->dbuser().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->message().data(), static_cast<int>(this->message().length()),
+      this->dbuser().data(), static_cast<int>(this->dbuser().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateResponse.message");
+      "dbauth.authenticator.protos.DBUserResponse.dbuser");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->message(), output);
-  }
-
-  // .dbauth.authenticator.messages.Credentials credentials = 3;
-  if (this->has_credentials()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, *this->credentials_, output);
+      1, this->dbuser(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
   }
-  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.protos.DBUserResponse)
 }
 
-::google::protobuf::uint8* AuthenticateResponse::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* DBUserResponse::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.protos.DBUserResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .dbauth.authenticator.messages.AuthenticateResponse.Status status = 1;
-  if (this->status() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      1, this->status(), target);
-  }
-
-  // string message = 2;
-  if (this->message().size() > 0) {
+  // string dbuser = 1;
+  if (this->dbuser().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->message().data(), static_cast<int>(this->message().length()),
+      this->dbuser().data(), static_cast<int>(this->dbuser().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "dbauth.authenticator.messages.AuthenticateResponse.message");
+      "dbauth.authenticator.protos.DBUserResponse.dbuser");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->message(), target);
-  }
-
-  // .dbauth.authenticator.messages.Credentials credentials = 3;
-  if (this->has_credentials()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        3, *this->credentials_, deterministic, target);
+        1, this->dbuser(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.protos.DBUserResponse)
   return target;
 }
 
-size_t AuthenticateResponse::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.messages.AuthenticateResponse)
+size_t DBUserResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.protos.DBUserResponse)
   size_t total_size = 0;
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1087,24 +964,11 @@ size_t AuthenticateResponse::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string message = 2;
-  if (this->message().size() > 0) {
+  // string dbuser = 1;
+  if (this->dbuser().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->message());
-  }
-
-  // .dbauth.authenticator.messages.Credentials credentials = 3;
-  if (this->has_credentials()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->credentials_);
-  }
-
-  // .dbauth.authenticator.messages.AuthenticateResponse.Status status = 1;
-  if (this->status() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->status());
+        this->dbuser());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1114,79 +978,327 @@ size_t AuthenticateResponse::ByteSizeLong() const {
   return total_size;
 }
 
-void AuthenticateResponse::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.messages.AuthenticateResponse)
+void DBUserResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.protos.DBUserResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  const AuthenticateResponse* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const AuthenticateResponse>(
+  const DBUserResponse* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const DBUserResponse>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.protos.DBUserResponse)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.messages.AuthenticateResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.protos.DBUserResponse)
     MergeFrom(*source);
   }
 }
 
-void AuthenticateResponse::MergeFrom(const AuthenticateResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.messages.AuthenticateResponse)
+void DBUserResponse::MergeFrom(const DBUserResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.protos.DBUserResponse)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.message().size() > 0) {
+  if (from.dbuser().size() > 0) {
 
-    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
-  }
-  if (from.has_credentials()) {
-    mutable_credentials()->::dbauth::authenticator::messages::Credentials::MergeFrom(from.credentials());
-  }
-  if (from.status() != 0) {
-    set_status(from.status());
+    dbuser_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.dbuser_);
   }
 }
 
-void AuthenticateResponse::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.messages.AuthenticateResponse)
+void DBUserResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.protos.DBUserResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void AuthenticateResponse::CopyFrom(const AuthenticateResponse& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.messages.AuthenticateResponse)
+void DBUserResponse::CopyFrom(const DBUserResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.protos.DBUserResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool AuthenticateResponse::IsInitialized() const {
+bool DBUserResponse::IsInitialized() const {
   return true;
 }
 
-void AuthenticateResponse::Swap(AuthenticateResponse* other) {
+void DBUserResponse::Swap(DBUserResponse* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void AuthenticateResponse::InternalSwap(AuthenticateResponse* other) {
+void DBUserResponse::InternalSwap(DBUserResponse* other) {
   using std::swap;
-  message_.Swap(&other->message_);
-  swap(credentials_, other->credentials_);
-  swap(status_, other->status_);
+  dbuser_.Swap(&other->dbuser_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
 
-::google::protobuf::Metadata AuthenticateResponse::GetMetadata() const {
+::google::protobuf::Metadata DBUserResponse::GetMetadata() const {
+  protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void DBHashResponse::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int DBHashResponse::kHashFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+DBHashResponse::DBHashResponse()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_authenticator_2eproto::InitDefaultsDBHashResponse();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:dbauth.authenticator.protos.DBHashResponse)
+}
+DBHashResponse::DBHashResponse(const DBHashResponse& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  hash_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.hash().size() > 0) {
+    hash_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hash_);
+  }
+  // @@protoc_insertion_point(copy_constructor:dbauth.authenticator.protos.DBHashResponse)
+}
+
+void DBHashResponse::SharedCtor() {
+  hash_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _cached_size_ = 0;
+}
+
+DBHashResponse::~DBHashResponse() {
+  // @@protoc_insertion_point(destructor:dbauth.authenticator.protos.DBHashResponse)
+  SharedDtor();
+}
+
+void DBHashResponse::SharedDtor() {
+  hash_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void DBHashResponse::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* DBHashResponse::descriptor() {
+  ::protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const DBHashResponse& DBHashResponse::default_instance() {
+  ::protobuf_authenticator_2eproto::InitDefaultsDBHashResponse();
+  return *internal_default_instance();
+}
+
+DBHashResponse* DBHashResponse::New(::google::protobuf::Arena* arena) const {
+  DBHashResponse* n = new DBHashResponse;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void DBHashResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:dbauth.authenticator.protos.DBHashResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  hash_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+bool DBHashResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:dbauth.authenticator.protos.DBHashResponse)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string hash = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_hash()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->hash().data(), static_cast<int>(this->hash().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "dbauth.authenticator.protos.DBHashResponse.hash"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:dbauth.authenticator.protos.DBHashResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:dbauth.authenticator.protos.DBHashResponse)
+  return false;
+#undef DO_
+}
+
+void DBHashResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:dbauth.authenticator.protos.DBHashResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string hash = 1;
+  if (this->hash().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hash().data(), static_cast<int>(this->hash().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "dbauth.authenticator.protos.DBHashResponse.hash");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->hash(), output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:dbauth.authenticator.protos.DBHashResponse)
+}
+
+::google::protobuf::uint8* DBHashResponse::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:dbauth.authenticator.protos.DBHashResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string hash = 1;
+  if (this->hash().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->hash().data(), static_cast<int>(this->hash().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "dbauth.authenticator.protos.DBHashResponse.hash");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->hash(), target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:dbauth.authenticator.protos.DBHashResponse)
+  return target;
+}
+
+size_t DBHashResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:dbauth.authenticator.protos.DBHashResponse)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // string hash = 1;
+  if (this->hash().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->hash());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void DBHashResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:dbauth.authenticator.protos.DBHashResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  const DBHashResponse* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const DBHashResponse>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dbauth.authenticator.protos.DBHashResponse)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:dbauth.authenticator.protos.DBHashResponse)
+    MergeFrom(*source);
+  }
+}
+
+void DBHashResponse::MergeFrom(const DBHashResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:dbauth.authenticator.protos.DBHashResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.hash().size() > 0) {
+
+    hash_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.hash_);
+  }
+}
+
+void DBHashResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:dbauth.authenticator.protos.DBHashResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void DBHashResponse::CopyFrom(const DBHashResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:dbauth.authenticator.protos.DBHashResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DBHashResponse::IsInitialized() const {
+  return true;
+}
+
+void DBHashResponse::Swap(DBHashResponse* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void DBHashResponse::InternalSwap(DBHashResponse* other) {
+  using std::swap;
+  hash_.Swap(&other->hash_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata DBHashResponse::GetMetadata() const {
   protobuf_authenticator_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_authenticator_2eproto::file_level_metadata[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
-}  // namespace messages
+}  // namespace protos
 }  // namespace authenticator
 }  // namespace dbauth
 

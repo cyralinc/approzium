@@ -15,10 +15,11 @@
 #include <grpcpp/impl/codegen/sync_stream.h>
 namespace dbauth {
 namespace authenticator {
-namespace messages {
+namespace protos {
 
 static const char* Authenticator_method_names[] = {
-  "/dbauth.authenticator.messages.Authenticator/Authenticate",
+  "/dbauth.authenticator.protos.Authenticator/GetDBUser",
+  "/dbauth.authenticator.protos.Authenticator/GetDBHash",
 };
 
 std::unique_ptr< Authenticator::Stub> Authenticator::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -28,33 +29,58 @@ std::unique_ptr< Authenticator::Stub> Authenticator::NewStub(const std::shared_p
 }
 
 Authenticator::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_Authenticate_(Authenticator_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_GetDBUser_(Authenticator_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetDBHash_(Authenticator_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status Authenticator::Stub::Authenticate(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::dbauth::authenticator::messages::AuthenticateResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Authenticate_, context, request, response);
+::grpc::Status Authenticator::Stub::GetDBUser(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::dbauth::authenticator::protos::DBUserResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetDBUser_, context, request, response);
 }
 
-::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>* Authenticator::Stub::AsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::messages::AuthenticateResponse>::Create(channel_.get(), cq, rpcmethod_Authenticate_, context, request, true);
+::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>* Authenticator::Stub::AsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::protos::DBUserResponse>::Create(channel_.get(), cq, rpcmethod_GetDBUser_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::messages::AuthenticateResponse>* Authenticator::Stub::PrepareAsyncAuthenticateRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::messages::AuthenticateResponse>::Create(channel_.get(), cq, rpcmethod_Authenticate_, context, request, false);
+::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBUserResponse>* Authenticator::Stub::PrepareAsyncGetDBUserRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBUserRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::protos::DBUserResponse>::Create(channel_.get(), cq, rpcmethod_GetDBUser_, context, request, false);
+}
+
+::grpc::Status Authenticator::Stub::GetDBHash(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::dbauth::authenticator::protos::DBHashResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetDBHash_, context, request, response);
+}
+
+::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>* Authenticator::Stub::AsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::protos::DBHashResponse>::Create(channel_.get(), cq, rpcmethod_GetDBHash_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::dbauth::authenticator::protos::DBHashResponse>* Authenticator::Stub::PrepareAsyncGetDBHashRaw(::grpc::ClientContext* context, const ::dbauth::authenticator::protos::DBHashRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dbauth::authenticator::protos::DBHashResponse>::Create(channel_.get(), cq, rpcmethod_GetDBHash_, context, request, false);
 }
 
 Authenticator::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Authenticator_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Authenticator::Service, ::dbauth::authenticator::messages::AuthenticateRequest, ::dbauth::authenticator::messages::AuthenticateResponse>(
-          std::mem_fn(&Authenticator::Service::Authenticate), this)));
+      new ::grpc::internal::RpcMethodHandler< Authenticator::Service, ::dbauth::authenticator::protos::DBUserRequest, ::dbauth::authenticator::protos::DBUserResponse>(
+          std::mem_fn(&Authenticator::Service::GetDBUser), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Authenticator_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Authenticator::Service, ::dbauth::authenticator::protos::DBHashRequest, ::dbauth::authenticator::protos::DBHashResponse>(
+          std::mem_fn(&Authenticator::Service::GetDBHash), this)));
 }
 
 Authenticator::Service::~Service() {
 }
 
-::grpc::Status Authenticator::Service::Authenticate(::grpc::ServerContext* context, const ::dbauth::authenticator::messages::AuthenticateRequest* request, ::dbauth::authenticator::messages::AuthenticateResponse* response) {
+::grpc::Status Authenticator::Service::GetDBUser(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBUserRequest* request, ::dbauth::authenticator::protos::DBUserResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Authenticator::Service::GetDBHash(::grpc::ServerContext* context, const ::dbauth::authenticator::protos::DBHashRequest* request, ::dbauth::authenticator::protos::DBHashResponse* response) {
   (void) context;
   (void) request;
   (void) response;
@@ -64,5 +90,5 @@ Authenticator::Service::~Service() {
 
 }  // namespace dbauth
 }  // namespace authenticator
-}  // namespace messages
+}  // namespace protos
 

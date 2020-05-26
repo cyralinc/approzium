@@ -12,8 +12,8 @@ libdbauthclient.so: authenticator.pb.o authenticator.grpc.pb.o dbauth_client.o
 	$(CXX) -shared -o $@ $^ $(SHEESH)
 
 deps:
-	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` authenticator.proto --proto_path=../authenticator/messages/
-	protoc --cpp_out=. authenticator.proto --proto_path=../authenticator/messages/
+	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` authenticator.proto --proto_path=../authenticator/protos/
+	protoc --cpp_out=. authenticator.proto --proto_path=../authenticator/protos/
 
 clean:
 	rm -f *.o *.a *.so
