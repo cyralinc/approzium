@@ -54,7 +54,7 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 	a.counter++
 	identity := req.GetIdentity()
     salt := req.GetSalt()
-	log.Printf("received DBUserRequest for identity %s given salt %s\n", identity, salt)
+	log.Printf("received DBHashRequest for identity %s given salt %s\n", identity, salt)
 
     if (len(salt) != 4) {
 		msg := "salt not received or not 4 bytes long"
@@ -67,7 +67,7 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
     }
-    return &pb.DBHashResponse{Hash: computePGMD5(identity, creds.password, salt)}, nil
+    return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
 }
 
 func (a *Authenticator) getCreds(identity string) (credentials, error) {
