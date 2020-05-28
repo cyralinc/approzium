@@ -57,7 +57,7 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 	log.Printf("received DBHashRequest for identity %s given salt %s\n", identity, salt)
 
 	if len(salt) != 4 {
-		msg := "salt not received or not 4 bytes long"
+		msg := fmt.Sprintf("expected salt to be 4 bytes long, but got %d bytes", len(salt))
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
