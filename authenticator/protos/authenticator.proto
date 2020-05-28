@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package dbauth.authenticator.protos;
+
+service Authenticator {
+        rpc GetDBUser(DBUserRequest) returns (DBUserResponse) {}
+        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
+}
+
+message DBUserRequest {
+        string identity = 1;
+}
+
+message DBHashRequest {
+        string identity = 1;
+        bytes salt = 2;
+}
+
+message DBUserResponse {
+        string dbuser = 1;
+}
+
+message DBHashResponse {
+        string hash = 1;
+}

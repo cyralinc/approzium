@@ -6,4 +6,4 @@ server:
 	-go build .
 	-mv client client.go
 deps:
-	protoc -I messages authenticator.proto --go_out=plugins=grpc:messages
+	protoc -I protos authenticator.proto --go_out=plugins=grpc:protos

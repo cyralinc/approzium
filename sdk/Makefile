@@ -1,32 +1,24 @@
-MY_PATH = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-DBAUTHDIR= $(realpath $(MK_PATH)../)
-
-AUTHMSGSDIR = authenticator/messages
 PGDIR = ~/postgresql
-LIBPQDIR = $(PGDIR)/src/interfaces/libpq
 
-INCLUDES =
-CC = gcc
-IFLAGS =  -I $(LIBPQDIR) -I $(PGDIR)/src/include -I $(PGDIR)/src/include/libpq
+all: libdbauthclient.so
 
-CFLAGS = -g -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-variable $(IFLAGS)
-LDFLAGS = -L $(PGDIR)/src/port/ -L $(PGDIR)/src/interfaces/libpq/
-LDLIBS = -lpgport -lpq
+CXX = g++
+CPPFLAGS += `pkg-config --cflags protobuf grpc++`
+CXXFLAGS += -std=c++11 -fPIC
+SHEESH = -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
+		   -lgrpc++_reflection -ldl
 
-EXECUTABLES = main
+libdbauthclient.so: authenticator.pb.o authenticator.grpc.pb.o dbauth_client.o
+	$(CXX) -shared -o $@ $^ $(SHEESH)
 
-all: $(EXECUTABLES)
+deps:
+	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` authenticator.proto --proto_path=../authenticator/protos/
+	protoc --cpp_out=. authenticator.proto --proto_path=../authenticator/protos/
 
 clean:
-	rm -f $(EXECUTABLES) *.o $(AUTHMSGSDIR)/*.h $(AUTHMSGSDIR)/*.c
-
-%.o:%.c $(INCLUDES)
-	$(CC) $(CFLAGS) -c $<
-
-main: main.o
-	$(CC) -o main main.o $(LDFLAGS) $(LDLIBS)
+	rm -f *.o *.a *.so
 
 gen-libpqpatch:
 	# following has to be done to ensure new files are included in patch
-	(cd $(PGDIR) && git add -A && git diff --staged HEAD --no-prefix -u .) > libpqpatch.diff
+	(cd $(PGDIR) && rm -f libpqpathh.diff && git add -A && git diff --staged HEAD --no-prefix -u .) > libpqpatch.diff
 	cd $(PGDIR) && git reset
