@@ -5,10 +5,10 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"time"
-    "google.golang.org/grpc/codes"
-    "google.golang.org/grpc/status"
 
 	pb "dbauth/authenticator/protos"
 	log "github.com/sirupsen/logrus"
@@ -46,28 +46,28 @@ func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-    }
-    return &pb.DBUserResponse{Dbuser: creds.user}, nil
+	}
+	return &pb.DBUserResponse{Dbuser: creds.user}, nil
 }
 
 func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*pb.DBHashResponse, error) {
 	a.counter++
 	identity := req.GetIdentity()
-    salt := req.GetSalt()
+	salt := req.GetSalt()
 	log.Printf("received DBHashRequest for identity %s given salt %s\n", identity, salt)
 
-    if (len(salt) != 4) {
+	if len(salt) != 4 {
 		msg := "salt not received or not 4 bytes long"
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
-    }
+	}
 
 	creds, err := a.getCreds(identity)
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-    }
-    return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
+	}
+	return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
 }
 
 func (a *Authenticator) getCreds(identity string) (credentials, error) {

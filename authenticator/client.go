@@ -35,11 +35,11 @@ func main() {
 
 	fmt.Printf("\nuser: %s\n", resp.Dbuser)
 
-    req1 := pb.DBHashRequest{
+	req1 := pb.DBHashRequest{
 		Identity: "diotim",
-        Salt: []byte{0, 1, 0, 1},
+		Salt:     []byte{0, 1, 0, 1},
 	}
-    resp1, err := client.GetDBHash(ctx, &req1)
+	resp1, err := client.GetDBHash(ctx, &req1)
 	if err != nil {
 		panic(fmt.Sprintf("failed to execute GetHashUser: %v", err))
 	}
