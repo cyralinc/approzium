@@ -4,7 +4,7 @@ package dbauth.authenticator.protos;
 
 service Authenticator {
         rpc GetDBUser(DBUserRequest) returns (DBUserResponse) {}
-//        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
+        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
 }
 
 message DBUserRequest {

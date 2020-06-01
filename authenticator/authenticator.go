@@ -38,21 +38,21 @@ func (a *Authenticator) run() {
 }
 
 func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
-    log.Printf("verifying service for role: %s\n", claimed_iam_arn)
-    return nil
+	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
+	return nil
 }
 
 func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*pb.DBUserResponse, error) {
 	a.counter++
 
-    claimed_iam_arn := req.GetIamRoleArn()
+	claimed_iam_arn := req.GetIamRoleArn()
 	log.Printf("received GetDBUser request\n")
-    err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
-    if err != nil {
-        return nil, status.Errorf(codes.Unauthenticated, err.Error())
-    }
+	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, err.Error())
+	}
 
-	creds, err := a.getCreds(claimed_iam_arn+"/"+req.GetDbname())
+	creds, err := a.getCreds(claimed_iam_arn + "/" + req.GetDbname())
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -60,12 +60,23 @@ func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*
 	return &pb.DBUserResponse{Dbuser: creds.user}, nil
 }
 
-/*
 func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*pb.DBHashResponse, error) {
 	a.counter++
-	identity := req.GetIdentity()
+
+	claimed_iam_arn := req.GetIamRoleArn()
+	log.Printf("received GetDBHash request\n")
+	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, err.Error())
+	}
+
+	creds, err := a.getCreds(claimed_iam_arn + "/" + req.GetDbname())
+	if err != nil {
+		log.Error(err)
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	salt := req.GetSalt()
-	log.Printf("received DBHashRequest for identity %s given salt %s\n", identity, salt)
 
 	if len(salt) != 4 {
 		msg := fmt.Sprintf("expected salt to be 4 bytes long, but got %d bytes", len(salt))
@@ -73,14 +84,8 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	creds, err := a.getCreds(identity)
-	if err != nil {
-		log.Error(err)
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
 	return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
 }
-*/
 
 func (a *Authenticator) getCreds(identity string) (credentials, error) {
 	if creds, ok := a.vault[identity]; ok {
