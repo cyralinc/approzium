@@ -8,6 +8,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
+	"io/ioutil"
+	"net/http"
+	"regexp"
+	"strings"
 	"time"
 
 	pb "dbauth/authenticator/protos"
@@ -33,13 +37,41 @@ func NewAuthenticator() *Authenticator {
 func (a *Authenticator) run() {
 	for {
 		log.Printf("authenticator running. %d requests received\n", a.counter)
-		time.Sleep(2 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
 func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
+	resp, err := http.Post(signed_get_caller_identity, "", nil)
 	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
-	return nil
+	if err != nil {
+		return err
+	}
+	responseData, err := ioutil.ReadAll(resp.Body)
+	responseString := string(responseData)
+	re := regexp.MustCompile(`<Arn>(.*)</Arn>`)
+	match := re.FindStringSubmatch(responseString)
+	if match == nil {
+		return fmt.Errorf("no ARN found in response")
+	}
+	returned_arn := match[1]
+	// check if returned and provided ARNs match
+	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(claimed_iam_arn)
+	if matches == nil {
+		return fmt.Errorf("provided IAM role ARN not properly formatted")
+	}
+	accountId := matches[1]
+	role := matches[2]
+	expected := fmt.Sprintf("arn:aws:sts::%s:assumed-role/%s", accountId, role)
+	// uses prefix check because user might have added a session tag in their claimed ARN
+	// example:
+	// arn:aws:sts::403019568400:assumed-role/dev
+	// arn:aws:sts::403019568400:assumed-role/dev/Service1
+	if strings.HasPrefix(returned_arn, expected) {
+		return nil
+	} else {
+		return fmt.Errorf("received ARN %s does not match claimed ARN %s", match[1], claimed_iam_arn)
+	}
 }
 
 func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*pb.DBUserResponse, error) {
@@ -99,6 +131,10 @@ func (a *Authenticator) getCreds(identity string) (credentials, error) {
 func newVault() map[string]credentials {
 	creds := make(map[string]credentials)
 	creds["diotim"] = credentials{
+		user:     "bob",
+		password: "password",
+	}
+	creds["arn:aws:iam::403019568400:role/dev/db"] = credentials{
 		user:     "bob",
 		password: "password",
 	}
