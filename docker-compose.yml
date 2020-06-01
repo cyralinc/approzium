@@ -25,3 +25,4 @@ services:
         image: dbauth_sdk
         volumes:
             - .:/usr/src/dbauth
+            - ~/.aws/:/root/.aws/:ro

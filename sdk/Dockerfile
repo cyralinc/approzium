@@ -17,5 +17,5 @@ ENV PATH="/usr/local/pgsql/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/pgsql/lib/:${LD_LIBRARY_PATH}"
 RUN apt-get install -y python3-dev
 RUN apt-get install -y python3-pip
-RUN pip3 install psycopg2
+RUN pip3 install psycopg2 boto3
 WORKDIR /usr/src/dbauth/sdk
