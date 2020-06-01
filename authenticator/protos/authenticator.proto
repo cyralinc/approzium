@@ -4,16 +4,20 @@ package dbauth.authenticator.protos;
 
 service Authenticator {
         rpc GetDBUser(DBUserRequest) returns (DBUserResponse) {}
-        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
+//        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
 }
 
 message DBUserRequest {
-        string identity = 1;
+        string iam_role_arn = 1;
+        string signed_get_caller_identity = 2;
+        string dbname = 3;
 }
 
 message DBHashRequest {
-        string identity = 1;
-        bytes salt = 2;
+        string iam_role_arn = 1;
+        string signed_get_caller_identity = 2;
+        string dbname = 3;
+        bytes salt = 4;
 }
 
 message DBUserResponse {

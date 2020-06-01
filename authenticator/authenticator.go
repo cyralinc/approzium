@@ -15,7 +15,7 @@ import (
 )
 
 type Authenticator struct {
-	creds   map[string]credentials
+	vault   map[string]credentials
 	counter int
 }
 
@@ -26,7 +26,7 @@ type credentials struct {
 
 func NewAuthenticator() *Authenticator {
 	return &Authenticator{
-		creds: newCreds(),
+		vault: newVault(),
 	}
 }
 
@@ -37,12 +37,22 @@ func (a *Authenticator) run() {
 	}
 }
 
+func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
+    log.Printf("verifying service for role: %s\n", claimed_iam_arn)
+    return nil
+}
+
 func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*pb.DBUserResponse, error) {
 	a.counter++
-	identity := req.GetIdentity()
-	log.Printf("received DBUserRequest for identity %s\n", identity)
 
-	creds, err := a.getCreds(identity)
+    claimed_iam_arn := req.GetIamRoleArn()
+	log.Printf("received GetDBUser request\n")
+    err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+    if err != nil {
+        return nil, status.Errorf(codes.Unauthenticated, err.Error())
+    }
+
+	creds, err := a.getCreds(claimed_iam_arn+"/"+req.GetDbname())
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -50,6 +60,7 @@ func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*
 	return &pb.DBUserResponse{Dbuser: creds.user}, nil
 }
 
+/*
 func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*pb.DBHashResponse, error) {
 	a.counter++
 	identity := req.GetIdentity()
@@ -69,9 +80,10 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 	}
 	return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
 }
+*/
 
 func (a *Authenticator) getCreds(identity string) (credentials, error) {
-	if creds, ok := a.creds[identity]; ok {
+	if creds, ok := a.vault[identity]; ok {
 		return creds, nil
 	}
 	msg := fmt.Errorf("credentials not found for identity %s", identity)
@@ -79,7 +91,7 @@ func (a *Authenticator) getCreds(identity string) (credentials, error) {
 	return credentials{}, msg
 }
 
-func newCreds() map[string]credentials {
+func newVault() map[string]credentials {
 	creds := make(map[string]credentials)
 	creds["diotim"] = credentials{
 		user:     "bob",
