@@ -3,16 +3,23 @@ import select
 import socket
 import struct
 import logging
+from ctypes import cdll, create_string_buffer
+from ctypes.util import find_library
 from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
+
+libpq = cdll.LoadLibrary("libpq.so.5")
+libssl = cdll.LoadLibrary(find_library("ssl"))
 
 
 def advance(pgconn, until_salt=False):
     sock = fromfd(pgconn.fileno(), keep_fd=True)
     state = pgconn.poll()
     poll_read_count = 0
+    CONNECTION_AWAITING_RESPONSE = 4
     while True:
+        status = libpq.PQstatus(pgconn.pgconn_ptr)
         fd = pgconn.fileno()
         if state == psycopg2.extensions.POLL_OK:
             return
@@ -20,14 +27,22 @@ def advance(pgconn, until_salt=False):
             select.select([], [fd], [])
         elif state == psycopg2.extensions.POLL_READ:
             select.select([fd], [], [])
-            if until_salt and poll_read_count == 0:
-                bytes = sock.recv(8096)
-                for index, byte in enumerate(bytes):
-                    msg_size = read_int32_from_bytes(bytes, index + 1)
-                    auth_type = read_int32_from_bytes(bytes, index + 5)
+            if until_salt and status == CONNECTION_AWAITING_RESPONSE:
+                nbytes = 8096
+                if libpq.PQsslInUse(pgconn.pgconn_ptr):
+                    buffer = bytearray(nbytes)
+                    c_buffer = create_string_buffer(bytes(buffer), nbytes)
+                    ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
+                    nread = libssl.SSL_read(ssl_obj, c_buffer, nbytes)
+                    challenge = bytearray(c_buffer.raw[:nread])
+                else:
+                    challenge = sock.recv(nbytes)
+                for index, byte in enumerate(challenge):
+                    msg_size = read_int32_from_bytes(challenge, index + 1)
+                    auth_type = read_int32_from_bytes(challenge, index + 5)
                     AUTH_MD5 = 5
                     if byte == ord("R") and msg_size == 12 and auth_type == AUTH_MD5:
-                        salt = bytes[index + 9 : index + 9 + 4]
+                        salt = challenge[index + 9 : index + 9 + 4]
                         return salt
             poll_read_count += 1
         else:
@@ -44,7 +59,14 @@ def send_hash(pgconn, hash):
     msg += b"md5"
     msg += hash.encode("ascii")
     msg += b"\0"
-    sock.sendall(msg)
+    if libpq.PQsslInUse(pgconn.pgconn_ptr):
+        ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
+        c_buffer = create_string_buffer(msg, len(msg))
+        n = libssl.SSL_write(ssl_obj, c_buffer, len(msg))
+        if n != len(msg):
+            raise ValueError("could not send response")
+    else:
+        sock.sendall(msg)
 
 
 def parse_dsn_args(dsn, appz_args):
@@ -63,10 +85,9 @@ def parse_dsn_args(dsn, appz_args):
 
 
 def connect(dsn="", authenticator=None, **psycopgkwargs):
-    psycopgkwargs["sslmode"] = "disable"  # XXX: for now
     appz_args = {"authenticator": authenticator}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
-    pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=True)
+    pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
     dbuser = pgconn.get_dsn_parameters()["user"]
     salt = advance(pgconn, until_salt=True)
     hash = get_hash(dbuser, salt, appz_args["authenticator"])
