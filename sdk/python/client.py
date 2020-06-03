@@ -1,4 +1,5 @@
-import approzium
+from approzium.psycopg2 import connect
 
 
-print(approzium.connect())
+conn = connect('authenticator=authenticator:1234')
+print('Connection Established')
