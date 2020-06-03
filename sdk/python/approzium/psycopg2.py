@@ -8,10 +8,6 @@ from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 
 
-logging.basicConfig(level=logging.DEBUG,
-        format="[%(filename)s:%(lineno)s - %(funcName)10s() ] %(message)s")
-
-
 def advance(pgconn, until_salt=False):
     sock = fromfd(pgconn.fileno(), keep_fd=True)
     state = pgconn.poll()
