@@ -13,41 +13,51 @@ libpq = cdll.LoadLibrary("libpq.so.5")
 libssl = cdll.LoadLibrary(find_library("ssl"))
 
 
-def advance(pgconn, until_salt=False):
-    sock = fromfd(pgconn.fileno(), keep_fd=True)
+def advance_connection(pgconn):
     state = pgconn.poll()
-    poll_read_count = 0
+    status = libpq.PQstatus(pgconn.pgconn_ptr)
+    fd = pgconn.fileno()
+    if state == psycopg2.extensions.POLL_OK:
+        pass
+    elif state == psycopg2.extensions.POLL_WRITE:
+        select.select([], [fd], [])
+    elif state == psycopg2.extensions.POLL_READ:
+        select.select([fd], [], [])
+    else:
+        raise psycopg2.OperationalError("poll() returned %s" % state)
+    return state, status
+
+
+def advance_until_challenge(pgconn):
     CONNECTION_AWAITING_RESPONSE = 4
     while True:
-        status = libpq.PQstatus(pgconn.pgconn_ptr)
-        fd = pgconn.fileno()
+        state, status = advance_connection(pgconn)
+        if status == CONNECTION_AWAITING_RESPONSE:
+            nbytes = 8096
+            if libpq.PQsslInUse(pgconn.pgconn_ptr):
+                buffer = bytearray(nbytes)
+                c_buffer = create_string_buffer(bytes(buffer), nbytes)
+                ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
+                nread = libssl.SSL_read(ssl_obj, c_buffer, nbytes)
+                challenge = bytearray(c_buffer.raw[:nread])
+            else:
+                challenge = sock.recv(nbytes)
+            for index, byte in enumerate(challenge):
+                msg_size = read_int32_from_bytes(challenge, index + 1)
+                auth_type = read_int32_from_bytes(challenge, index + 5)
+                AUTH_MD5 = 5
+                if byte == ord("R") and msg_size == 12 and auth_type == AUTH_MD5:
+                    salt = challenge[index + 9 : index + 9 + 4]
+                    return salt
+        elif state == psycopg2.extensions.POLL_OK:
+            raise Exception("Connection already established")
+
+
+def advance_until_end(pgconn):
+    while True:
+        state, status = advance_connection(pgconn)
         if state == psycopg2.extensions.POLL_OK:
             return
-        elif state == psycopg2.extensions.POLL_WRITE:
-            select.select([], [fd], [])
-        elif state == psycopg2.extensions.POLL_READ:
-            select.select([fd], [], [])
-            if until_salt and status == CONNECTION_AWAITING_RESPONSE:
-                nbytes = 8096
-                if libpq.PQsslInUse(pgconn.pgconn_ptr):
-                    buffer = bytearray(nbytes)
-                    c_buffer = create_string_buffer(bytes(buffer), nbytes)
-                    ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
-                    nread = libssl.SSL_read(ssl_obj, c_buffer, nbytes)
-                    challenge = bytearray(c_buffer.raw[:nread])
-                else:
-                    challenge = sock.recv(nbytes)
-                for index, byte in enumerate(challenge):
-                    msg_size = read_int32_from_bytes(challenge, index + 1)
-                    auth_type = read_int32_from_bytes(challenge, index + 5)
-                    AUTH_MD5 = 5
-                    if byte == ord("R") and msg_size == 12 and auth_type == AUTH_MD5:
-                        salt = challenge[index + 9 : index + 9 + 4]
-                        return salt
-            poll_read_count += 1
-        else:
-            raise psycopg2.OperationalError("poll() returned %s" % state)
-        state = pgconn.poll()
 
 
 def send_hash(pgconn, hash):
@@ -89,9 +99,9 @@ def connect(dsn="", authenticator=None, **psycopgkwargs):
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
     pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
     dbuser = pgconn.get_dsn_parameters()["user"]
-    salt = advance(pgconn, until_salt=True)
+    salt = advance_until_challenge(pgconn)
     hash = get_hash(dbuser, salt, appz_args["authenticator"])
     logging.debug(f"salt: {salt}, hash: {hash}")
     send_hash(pgconn, hash)
-    advance(pgconn)
+    advance_until_end(pgconn)
     return pgconn
