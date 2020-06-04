@@ -18,26 +18,27 @@ libssl = cdll.LoadLibrary(find_library("ssl"))
 
 def set_connection_sync(pgconn):
     mem = bytearray(string_at(id(pgconn), getsizeof(pgconn)))
-    sizeofint = struct.calcsize('@i')
-    sizeoflong = struct.calcsize('@l')
+    sizeofint = struct.calcsize("@i")
+    sizeoflong = struct.calcsize("@l")
 
     def addressofint(number):
-        int_bytes = struct.pack('@i', number)
+        int_bytes = struct.pack("@i", number)
         return mem.find(int_bytes)
 
     def intataddress(address):
-        return struct.unpack('@i', mem[address:address+sizeofint])[0]
+        return struct.unpack("@i", mem[address : address + sizeofint])[0]
+
     # as a check, we check server and protocol version numbers, which succeed
     # the async value in the psycopg connection struct
     server_version_addr = addressofint(pgconn.server_version)
-    protocol_address = server_version_addr-sizeofint
+    protocol_address = server_version_addr - sizeofint
     protocol_version = intataddress(protocol_address)
     assert protocol_version == pgconn.protocol_version
-    async_address = protocol_address-sizeoflong
-    async_value = struct.unpack('@l', mem[async_address:protocol_address])[0]
+    async_address = protocol_address - sizeoflong
+    async_value = struct.unpack("@l", mem[async_address:protocol_address])[0]
     assert async_value == pgconn.async
-    new_async_value = struct.pack('@l', 0)
-    memmove(id(pgconn)+async_address, new_async_value, sizeoflong)
+    new_async_value = struct.pack("@l", 0)
+    memmove(id(pgconn) + async_address, new_async_value, sizeoflong)
     assert pgconn.async == 0
     error = libpq.PQsetnonblocking(pgconn.pgconn_ptr, 0)
     assert error == 0
