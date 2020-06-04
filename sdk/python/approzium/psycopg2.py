@@ -8,6 +8,8 @@ from ctypes.util import find_library
 from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
+from ._psycopg2_utils import set_sync
+
 
 libpq = cdll.LoadLibrary("libpq.so.5")
 libssl = cdll.LoadLibrary(find_library("ssl"))
@@ -94,7 +96,7 @@ def parse_dsn_args(dsn, appz_args):
     return psycopg_dsn
 
 
-def connect(dsn="", authenticator=None, **psycopgkwargs):
+def connect(dsn="", authenticator=None, async=0, **psycopgkwargs):
     appz_args = {"authenticator": authenticator}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
     pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
@@ -104,4 +106,6 @@ def connect(dsn="", authenticator=None, **psycopgkwargs):
     logging.debug(f"salt: {salt}, hash: {hash}")
     send_hash(pgconn, hash)
     advance_until_end(pgconn)
+    if async == 0:
+        set_sync(pgconn)
     return pgconn
