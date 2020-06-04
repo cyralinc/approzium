@@ -21,7 +21,7 @@ def set_connection_sync(pgconn):
     sizeofint = struct.calcsize("@i")
     sizeoflong = struct.calcsize("@l")
 
-    def addressofint(number):
+    def addressofint(number, mem=mem):
         int_bytes = struct.pack("@i", number)
         return mem.find(int_bytes)
 
@@ -31,6 +31,8 @@ def set_connection_sync(pgconn):
     # as a check, we check server and protocol version numbers, which succeed
     # the async value in the psycopg connection struct
     server_version_addr = addressofint(pgconn.server_version)
+    # check that there is only one match for that value
+    assert addressofint(pgconn.server_version, mem[server_version_addr+sizeofint:]) == -1
     protocol_address = server_version_addr - sizeofint
     protocol_version = intataddress(protocol_address)
     assert protocol_version == pgconn.protocol_version
@@ -125,7 +127,7 @@ def parse_dsn_args(dsn, appz_args):
     return psycopg_dsn
 
 
-def connect(dsn="", authenticator=None, **psycopgkwargs):
+def connect(dsn="", authenticator=None, async=0, **psycopgkwargs):
     appz_args = {"authenticator": authenticator}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
     pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
