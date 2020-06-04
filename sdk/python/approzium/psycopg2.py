@@ -1,16 +1,46 @@
 import psycopg2
 import select
 import socket
+from socket import ntohl, htonl
 import struct
 import logging
-from ctypes import cdll, create_string_buffer
+from sys import getsizeof
+from ctypes import cdll, create_string_buffer, string_at, memmove
 from ctypes.util import find_library
 from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 
+
 libpq = cdll.LoadLibrary("libpq.so.5")
 libssl = cdll.LoadLibrary(find_library("ssl"))
+
+
+def set_connection_sync(pgconn):
+    mem = bytearray(string_at(id(pgconn), getsizeof(pgconn)))
+    sizeofint = struct.calcsize('@i')
+    sizeoflong = struct.calcsize('@l')
+
+    def addressofint(number):
+        int_bytes = struct.pack('@i', number)
+        return mem.find(int_bytes)
+
+    def intataddress(address):
+        return struct.unpack('@i', mem[address:address+sizeofint])[0]
+    # as a check, we check server and protocol version numbers, which succeed
+    # the async value in the psycopg connection struct
+    server_version_addr = addressofint(pgconn.server_version)
+    protocol_address = server_version_addr-sizeofint
+    protocol_version = intataddress(protocol_address)
+    assert protocol_version == pgconn.protocol_version
+    async_address = protocol_address-sizeoflong
+    async_value = struct.unpack('@l', mem[async_address:protocol_address])[0]
+    assert async_value == pgconn.async
+    new_async_value = struct.pack('@l', 0)
+    memmove(id(pgconn)+async_address, new_async_value, sizeoflong)
+    assert pgconn.async == 0
+    error = libpq.PQsetnonblocking(pgconn.pgconn_ptr, 0)
+    assert error == 0
 
 
 def advance_connection(pgconn):
@@ -104,4 +134,6 @@ def connect(dsn="", authenticator=None, **psycopgkwargs):
     logging.debug(f"salt: {salt}, hash: {hash}")
     send_hash(pgconn, hash)
     advance_until_end(pgconn)
+    if async == 0:
+        set_connection_sync(pgconn)
     return pgconn
