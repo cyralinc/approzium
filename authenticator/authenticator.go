@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -18,14 +19,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Authenticator struct {
-	vault   map[string]credentials
-	counter int
+type vaultKey struct {
+	iam_arn string
+	dbhost  string
+	dbuser  string
 }
 
-type credentials struct {
-	user     string
-	password string
+type Authenticator struct {
+	vault   map[vaultKey]string
+	counter int
 }
 
 func NewAuthenticator() *Authenticator {
@@ -74,35 +76,19 @@ func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
 	}
 }
 
-func (a *Authenticator) GetDBUser(ctx context.Context, req *pb.DBUserRequest) (*pb.DBUserResponse, error) {
+func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5HashResponse, error) {
 	a.counter++
 
-	claimed_iam_arn := req.GetIamRoleArn()
-	log.Printf("received GetDBUser request\n")
+	claimed_iam_arn := req.GetClaimedIamArn()
+	dbhost := req.GetDbhost()
+	dbuser := req.GetDbuser()
+	log.Printf("received GetDBHash request with claimed_iam_arn: %s\n", claimed_iam_arn)
 	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
-	creds, err := a.getCreds(claimed_iam_arn + "/" + req.GetDbname())
-	if err != nil {
-		log.Error(err)
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	return &pb.DBUserResponse{Dbuser: creds.user}, nil
-}
-
-func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*pb.DBHashResponse, error) {
-	a.counter++
-
-	claimed_iam_arn := req.GetIamRoleArn()
-	log.Printf("received GetDBHash request\n")
-	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, err.Error())
-	}
-
-	creds, err := a.getCreds(claimed_iam_arn + "/" + req.GetDbname())
+	password, err := a.getCreds(vaultKey{claimed_iam_arn, dbhost, dbuser})
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -116,28 +102,37 @@ func (a *Authenticator) GetDBHash(ctx context.Context, req *pb.DBHashRequest) (*
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	return &pb.DBHashResponse{Hash: computePGMD5(creds.user, creds.password, salt)}, nil
+	return &pb.PGMD5HashResponse{Hash: computePGMD5(dbuser, password, salt)}, nil
 }
 
-func (a *Authenticator) getCreds(identity string) (credentials, error) {
+func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
 	if creds, ok := a.vault[identity]; ok {
 		return creds, nil
 	}
-	msg := fmt.Errorf("credentials not found for identity %s", identity)
+	msg := fmt.Errorf("password not found for identity %s", identity)
 	log.Error(msg)
-	return credentials{}, msg
+	return "", msg
 }
 
-func newVault() map[string]credentials {
-	creds := make(map[string]credentials)
-	creds["diotim"] = credentials{
-		user:     "bob",
-		password: "password",
+func newVault() map[vaultKey]string {
+	creds := make(map[vaultKey]string)
+	// for dev purposes: read credentials from a local file
+	type secret struct {
+		Dbhost   string `yaml:"dbhost"`
+		Dbuser   string `yaml:"dbuser"`
+		Password string `yaml:"password"`
 	}
-	creds["arn:aws:iam::403019568400:role/dev/db"] = credentials{
-		user:     "bob",
-		password: "password",
+	var devCreds secret
+	yamlFile, err := ioutil.ReadFile("secrets.yaml")
+	if err != nil {
+		log.Errorf("yamlFile.Get err #%v ", err)
 	}
+	err = yaml.Unmarshal(yamlFile, &devCreds)
+	if err != nil {
+		log.Errorf("Unmarshal: #%v ", err)
+	}
+	key := vaultKey{"arn:aws:iam::403019568400:role/dev", devCreds.Dbhost, devCreds.Dbuser}
+	creds[key] = devCreds.Password
 	return creds
 }
 
@@ -152,5 +147,5 @@ func computeMD5(s string, salt []byte) string {
 func computePGMD5(user, password string, salt []byte) string {
 	first_hash := computeMD5(password, []byte(user))
 	second_hash := computeMD5(first_hash, salt)
-	return "md5" + second_hash
+	return second_hash
 }
