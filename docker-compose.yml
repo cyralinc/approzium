@@ -12,14 +12,6 @@ services:
         volumes:
             - .:/usr/src/dbauth
         command: ./authenticator
-    goclient:
-        build: authenticator
-        image: dbauth_authenticator
-        volumes:
-            - .:/usr/src/dbauth
-        command: go run client.go
-        depends_on:
-            - authenticator
     sdk:
         build: sdk
         image: dbauth_sdk
