@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/xml"
 	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,36 +44,54 @@ func (a *Authenticator) run() {
 	}
 }
 
-func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
-	resp, err := http.Post(signed_get_caller_identity, "", nil)
-	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
-	if err != nil {
-		return err
-	}
-	responseData, err := ioutil.ReadAll(resp.Body)
-	responseString := string(responseData)
-	re := regexp.MustCompile(`<Arn>(.*)</Arn>`)
-	match := re.FindStringSubmatch(responseString)
-	if match == nil {
-		return fmt.Errorf("no ARN found in response")
-	}
-	returned_arn := match[1]
-	// check if returned and provided ARNs match
-	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(claimed_iam_arn)
+func switchARNFormatToSTS(iam_arn string) (string, error) {
+	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(iam_arn)
 	if matches == nil {
-		return fmt.Errorf("provided IAM role ARN not properly formatted")
+		return "",  fmt.Errorf("provided IAM role ARN is not properly formatted")
 	}
 	accountId := matches[1]
 	role := matches[2]
-	expected := fmt.Sprintf("arn:aws:sts::%s:assumed-role/%s", accountId, role)
+	return fmt.Sprintf("arn:aws:sts::%s:assumed-role/%s", accountId, role), nil
+}
+
+func executeGetCallerIdentity(request string) (string, error) {
+	resp, err := http.Post(request, "", nil)
+	if err != nil {
+		return "", err
+	}
+	responseData, err := ioutil.ReadAll(resp.Body)
+    type GetCallerIdentityResponse struct {
+         IamArn string `xml:"GetCallerIdentityResult>Arn"`
+    }
+    response := GetCallerIdentityResponse{"none"}
+    err = xml.Unmarshal(responseData, &response)
+    if err != nil {
+        return "", err
+    }
+    iamArn := strings.Trim(response.IamArn, "{}")
+    return iamArn, nil
+}
+
+func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
+	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
+    actual_iam_arn, err := executeGetCallerIdentity(signed_get_caller_identity)
+    if err != nil {
+		return fmt.Errorf("could not execute GetCallerIdentity %s", err)
+    }
+    // have to change formats of arns to be able to do string comparison
+    claimed_iam_arn, err = switchARNFormatToSTS(claimed_iam_arn)
+    if err != nil {
+		return fmt.Errorf("could not parse claimed IAM ARN %s", err)
+    }
+
 	// uses prefix check because user might have added a session tag in their claimed ARN
-	// example:
+	// for example, the following two IAMs should match
 	// arn:aws:sts::403019568400:assumed-role/dev
 	// arn:aws:sts::403019568400:assumed-role/dev/Service1
-	if strings.HasPrefix(returned_arn, expected) {
+	if strings.HasPrefix(actual_iam_arn, claimed_iam_arn) {
 		return nil
 	} else {
-		return fmt.Errorf("received ARN %s does not match claimed ARN %s", match[1], claimed_iam_arn)
+		return fmt.Errorf("actual IAM ARN %s does not match claimed IAM ARN %s", actual_iam_arn, claimed_iam_arn)
 	}
 }
 
