@@ -69,15 +69,18 @@ def advance_until_challenge(pgconn):
     while True:
         state, status = advance_connection(pgconn)
         if status == CONNECTION_AWAITING_RESPONSE:
-            nbytes = 8096
+            # request many more bytes than necessary. if connection is at the
+            # right stage, only the right number of bytes will be received
+            NBYTES = 8096
             if libpq.PQsslInUse(pgconn.pgconn_ptr):
-                buffer = bytearray(nbytes)
-                c_buffer = create_string_buffer(bytes(buffer), nbytes)
+                buffer = bytearray(NBYTES)
+                c_buffer = create_string_buffer(bytes(buffer), NBYTES)
                 ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
-                nread = libssl.SSL_read(ssl_obj, c_buffer, nbytes)
+                nread = libssl.SSL_read(ssl_obj, c_buffer, NBYTES)
                 challenge = bytearray(c_buffer.raw[:nread])
             else:
-                challenge = sock.recv(nbytes)
+                challenge = sock.recv(NBYTES)
+            assert len(challenge) == 13, "Challenge length is not correct"
             for index, byte in enumerate(challenge):
                 msg_size = read_int32_from_bytes(challenge, index + 1)
                 auth_type = read_int32_from_bytes(challenge, index + 5)
