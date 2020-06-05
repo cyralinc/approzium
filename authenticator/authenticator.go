@@ -47,7 +47,7 @@ func (a *Authenticator) run() {
 func switchARNFormatToSTS(iam_arn string) (string, error) {
 	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(iam_arn)
 	if matches == nil {
-		return "",  fmt.Errorf("provided IAM role ARN is not properly formatted")
+		return "", fmt.Errorf("provided IAM role ARN is not properly formatted")
 	}
 	accountId := matches[1]
 	role := matches[2]
@@ -60,29 +60,29 @@ func executeGetCallerIdentity(request string) (string, error) {
 		return "", err
 	}
 	responseData, err := ioutil.ReadAll(resp.Body)
-    type GetCallerIdentityResponse struct {
-         IamArn string `xml:"GetCallerIdentityResult>Arn"`
-    }
-    response := GetCallerIdentityResponse{"none"}
-    err = xml.Unmarshal(responseData, &response)
-    if err != nil {
-        return "", err
-    }
-    iamArn := strings.Trim(response.IamArn, "{}")
-    return iamArn, nil
+	type GetCallerIdentityResponse struct {
+		IamArn string `xml:"GetCallerIdentityResult>Arn"`
+	}
+	response := GetCallerIdentityResponse{"none"}
+	err = xml.Unmarshal(responseData, &response)
+	if err != nil {
+		return "", err
+	}
+	iamArn := strings.Trim(response.IamArn, "{}")
+	return iamArn, nil
 }
 
 func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
 	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
-    actual_iam_arn, err := executeGetCallerIdentity(signed_get_caller_identity)
-    if err != nil {
+	actual_iam_arn, err := executeGetCallerIdentity(signed_get_caller_identity)
+	if err != nil {
 		return fmt.Errorf("could not execute GetCallerIdentity %s", err)
-    }
-    // have to change formats of arns to be able to do string comparison
-    claimed_iam_arn, err = switchARNFormatToSTS(claimed_iam_arn)
-    if err != nil {
+	}
+	// have to change formats of arns to be able to do string comparison
+	claimed_iam_arn, err = switchARNFormatToSTS(claimed_iam_arn)
+	if err != nil {
 		return fmt.Errorf("could not parse claimed IAM ARN %s", err)
-    }
+	}
 
 	// uses prefix check because user might have added a session tag in their claimed ARN
 	// for example, the following two IAMs should match
