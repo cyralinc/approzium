@@ -44,10 +44,10 @@ func (a *Authenticator) run() {
 	}
 }
 
-func switchARNFormatToSTS(iam_arn string) (string, error) {
+func IAMFormatToSTS(iam_arn string) (string, error) {
 	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(iam_arn)
 	if matches == nil {
-		return "", fmt.Errorf("provided IAM role ARN is not properly formatted")
+		return "", fmt.Errorf("provided IAM role ARN is not properly formatted, expected format: arn:aws:iam::accountid:role/rolename")
 	}
 	accountId := matches[1]
 	role := matches[2]
@@ -63,7 +63,7 @@ func executeGetCallerIdentity(request string) (string, error) {
 	type GetCallerIdentityResponse struct {
 		IamArn string `xml:"GetCallerIdentityResult>Arn"`
 	}
-	response := GetCallerIdentityResponse{"none"}
+	response := GetCallerIdentityResponse{}
 	err = xml.Unmarshal(responseData, &response)
 	if err != nil {
 		return "", err
@@ -79,7 +79,7 @@ func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
 		return fmt.Errorf("could not execute GetCallerIdentity %s", err)
 	}
 	// have to change formats of arns to be able to do string comparison
-	claimed_iam_arn, err = switchARNFormatToSTS(claimed_iam_arn)
+	claimed_iam_arn, err = IAMFormatToSTS(claimed_iam_arn)
 	if err != nil {
 		return fmt.Errorf("could not parse claimed IAM ARN %s", err)
 	}
