@@ -26,4 +26,4 @@ RUN mkdir -p cmake/build && \
     cmake -DgRPC_BUILD_TESTS=ON ../../ && \
     make grpc_cli && \
     cp grpc_cli /usr/bin/
-WORKDIR /usr/src/dbauth/authenticator
+WORKDIR /usr/src/approzium/authenticator
