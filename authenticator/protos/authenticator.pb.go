@@ -24,164 +24,110 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type DBUserRequest struct {
-	Identity             string   `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type PGMD5HashRequest struct {
+	SignedGetCallerIdentity string   `protobuf:"bytes,1,opt,name=signed_get_caller_identity,json=signedGetCallerIdentity,proto3" json:"signed_get_caller_identity,omitempty"`
+	ClaimedIamArn           string   `protobuf:"bytes,2,opt,name=claimed_iam_arn,json=claimedIamArn,proto3" json:"claimed_iam_arn,omitempty"`
+	Dbhost                  string   `protobuf:"bytes,3,opt,name=dbhost,proto3" json:"dbhost,omitempty"`
+	Dbuser                  string   `protobuf:"bytes,4,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
+	Salt                    []byte   `protobuf:"bytes,5,opt,name=salt,proto3" json:"salt,omitempty"`
+	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
+	XXX_unrecognized        []byte   `json:"-"`
+	XXX_sizecache           int32    `json:"-"`
 }
 
-func (m *DBUserRequest) Reset()         { *m = DBUserRequest{} }
-func (m *DBUserRequest) String() string { return proto.CompactTextString(m) }
-func (*DBUserRequest) ProtoMessage()    {}
-func (*DBUserRequest) Descriptor() ([]byte, []int) {
+func (m *PGMD5HashRequest) Reset()         { *m = PGMD5HashRequest{} }
+func (m *PGMD5HashRequest) String() string { return proto.CompactTextString(m) }
+func (*PGMD5HashRequest) ProtoMessage()    {}
+func (*PGMD5HashRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e86ec39f7c35dea3, []int{0}
 }
 
-func (m *DBUserRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DBUserRequest.Unmarshal(m, b)
+func (m *PGMD5HashRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PGMD5HashRequest.Unmarshal(m, b)
 }
-func (m *DBUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DBUserRequest.Marshal(b, m, deterministic)
+func (m *PGMD5HashRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PGMD5HashRequest.Marshal(b, m, deterministic)
 }
-func (m *DBUserRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DBUserRequest.Merge(m, src)
+func (m *PGMD5HashRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PGMD5HashRequest.Merge(m, src)
 }
-func (m *DBUserRequest) XXX_Size() int {
-	return xxx_messageInfo_DBUserRequest.Size(m)
+func (m *PGMD5HashRequest) XXX_Size() int {
+	return xxx_messageInfo_PGMD5HashRequest.Size(m)
 }
-func (m *DBUserRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DBUserRequest.DiscardUnknown(m)
+func (m *PGMD5HashRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PGMD5HashRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DBUserRequest proto.InternalMessageInfo
+var xxx_messageInfo_PGMD5HashRequest proto.InternalMessageInfo
 
-func (m *DBUserRequest) GetIdentity() string {
+func (m *PGMD5HashRequest) GetSignedGetCallerIdentity() string {
 	if m != nil {
-		return m.Identity
+		return m.SignedGetCallerIdentity
 	}
 	return ""
 }
 
-type DBHashRequest struct {
-	Identity             string   `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
-	Salt                 []byte   `protobuf:"bytes,2,opt,name=salt,proto3" json:"salt,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *DBHashRequest) Reset()         { *m = DBHashRequest{} }
-func (m *DBHashRequest) String() string { return proto.CompactTextString(m) }
-func (*DBHashRequest) ProtoMessage()    {}
-func (*DBHashRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{1}
-}
-
-func (m *DBHashRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DBHashRequest.Unmarshal(m, b)
-}
-func (m *DBHashRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DBHashRequest.Marshal(b, m, deterministic)
-}
-func (m *DBHashRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DBHashRequest.Merge(m, src)
-}
-func (m *DBHashRequest) XXX_Size() int {
-	return xxx_messageInfo_DBHashRequest.Size(m)
-}
-func (m *DBHashRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DBHashRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DBHashRequest proto.InternalMessageInfo
-
-func (m *DBHashRequest) GetIdentity() string {
+func (m *PGMD5HashRequest) GetClaimedIamArn() string {
 	if m != nil {
-		return m.Identity
+		return m.ClaimedIamArn
 	}
 	return ""
 }
 
-func (m *DBHashRequest) GetSalt() []byte {
+func (m *PGMD5HashRequest) GetDbhost() string {
 	if m != nil {
-		return m.Salt
+		return m.Dbhost
 	}
-	return nil
+	return ""
 }
 
-type DBUserResponse struct {
-	Dbuser               string   `protobuf:"bytes,1,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *DBUserResponse) Reset()         { *m = DBUserResponse{} }
-func (m *DBUserResponse) String() string { return proto.CompactTextString(m) }
-func (*DBUserResponse) ProtoMessage()    {}
-func (*DBUserResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{2}
-}
-
-func (m *DBUserResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DBUserResponse.Unmarshal(m, b)
-}
-func (m *DBUserResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DBUserResponse.Marshal(b, m, deterministic)
-}
-func (m *DBUserResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DBUserResponse.Merge(m, src)
-}
-func (m *DBUserResponse) XXX_Size() int {
-	return xxx_messageInfo_DBUserResponse.Size(m)
-}
-func (m *DBUserResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DBUserResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DBUserResponse proto.InternalMessageInfo
-
-func (m *DBUserResponse) GetDbuser() string {
+func (m *PGMD5HashRequest) GetDbuser() string {
 	if m != nil {
 		return m.Dbuser
 	}
 	return ""
 }
 
-type DBHashResponse struct {
+func (m *PGMD5HashRequest) GetSalt() []byte {
+	if m != nil {
+		return m.Salt
+	}
+	return nil
+}
+
+type PGMD5HashResponse struct {
 	Hash                 string   `protobuf:"bytes,1,opt,name=hash,proto3" json:"hash,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DBHashResponse) Reset()         { *m = DBHashResponse{} }
-func (m *DBHashResponse) String() string { return proto.CompactTextString(m) }
-func (*DBHashResponse) ProtoMessage()    {}
-func (*DBHashResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{3}
+func (m *PGMD5HashResponse) Reset()         { *m = PGMD5HashResponse{} }
+func (m *PGMD5HashResponse) String() string { return proto.CompactTextString(m) }
+func (*PGMD5HashResponse) ProtoMessage()    {}
+func (*PGMD5HashResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e86ec39f7c35dea3, []int{1}
 }
 
-func (m *DBHashResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DBHashResponse.Unmarshal(m, b)
+func (m *PGMD5HashResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PGMD5HashResponse.Unmarshal(m, b)
 }
-func (m *DBHashResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DBHashResponse.Marshal(b, m, deterministic)
+func (m *PGMD5HashResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PGMD5HashResponse.Marshal(b, m, deterministic)
 }
-func (m *DBHashResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DBHashResponse.Merge(m, src)
+func (m *PGMD5HashResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PGMD5HashResponse.Merge(m, src)
 }
-func (m *DBHashResponse) XXX_Size() int {
-	return xxx_messageInfo_DBHashResponse.Size(m)
+func (m *PGMD5HashResponse) XXX_Size() int {
+	return xxx_messageInfo_PGMD5HashResponse.Size(m)
 }
-func (m *DBHashResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DBHashResponse.DiscardUnknown(m)
+func (m *PGMD5HashResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PGMD5HashResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DBHashResponse proto.InternalMessageInfo
+var xxx_messageInfo_PGMD5HashResponse proto.InternalMessageInfo
 
-func (m *DBHashResponse) GetHash() string {
+func (m *PGMD5HashResponse) GetHash() string {
 	if m != nil {
 		return m.Hash
 	}
@@ -189,30 +135,31 @@ func (m *DBHashResponse) GetHash() string {
 }
 
 func init() {
-	proto.RegisterType((*DBUserRequest)(nil), "dbauth.authenticator.protos.DBUserRequest")
-	proto.RegisterType((*DBHashRequest)(nil), "dbauth.authenticator.protos.DBHashRequest")
-	proto.RegisterType((*DBUserResponse)(nil), "dbauth.authenticator.protos.DBUserResponse")
-	proto.RegisterType((*DBHashResponse)(nil), "dbauth.authenticator.protos.DBHashResponse")
+	proto.RegisterType((*PGMD5HashRequest)(nil), "dbauth.authenticator.protos.PGMD5HashRequest")
+	proto.RegisterType((*PGMD5HashResponse)(nil), "dbauth.authenticator.protos.PGMD5HashResponse")
 }
 
 func init() { proto.RegisterFile("authenticator.proto", fileDescriptor_e86ec39f7c35dea3) }
 
 var fileDescriptor_e86ec39f7c35dea3 = []byte{
-	// 219 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0x2c, 0x2d, 0xc9,
-	0x48, 0xcd, 0x2b, 0xc9, 0x4c, 0x4e, 0x2c, 0xc9, 0x2f, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0x92, 0x4e, 0x49, 0x02, 0x09, 0xeb, 0x61, 0x91, 0x2b, 0x56, 0xd2, 0xe6, 0xe2, 0x75, 0x71, 0x0a,
-	0x2d, 0x4e, 0x2d, 0x0a, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x92, 0xe2, 0xe2, 0xc8, 0x4c,
-	0x01, 0x29, 0x2b, 0xa9, 0x94, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x82, 0xf3, 0x95, 0xec, 0x41,
-	0x8a, 0x3d, 0x12, 0x8b, 0x33, 0x88, 0x50, 0x2c, 0x24, 0xc4, 0xc5, 0x52, 0x9c, 0x98, 0x53, 0x22,
-	0xc1, 0xa4, 0xc0, 0xa8, 0xc1, 0x13, 0x04, 0x66, 0x2b, 0x69, 0x70, 0xf1, 0xc1, 0x6c, 0x2b, 0x2e,
-	0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x12, 0xe3, 0x62, 0x4b, 0x49, 0x2a, 0x2d, 0x4e, 0x2d, 0x82, 0xea,
-	0x87, 0xf2, 0x94, 0x54, 0x40, 0x2a, 0x21, 0x56, 0x41, 0x55, 0x0a, 0x71, 0xb1, 0x64, 0x24, 0x16,
-	0x67, 0x40, 0xd5, 0x81, 0xd9, 0x46, 0xf7, 0x19, 0xb9, 0x78, 0x1d, 0x91, 0xbd, 0x25, 0x94, 0xc6,
-	0xc5, 0xe9, 0x9e, 0x5a, 0x02, 0xb1, 0x44, 0x48, 0x4b, 0x0f, 0x8f, 0xd7, 0xf5, 0x50, 0xfc, 0x2d,
-	0xa5, 0x4d, 0x94, 0x5a, 0x88, 0x5b, 0x94, 0x18, 0xe0, 0xf6, 0x80, 0x9c, 0x48, 0xd0, 0x1e, 0xa4,
-	0x20, 0x23, 0x68, 0x0f, 0xb2, 0x9f, 0x95, 0x18, 0x92, 0xd8, 0xc0, 0x12, 0xc6, 0x80, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x69, 0x97, 0x33, 0xe3, 0xda, 0x01, 0x00, 0x00,
+	// 258 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x41, 0x4b, 0xc3, 0x40,
+	0x10, 0x85, 0x8d, 0xd6, 0x82, 0x4b, 0x8b, 0xba, 0x82, 0x86, 0x7a, 0x29, 0x39, 0x68, 0x2f, 0xe6,
+	0xa0, 0x78, 0xf2, 0x54, 0x14, 0x62, 0x0f, 0x82, 0xe4, 0x0f, 0x84, 0x49, 0x76, 0xe8, 0x2e, 0x24,
+	0xbb, 0x75, 0x67, 0x72, 0xf0, 0xe6, 0xff, 0xf2, 0xcf, 0x49, 0x36, 0x51, 0x8a, 0x88, 0xf4, 0x36,
+	0xf3, 0xbe, 0xf7, 0xe0, 0xcd, 0x88, 0x33, 0x68, 0x59, 0xa3, 0x65, 0x53, 0x01, 0x3b, 0x9f, 0x6e,
+	0xbc, 0x63, 0x27, 0x2f, 0x55, 0xd9, 0xc9, 0xe9, 0x1f, 0x8c, 0x92, 0xcf, 0x48, 0x9c, 0xbc, 0x66,
+	0x2f, 0x4f, 0xf7, 0xcf, 0x40, 0x3a, 0xc7, 0xb7, 0x16, 0x89, 0xe5, 0x83, 0x98, 0x91, 0x59, 0x5b,
+	0x54, 0xc5, 0x1a, 0xb9, 0xa8, 0xa0, 0xae, 0xd1, 0x17, 0x46, 0x75, 0x61, 0x7e, 0x8f, 0xa3, 0x79,
+	0xb4, 0x38, 0xca, 0x2f, 0x7a, 0x47, 0x86, 0xfc, 0x18, 0xf8, 0x6a, 0xc0, 0xf2, 0x4a, 0x1c, 0x57,
+	0x35, 0x98, 0x06, 0x55, 0x61, 0xa0, 0x29, 0xc0, 0xdb, 0x78, 0x3f, 0x24, 0xa6, 0x83, 0xbc, 0x82,
+	0x66, 0xe9, 0xad, 0x3c, 0x17, 0x63, 0x55, 0x6a, 0x47, 0x1c, 0x1f, 0x04, 0x3c, 0x6c, 0xbd, 0xde,
+	0x12, 0xfa, 0x78, 0xf4, 0xad, 0x77, 0x9b, 0x94, 0x62, 0x44, 0x50, 0x73, 0x7c, 0x38, 0x8f, 0x16,
+	0x93, 0x3c, 0xcc, 0xc9, 0xb5, 0x38, 0xdd, 0x2a, 0x4f, 0x1b, 0x67, 0x09, 0x3b, 0xa3, 0x06, 0xd2,
+	0x43, 0xcf, 0x30, 0xdf, 0x7e, 0x44, 0x62, 0xba, 0xdc, 0xbe, 0x5f, 0x3a, 0x31, 0xc9, 0x90, 0x7f,
+	0xd2, 0xf2, 0x26, 0xfd, 0xe7, 0x4d, 0xe9, 0xef, 0x17, 0xcd, 0xd2, 0x5d, 0xed, 0x7d, 0xa9, 0x64,
+	0xaf, 0x1c, 0x07, 0x76, 0xf7, 0x15, 0x00, 0x00, 0xff, 0xff, 0x10, 0xc4, 0xb4, 0x24, 0xa4, 0x01,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -227,8 +174,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthenticatorClient interface {
-	GetDBUser(ctx context.Context, in *DBUserRequest, opts ...grpc.CallOption) (*DBUserResponse, error)
-	GetDBHash(ctx context.Context, in *DBHashRequest, opts ...grpc.CallOption) (*DBHashResponse, error)
+	GetPGMD5Hash(ctx context.Context, in *PGMD5HashRequest, opts ...grpc.CallOption) (*PGMD5HashResponse, error)
 }
 
 type authenticatorClient struct {
@@ -239,18 +185,9 @@ func NewAuthenticatorClient(cc *grpc.ClientConn) AuthenticatorClient {
 	return &authenticatorClient{cc}
 }
 
-func (c *authenticatorClient) GetDBUser(ctx context.Context, in *DBUserRequest, opts ...grpc.CallOption) (*DBUserResponse, error) {
-	out := new(DBUserResponse)
-	err := c.cc.Invoke(ctx, "/dbauth.authenticator.protos.Authenticator/GetDBUser", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authenticatorClient) GetDBHash(ctx context.Context, in *DBHashRequest, opts ...grpc.CallOption) (*DBHashResponse, error) {
-	out := new(DBHashResponse)
-	err := c.cc.Invoke(ctx, "/dbauth.authenticator.protos.Authenticator/GetDBHash", in, out, opts...)
+func (c *authenticatorClient) GetPGMD5Hash(ctx context.Context, in *PGMD5HashRequest, opts ...grpc.CallOption) (*PGMD5HashResponse, error) {
+	out := new(PGMD5HashResponse)
+	err := c.cc.Invoke(ctx, "/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -259,57 +196,35 @@ func (c *authenticatorClient) GetDBHash(ctx context.Context, in *DBHashRequest, 
 
 // AuthenticatorServer is the server API for Authenticator service.
 type AuthenticatorServer interface {
-	GetDBUser(context.Context, *DBUserRequest) (*DBUserResponse, error)
-	GetDBHash(context.Context, *DBHashRequest) (*DBHashResponse, error)
+	GetPGMD5Hash(context.Context, *PGMD5HashRequest) (*PGMD5HashResponse, error)
 }
 
 // UnimplementedAuthenticatorServer can be embedded to have forward compatible implementations.
 type UnimplementedAuthenticatorServer struct {
 }
 
-func (*UnimplementedAuthenticatorServer) GetDBUser(ctx context.Context, req *DBUserRequest) (*DBUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDBUser not implemented")
-}
-func (*UnimplementedAuthenticatorServer) GetDBHash(ctx context.Context, req *DBHashRequest) (*DBHashResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDBHash not implemented")
+func (*UnimplementedAuthenticatorServer) GetPGMD5Hash(ctx context.Context, req *PGMD5HashRequest) (*PGMD5HashResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPGMD5Hash not implemented")
 }
 
 func RegisterAuthenticatorServer(s *grpc.Server, srv AuthenticatorServer) {
 	s.RegisterService(&_Authenticator_serviceDesc, srv)
 }
 
-func _Authenticator_GetDBUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DBUserRequest)
+func _Authenticator_GetPGMD5Hash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PGMD5HashRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticatorServer).GetDBUser(ctx, in)
+		return srv.(AuthenticatorServer).GetPGMD5Hash(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dbauth.authenticator.protos.Authenticator/GetDBUser",
+		FullMethod: "/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticatorServer).GetDBUser(ctx, req.(*DBUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Authenticator_GetDBHash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DBHashRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthenticatorServer).GetDBHash(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/dbauth.authenticator.protos.Authenticator/GetDBHash",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticatorServer).GetDBHash(ctx, req.(*DBHashRequest))
+		return srv.(AuthenticatorServer).GetPGMD5Hash(ctx, req.(*PGMD5HashRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -319,12 +234,8 @@ var _Authenticator_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthenticatorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetDBUser",
-			Handler:    _Authenticator_GetDBUser_Handler,
-		},
-		{
-			MethodName: "GetDBHash",
-			Handler:    _Authenticator_GetDBHash_Handler,
+			MethodName: "GetPGMD5Hash",
+			Handler:    _Authenticator_GetPGMD5Hash_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
