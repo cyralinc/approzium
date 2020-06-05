@@ -32,7 +32,10 @@ def set_connection_sync(pgconn):
     # the async value in the psycopg connection struct
     server_version_addr = addressofint(pgconn.server_version)
     # check that there is only one match for that value
-    assert addressofint(pgconn.server_version, mem[server_version_addr+sizeofint:]) == -1
+    assert (
+        addressofint(pgconn.server_version, mem[server_version_addr + sizeofint :])
+        == -1
+    )
     protocol_address = server_version_addr - sizeofint
     protocol_version = intataddress(protocol_address)
     assert protocol_version == pgconn.protocol_version
@@ -81,7 +84,7 @@ def advance_until_challenge(pgconn):
                 AUTH_MD5 = 5
                 if byte == ord("R") and msg_size == 12 and auth_type == AUTH_MD5:
                     salt = challenge[index + 9 : index + 9 + 4]
-                    return salt
+                    return bytes(salt)
         elif state == psycopg2.extensions.POLL_OK:
             raise Exception("Connection already established")
 
@@ -127,13 +130,14 @@ def parse_dsn_args(dsn, appz_args):
     return psycopg_dsn
 
 
-def connect(dsn="", authenticator=None, async=0, **psycopgkwargs):
-    appz_args = {"authenticator": authenticator}
+def connect(dsn="", authenticator=None, iam_arn=None, async=0, **psycopgkwargs):
+    appz_args = {"authenticator": authenticator, "iam_arn": iam_arn}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
     pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
-    dbuser = pgconn.get_dsn_parameters()["user"]
     salt = advance_until_challenge(pgconn)
-    hash = get_hash(dbuser, salt, appz_args["authenticator"])
+    dbhost = pgconn.get_dsn_parameters()["host"]
+    dbuser = pgconn.get_dsn_parameters()["user"]
+    hash = get_hash(iam_arn, dbhost, dbuser, salt, appz_args["authenticator"])
     logging.debug(f"salt: {salt}, hash: {hash}")
     send_hash(pgconn, hash)
     advance_until_end(pgconn)

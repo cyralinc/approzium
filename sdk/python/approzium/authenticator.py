@@ -9,14 +9,20 @@ import sys
 sys.path.append(str(Path(__file__).parent / "protos"))
 import authenticator_pb2_grpc
 import authenticator_pb2
+from .iam import obtain_signed_get_caller_identity
 
 
-def get_hash(dbuser, salt, authenticator):
-    # XXX: for now
+def get_hash(iam_arn, dbhost, dbuser, salt, authenticator):
     if len(salt) != 4:
         raise Exception("salt not right size")
-    password = "password"
-    logging.debug(f"computing hash")
-    first_hash = hashlib.md5((password + dbuser).encode("ascii")).hexdigest()
-    second_hash = hashlib.md5(first_hash.encode("ascii") + salt).hexdigest()
-    return second_hash
+    request = authenticator_pb2.PGMD5HashRequest(
+        signed_get_caller_identity=obtain_signed_get_caller_identity(iam_arn),
+        claimed_iam_arn=iam_arn,
+        dbhost=dbhost,
+        dbuser=dbuser,
+        salt=salt,
+    )
+    channel = grpc.insecure_channel(authenticator)
+    stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
+    response = stub.GetPGMD5Hash(request)
+    return response.hash
