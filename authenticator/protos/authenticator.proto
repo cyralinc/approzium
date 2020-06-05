@@ -3,27 +3,17 @@ syntax = "proto3";
 package dbauth.authenticator.protos;
 
 service Authenticator {
-        rpc GetDBUser(DBUserRequest) returns (DBUserResponse) {}
-        rpc GetDBHash(DBHashRequest) returns (DBHashResponse) {}
+        rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5HashResponse) {}
 }
 
-message DBUserRequest {
-        string iam_role_arn = 1;
-        string signed_get_caller_identity = 2;
-        string dbname = 3;
+message PGMD5HashRequest {
+        string signed_get_caller_identity = 1;
+        string claimed_iam_arn = 2;
+        string dbhost = 3;
+        string dbuser = 4;
+        bytes salt = 5;
 }
 
-message DBHashRequest {
-        string iam_role_arn = 1;
-        string signed_get_caller_identity = 2;
-        string dbname = 3;
-        bytes salt = 4;
-}
-
-message DBUserResponse {
-        string dbuser = 1;
-}
-
-message DBHashResponse {
+message PGMD5HashResponse {
         string hash = 1;
 }

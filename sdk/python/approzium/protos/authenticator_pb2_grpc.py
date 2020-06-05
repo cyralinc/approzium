@@ -13,64 +13,52 @@ class AuthenticatorStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetDBUser = channel.unary_unary(
-            "/dbauth.authenticator.protos.Authenticator/GetDBUser",
-            request_serializer=authenticator__pb2.DBUserRequest.SerializeToString,
-            response_deserializer=authenticator__pb2.DBUserResponse.FromString,
-        )
+        self.GetPGMD5Hash = channel.unary_unary(
+                '/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash',
+                request_serializer=authenticator__pb2.PGMD5HashRequest.SerializeToString,
+                response_deserializer=authenticator__pb2.PGMD5HashResponse.FromString,
+                )
 
 
 class AuthenticatorServicer(object):
     """Missing associated documentation comment in .proto file"""
 
-    def GetDBUser(self, request, context):
+    def GetPGMD5Hash(self, request, context):
         """Missing associated documentation comment in .proto file"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_AuthenticatorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "GetDBUser": grpc.unary_unary_rpc_method_handler(
-            servicer.GetDBUser,
-            request_deserializer=authenticator__pb2.DBUserRequest.FromString,
-            response_serializer=authenticator__pb2.DBUserResponse.SerializeToString,
-        ),
+            'GetPGMD5Hash': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPGMD5Hash,
+                    request_deserializer=authenticator__pb2.PGMD5HashRequest.FromString,
+                    response_serializer=authenticator__pb2.PGMD5HashResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "dbauth.authenticator.protos.Authenticator", rpc_method_handlers
-    )
+            'dbauth.authenticator.protos.Authenticator', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
-# This class is part of an EXPERIMENTAL API.
+ # This class is part of an EXPERIMENTAL API.
 class Authenticator(object):
     """Missing associated documentation comment in .proto file"""
 
     @staticmethod
-    def GetDBUser(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
-        return grpc.experimental.unary_unary(
-            request,
+    def GetPGMD5Hash(request,
             target,
-            "/dbauth.authenticator.protos.Authenticator/GetDBUser",
-            authenticator__pb2.DBUserRequest.SerializeToString,
-            authenticator__pb2.DBUserResponse.FromString,
-            options,
-            channel_credentials,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-        )
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash',
+            authenticator__pb2.PGMD5HashRequest.SerializeToString,
+            authenticator__pb2.PGMD5HashResponse.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)

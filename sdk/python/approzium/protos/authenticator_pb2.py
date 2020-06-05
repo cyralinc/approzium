@@ -6,339 +6,154 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
+
+
 DESCRIPTOR = _descriptor.FileDescriptor(
-    name="authenticator.proto",
-    package="dbauth.authenticator.protos",
-    syntax="proto3",
-    serialized_options=None,
-    serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1b\x64\x62\x61uth.authenticator.protos"Y\n\rDBUserRequest\x12\x14\n\x0ciam_role_arn\x18\x01 \x01(\t\x12"\n\x1asigned_get_caller_identity\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62name\x18\x03 \x01(\t"g\n\rDBHashRequest\x12\x14\n\x0ciam_role_arn\x18\x01 \x01(\t\x12"\n\x1asigned_get_caller_identity\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62name\x18\x03 \x01(\t\x12\x0c\n\x04salt\x18\x04 \x01(\x0c" \n\x0e\x44\x42UserResponse\x12\x0e\n\x06\x64\x62user\x18\x01 \x01(\t"\x1e\n\x0e\x44\x42HashResponse\x12\x0c\n\x04hash\x18\x01 \x01(\t2w\n\rAuthenticator\x12\x66\n\tGetDBUser\x12*.dbauth.authenticator.protos.DBUserRequest\x1a+.dbauth.authenticator.protos.DBUserResponse"\x00\x62\x06proto3',
+  name='authenticator.proto',
+  package='dbauth.authenticator.protos',
+  syntax='proto3',
+  serialized_options=None,
+  serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1b\x64\x62\x61uth.authenticator.protos\"}\n\x10PGMD5HashRequest\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x04 \x01(\t\x12\x0c\n\x04salt\x18\x05 \x01(\x0c\"!\n\x11PGMD5HashResponse\x12\x0c\n\x04hash\x18\x01 \x01(\t2\x80\x01\n\rAuthenticator\x12o\n\x0cGetPGMD5Hash\x12-.dbauth.authenticator.protos.PGMD5HashRequest\x1a..dbauth.authenticator.protos.PGMD5HashResponse\"\x00\x62\x06proto3'
 )
 
 
-_DBUSERREQUEST = _descriptor.Descriptor(
-    name="DBUserRequest",
-    full_name="dbauth.authenticator.protos.DBUserRequest",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="iam_role_arn",
-            full_name="dbauth.authenticator.protos.DBUserRequest.iam_role_arn",
-            index=0,
-            number=1,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-        _descriptor.FieldDescriptor(
-            name="signed_get_caller_identity",
-            full_name="dbauth.authenticator.protos.DBUserRequest.signed_get_caller_identity",
-            index=1,
-            number=2,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-        _descriptor.FieldDescriptor(
-            name="dbname",
-            full_name="dbauth.authenticator.protos.DBUserRequest.dbname",
-            index=2,
-            number=3,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=52,
-    serialized_end=141,
+
+
+_PGMD5HASHREQUEST = _descriptor.Descriptor(
+  name='PGMD5HashRequest',
+  full_name='dbauth.authenticator.protos.PGMD5HashRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='signed_get_caller_identity', full_name='dbauth.authenticator.protos.PGMD5HashRequest.signed_get_caller_identity', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='claimed_iam_arn', full_name='dbauth.authenticator.protos.PGMD5HashRequest.claimed_iam_arn', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dbhost', full_name='dbauth.authenticator.protos.PGMD5HashRequest.dbhost', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dbuser', full_name='dbauth.authenticator.protos.PGMD5HashRequest.dbuser', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='salt', full_name='dbauth.authenticator.protos.PGMD5HashRequest.salt', index=4,
+      number=5, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=52,
+  serialized_end=177,
 )
 
 
-_DBHASHREQUEST = _descriptor.Descriptor(
-    name="DBHashRequest",
-    full_name="dbauth.authenticator.protos.DBHashRequest",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="iam_role_arn",
-            full_name="dbauth.authenticator.protos.DBHashRequest.iam_role_arn",
-            index=0,
-            number=1,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-        _descriptor.FieldDescriptor(
-            name="signed_get_caller_identity",
-            full_name="dbauth.authenticator.protos.DBHashRequest.signed_get_caller_identity",
-            index=1,
-            number=2,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-        _descriptor.FieldDescriptor(
-            name="dbname",
-            full_name="dbauth.authenticator.protos.DBHashRequest.dbname",
-            index=2,
-            number=3,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-        _descriptor.FieldDescriptor(
-            name="salt",
-            full_name="dbauth.authenticator.protos.DBHashRequest.salt",
-            index=3,
-            number=4,
-            type=12,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"",
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=143,
-    serialized_end=246,
+_PGMD5HASHRESPONSE = _descriptor.Descriptor(
+  name='PGMD5HashResponse',
+  full_name='dbauth.authenticator.protos.PGMD5HashResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='hash', full_name='dbauth.authenticator.protos.PGMD5HashResponse.hash', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=179,
+  serialized_end=212,
 )
 
-
-_DBUSERRESPONSE = _descriptor.Descriptor(
-    name="DBUserResponse",
-    full_name="dbauth.authenticator.protos.DBUserResponse",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="dbuser",
-            full_name="dbauth.authenticator.protos.DBUserResponse.dbuser",
-            index=0,
-            number=1,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=248,
-    serialized_end=280,
-)
-
-
-_DBHASHRESPONSE = _descriptor.Descriptor(
-    name="DBHashResponse",
-    full_name="dbauth.authenticator.protos.DBHashResponse",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="hash",
-            full_name="dbauth.authenticator.protos.DBHashResponse.hash",
-            index=0,
-            number=1,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=282,
-    serialized_end=312,
-)
-
-DESCRIPTOR.message_types_by_name["DBUserRequest"] = _DBUSERREQUEST
-DESCRIPTOR.message_types_by_name["DBHashRequest"] = _DBHASHREQUEST
-DESCRIPTOR.message_types_by_name["DBUserResponse"] = _DBUSERRESPONSE
-DESCRIPTOR.message_types_by_name["DBHashResponse"] = _DBHASHRESPONSE
+DESCRIPTOR.message_types_by_name['PGMD5HashRequest'] = _PGMD5HASHREQUEST
+DESCRIPTOR.message_types_by_name['PGMD5HashResponse'] = _PGMD5HASHRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-DBUserRequest = _reflection.GeneratedProtocolMessageType(
-    "DBUserRequest",
-    (_message.Message,),
-    {
-        "DESCRIPTOR": _DBUSERREQUEST,
-        "__module__": "authenticator_pb2"
-        # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.DBUserRequest)
-    },
-)
-_sym_db.RegisterMessage(DBUserRequest)
+PGMD5HashRequest = _reflection.GeneratedProtocolMessageType('PGMD5HashRequest', (_message.Message,), {
+  'DESCRIPTOR' : _PGMD5HASHREQUEST,
+  '__module__' : 'authenticator_pb2'
+  # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.PGMD5HashRequest)
+  })
+_sym_db.RegisterMessage(PGMD5HashRequest)
 
-DBHashRequest = _reflection.GeneratedProtocolMessageType(
-    "DBHashRequest",
-    (_message.Message,),
-    {
-        "DESCRIPTOR": _DBHASHREQUEST,
-        "__module__": "authenticator_pb2"
-        # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.DBHashRequest)
-    },
-)
-_sym_db.RegisterMessage(DBHashRequest)
+PGMD5HashResponse = _reflection.GeneratedProtocolMessageType('PGMD5HashResponse', (_message.Message,), {
+  'DESCRIPTOR' : _PGMD5HASHRESPONSE,
+  '__module__' : 'authenticator_pb2'
+  # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.PGMD5HashResponse)
+  })
+_sym_db.RegisterMessage(PGMD5HashResponse)
 
-DBUserResponse = _reflection.GeneratedProtocolMessageType(
-    "DBUserResponse",
-    (_message.Message,),
-    {
-        "DESCRIPTOR": _DBUSERRESPONSE,
-        "__module__": "authenticator_pb2"
-        # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.DBUserResponse)
-    },
-)
-_sym_db.RegisterMessage(DBUserResponse)
-
-DBHashResponse = _reflection.GeneratedProtocolMessageType(
-    "DBHashResponse",
-    (_message.Message,),
-    {
-        "DESCRIPTOR": _DBHASHRESPONSE,
-        "__module__": "authenticator_pb2"
-        # @@protoc_insertion_point(class_scope:dbauth.authenticator.protos.DBHashResponse)
-    },
-)
-_sym_db.RegisterMessage(DBHashResponse)
 
 
 _AUTHENTICATOR = _descriptor.ServiceDescriptor(
-    name="Authenticator",
-    full_name="dbauth.authenticator.protos.Authenticator",
-    file=DESCRIPTOR,
+  name='Authenticator',
+  full_name='dbauth.authenticator.protos.Authenticator',
+  file=DESCRIPTOR,
+  index=0,
+  serialized_options=None,
+  serialized_start=215,
+  serialized_end=343,
+  methods=[
+  _descriptor.MethodDescriptor(
+    name='GetPGMD5Hash',
+    full_name='dbauth.authenticator.protos.Authenticator.GetPGMD5Hash',
     index=0,
+    containing_service=None,
+    input_type=_PGMD5HASHREQUEST,
+    output_type=_PGMD5HASHRESPONSE,
     serialized_options=None,
-    serialized_start=314,
-    serialized_end=433,
-    methods=[
-        _descriptor.MethodDescriptor(
-            name="GetDBUser",
-            full_name="dbauth.authenticator.protos.Authenticator.GetDBUser",
-            index=0,
-            containing_service=None,
-            input_type=_DBUSERREQUEST,
-            output_type=_DBUSERRESPONSE,
-            serialized_options=None,
-        ),
-    ],
-)
+  ),
+])
 _sym_db.RegisterServiceDescriptor(_AUTHENTICATOR)
 
-DESCRIPTOR.services_by_name["Authenticator"] = _AUTHENTICATOR
+DESCRIPTOR.services_by_name['Authenticator'] = _AUTHENTICATOR
 
 # @@protoc_insertion_point(module_scope)
