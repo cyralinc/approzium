@@ -14,7 +14,7 @@ class AuthenticatorStub(object):
             channel: A grpc.Channel.
         """
         self.GetPGMD5Hash = channel.unary_unary(
-                '/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash',
+                '/approzium.authenticator.protos.Authenticator/GetPGMD5Hash',
                 request_serializer=authenticator__pb2.PGMD5HashRequest.SerializeToString,
                 response_deserializer=authenticator__pb2.PGMD5HashResponse.FromString,
                 )
@@ -39,7 +39,7 @@ def add_AuthenticatorServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'dbauth.authenticator.protos.Authenticator', rpc_method_handlers)
+            'approzium.authenticator.protos.Authenticator', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -57,7 +57,7 @@ class Authenticator(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dbauth.authenticator.protos.Authenticator/GetPGMD5Hash',
+        return grpc.experimental.unary_unary(request, target, '/approzium.authenticator.protos.Authenticator/GetPGMD5Hash',
             authenticator__pb2.PGMD5HashRequest.SerializeToString,
             authenticator__pb2.PGMD5HashResponse.FromString,
             options, channel_credentials,

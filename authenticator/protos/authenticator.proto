@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package dbauth.authenticator.protos;
+package approzium.authenticator.protos;
 
 service Authenticator {
         rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5HashResponse) {}

@@ -7,4 +7,4 @@ RUN apt-get install -y python3-dev python3-pip
 RUN pip3 install psycopg2 boto3
 # protobuf tools for Python
 RUN pip3 install grpcio grpcio-tools
-WORKDIR /usr/src/dbauth/sdk
+WORKDIR /usr/src/approzium/sdk

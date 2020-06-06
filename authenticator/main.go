@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "dbauth/authenticator/protos"
+	pb "approzium/authenticator/protos"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"

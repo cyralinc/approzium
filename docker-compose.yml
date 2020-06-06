@@ -8,13 +8,13 @@ services:
             - POSTGRES_DB=db
     authenticator:
         build: authenticator
-        image: dbauth_authenticator
+        image: approzium_authenticator
         volumes:
-            - .:/usr/src/dbauth
+            - .:/usr/src/approzium
         command: ./authenticator
     sdk:
         build: sdk
-        image: dbauth_sdk
+        image: approzium_sdk
         volumes:
-            - .:/usr/src/dbauth
+            - .:/usr/src/approzium
             - ~/.aws/:/root/.aws/:ro
