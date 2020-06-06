@@ -79,6 +79,8 @@ def advance_until_challenge(pgconn):
                 nread = libssl.SSL_read(ssl_obj, c_buffer, NBYTES)
                 challenge = bytearray(c_buffer.raw[:nread])
             else:
+                fd = pgconn.fileno()
+                sock = fromfd(fd)
                 challenge = sock.recv(NBYTES)
             assert len(challenge) == 13, "Challenge length is not correct"
             for index, byte in enumerate(challenge):
