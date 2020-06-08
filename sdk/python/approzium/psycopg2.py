@@ -5,15 +5,45 @@ from socket import ntohl, htonl
 import struct
 import logging
 from sys import getsizeof
-from ctypes import cdll, create_string_buffer, string_at, memmove
+from ctypes import cdll, create_string_buffer, string_at, memmove, c_void_p, c_int, c_char_p
 from ctypes.util import find_library
 from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 
 
+pgconnect = psycopg2.connect
+
+
 libpq = cdll.LoadLibrary("libpq.so.5")
 libssl = cdll.LoadLibrary(find_library("ssl"))
+
+
+# setup ctypes functions
+# necessary to avoid segfaults when using multiple Python threads
+libpq_PQstatus = libpq.PQstatus
+libpq_PQstatus.argtypes = [c_void_p]
+libpq_PQstatus.restype = c_int
+
+libpq_PQsslInUse = libpq.PQsslInUse
+libpq_PQsslInUse.argtypes = [c_void_p]
+libpq_PQsslInUse.restype = c_int
+
+libpq_PQgetssl = libpq.PQgetssl
+libpq_PQgetssl.argtypes = [c_void_p]
+libpq_PQgetssl.restype = c_void_p
+
+libpq_PQsetnonblocking = libpq.PQsetnonblocking
+libpq_PQsetnonblocking.argtypes = [c_void_p, c_int]
+libpq_PQsetnonblocking.restype = c_int
+
+libssl_SSL_read = libssl.SSL_read
+libssl_SSL_read.argtypes = [c_void_p, c_char_p, c_int]
+libssl_SSL_read.restype = c_int
+
+libssl_SSL_write = libssl.SSL_write
+libssl_SSL_write.argtypes = [c_void_p, c_char_p, c_int]
+libssl_SSL_write.restype = c_int
 
 
 def set_connection_sync(pgconn):
@@ -45,13 +75,13 @@ def set_connection_sync(pgconn):
     new_async_value = struct.pack("@l", 0)
     memmove(id(pgconn) + async_address, new_async_value, sizeoflong)
     assert pgconn.async == 0
-    error = libpq.PQsetnonblocking(pgconn.pgconn_ptr, 0)
+    error = libpq_PQsetnonblocking(pgconn.pgconn_ptr, 0)
     assert error == 0
 
 
 def advance_connection(pgconn):
     state = pgconn.poll()
-    status = libpq.PQstatus(pgconn.pgconn_ptr)
+    status = libpq_PQstatus(pgconn.pgconn_ptr)
     fd = pgconn.fileno()
     if state == psycopg2.extensions.POLL_OK:
         pass
@@ -72,11 +102,11 @@ def advance_until_challenge(pgconn):
             # request many more bytes than necessary. if connection is at the
             # right stage, only the right number of bytes will be received
             NBYTES = 8096
-            if libpq.PQsslInUse(pgconn.pgconn_ptr):
+            if libpq_PQsslInUse(pgconn.pgconn_ptr):
                 buffer = bytearray(NBYTES)
                 c_buffer = create_string_buffer(bytes(buffer), NBYTES)
-                ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
-                nread = libssl.SSL_read(ssl_obj, c_buffer, NBYTES)
+                ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
+                nread = libssl_SSL_read(ssl_obj, c_buffer, NBYTES)
                 challenge = bytearray(c_buffer.raw[:nread])
             else:
                 fd = pgconn.fileno()
@@ -110,10 +140,10 @@ def send_hash(pgconn, hash):
     msg += b"md5"
     msg += hash.encode("ascii")
     msg += b"\0"
-    if libpq.PQsslInUse(pgconn.pgconn_ptr):
-        ssl_obj = libpq.PQgetssl(pgconn.pgconn_ptr)
+    if libpq_PQsslInUse(pgconn.pgconn_ptr):
+        ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
         c_buffer = create_string_buffer(msg, len(msg))
-        n = libssl.SSL_write(ssl_obj, c_buffer, len(msg))
+        n = libssl_SSL_write(ssl_obj, c_buffer, len(msg))
         if n != len(msg):
             raise ValueError("could not send response")
     else:
