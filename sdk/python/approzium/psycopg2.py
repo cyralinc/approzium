@@ -165,7 +165,8 @@ def parse_dsn_args(dsn, appz_args):
     return psycopg_dsn
 
 
-def connect(dsn="", authenticator=None, iam_arn=None, async=0, **psycopgkwargs):
+def connect(dsn, authenticator=None, iam_arn=None, **psycopgkwargs):
+
     appz_args = {"authenticator": authenticator, "iam_arn": iam_arn}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
     pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
