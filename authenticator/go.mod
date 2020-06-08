@@ -1,4 +1,4 @@
-module dbauth/authenticator
+module approzium/authenticator
 
 go 1.13
 
