@@ -169,7 +169,15 @@ def connect(dsn, authenticator=None, iam_arn=None, **psycopgkwargs):
 
     appz_args = {"authenticator": authenticator, "iam_arn": iam_arn}
     psycopg_dsn = parse_dsn_args(dsn, appz_args)
-    pgconn = psycopg2.connect(psycopg_dsn, **psycopgkwargs, async=1)
+    async_ = 0
+    if 'async' in psycopgkwargs:
+        async_ = psycopgkwargs.pop('async')
+    if 'async_' in psycopgkwargs:
+        async_ = psycopgkwargs.pop('async_')
+    pgconn = pgconnect(psycopg_dsn, **psycopgkwargs, async_=1)
+    if pgconn.pgconn_ptr is None:
+        # if connection is uninitialized, something is wrong so return as is
+        return pgconn
     salt = advance_until_challenge(pgconn)
     dbhost = pgconn.get_dsn_parameters()["host"]
     dbuser = pgconn.get_dsn_parameters()["user"]
@@ -177,6 +185,8 @@ def connect(dsn, authenticator=None, iam_arn=None, **psycopgkwargs):
     logging.debug(f"salt: {salt}, hash: {hash}")
     send_hash(pgconn, hash)
     advance_until_end(pgconn)
-    if async == 0:
+    if async_ == 0:
         set_connection_sync(pgconn)
+        pgconn.autocommit = False
+        pgconn.poll()
     return pgconn
