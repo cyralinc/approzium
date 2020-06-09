@@ -4,12 +4,22 @@ import socket
 from socket import ntohl, htonl
 import struct
 import logging
+import warnings
 from sys import getsizeof
-from ctypes import cdll, create_string_buffer, string_at, memmove, c_void_p, c_int, c_char_p
+from ctypes import (
+    cdll,
+    create_string_buffer,
+    string_at,
+    memmove,
+    c_void_p,
+    c_int,
+    c_char_p,
+)
 from ctypes.util import find_library
 from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
+import approzium
 
 
 pgconnect = psycopg2.connect
