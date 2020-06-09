@@ -206,7 +206,3 @@ def connect(dsn=None, connection_factory=None, cursor_factory=None, **kwargs):
     # construct our approzium factory class on top of given connection factory class
     factory = construct_approzium_conn(connection_factory, is_sync)
     return pgconnect(dsn, factory, cursor_factory, **kwargs)
-
-    # if pgconn is None or pgconn.pgconn_ptr is None:
-    #    # if connection is uninitialized, something is wrong so return as is
-    #    return pgconn
