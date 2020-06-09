@@ -1,3 +1,4 @@
+import approzium
 import logging
 import hashlib
 import grpc
@@ -12,11 +13,12 @@ import authenticator_pb2
 from .iam import obtain_signed_get_caller_identity
 
 
-def get_hash(iam_arn, dbhost, dbuser, salt, authenticator):
+def get_hash(dbhost, dbuser, salt, authenticator):
     if len(salt) != 4:
         raise Exception("salt not right size")
+    iam_arn, signed_gci = obtain_signed_get_caller_identity()
     request = authenticator_pb2.PGMD5HashRequest(
-        signed_get_caller_identity=obtain_signed_get_caller_identity(iam_arn),
+        signed_get_caller_identity=signed_gci,
         claimed_iam_arn=iam_arn,
         dbhost=dbhost,
         dbuser=dbuser,

@@ -1,10 +1,13 @@
 import boto3
+import approzium
 
 
-def obtain_signed_get_caller_identity(iam_role):
+def obtain_signed_get_caller_identity():
+    if approzium.iam_role is None:
+        raise NotImplementedError('Automatic IAM ARN determination is not implemented yet')
     sts_client = boto3.client("sts")
     credentials = sts_client.assume_role(
-        DurationSeconds=3600, RoleArn=iam_role, RoleSessionName="Service1",
+        DurationSeconds=3600, RoleArn=approzium.iam_role, RoleSessionName="Service1",
     )["Credentials"]
     iam_session = boto3.Session(
         aws_access_key_id=credentials["AccessKeyId"],

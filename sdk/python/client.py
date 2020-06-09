@@ -1,8 +1,9 @@
+import psycopg2
 from approzium.psycopg2 import connect
+from approzium import set_authenticator, set_iam_role
 
 
-conn = connect(
-        authenticator='authenticator:1234',
-        iam_arn='arn:aws:iam::403019568400:role/dev'
-)
+set_iam_role('arn:aws:iam::accountid:role/rolename')
+set_authenticator('authenticator:1234')
+conn = connect("")
 print('Connection Established')
