@@ -2,6 +2,8 @@
 authenticator/authenticator
 main
 
+sdk/python/tests/pg2_testsuite/
+
 # Prerequisites
 *.d
 
