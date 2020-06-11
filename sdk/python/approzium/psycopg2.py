@@ -1,120 +1,52 @@
 import psycopg2
 import select
-import socket
-from socket import ntohl, htonl
-import struct
 import logging
-import warnings
+import struct
 from sys import getsizeof
-from ctypes import (
-    cdll,
-    create_string_buffer,
-    string_at,
-    memmove,
-    c_void_p,
-    c_int,
-    c_char_p,
+import warnings
+from ._psycopg2_ctypes import (
+    libpq_PQstatus,
+    libpq_PQsslInUse,
+    libpq_PQgetssl,
+    libpq_PQsetnonblocking,
+    libssl_SSL_read,
+    libssl_SSL_write,
+    set_connection_sync,
+    read_from_conn,
+    write_to_conn,
 )
-from ctypes.util import find_library
-from .socketfromfd import fromfd
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 import approzium
 
 
+# Postgres protocol constants
+# derived from PGsource/src/include/libpq/pgcomm.h
+AUTH_REQ_MD5 = 5
+AUTH_REQ_SASL = 10
+
 pgconnect = psycopg2.connect
 
-
-libpq = cdll.LoadLibrary("libpq.so.5")
-libssl = cdll.LoadLibrary(find_library("ssl"))
-
-
-# setup ctypes functions
-# necessary to avoid segfaults when using multiple Python threads
-libpq_PQstatus = libpq.PQstatus
-libpq_PQstatus.argtypes = [c_void_p]
-libpq_PQstatus.restype = c_int
-
-libpq_PQsslInUse = libpq.PQsslInUse
-libpq_PQsslInUse.argtypes = [c_void_p]
-libpq_PQsslInUse.restype = c_int
-
-libpq_PQgetssl = libpq.PQgetssl
-libpq_PQgetssl.argtypes = [c_void_p]
-libpq_PQgetssl.restype = c_void_p
-
-libpq_PQsetnonblocking = libpq.PQsetnonblocking
-libpq_PQsetnonblocking.argtypes = [c_void_p, c_int]
-libpq_PQsetnonblocking.restype = c_int
-
-libssl_SSL_read = libssl.SSL_read
-libssl_SSL_read.argtypes = [c_void_p, c_char_p, c_int]
-libssl_SSL_read.restype = c_int
-
-libssl_SSL_write = libssl.SSL_write
-libssl_SSL_write.argtypes = [c_void_p, c_char_p, c_int]
-libssl_SSL_write.restype = c_int
-
-
-def set_connection_sync(pgconn):
-    mem = bytearray(string_at(id(pgconn), getsizeof(pgconn)))
-    sizeofint = struct.calcsize("@i")
-    sizeoflong = struct.calcsize("@l")
-
-    def addressofint(number, mem=mem):
-        int_bytes = struct.pack("@i", number)
-        return mem.find(int_bytes)
-
-    def intataddress(address):
-        return struct.unpack("@i", mem[address : address + sizeofint])[0]
-
-    # as a check, we check server and protocol version numbers, which succeed
-    # the async value in the psycopg connection struct
-    server_version_addr = addressofint(pgconn.server_version)
-    # check that there is only one match for that value
-    assert (
-        addressofint(pgconn.server_version, mem[server_version_addr + sizeofint :])
-        == -1
-    )
-    protocol_address = server_version_addr - sizeofint
-    protocol_version = intataddress(protocol_address)
-    assert protocol_version == pgconn.protocol_version
-    async_address = protocol_address - sizeoflong
-    async_value = struct.unpack("@l", mem[async_address:protocol_address])[0]
-    assert async_value == pgconn.async
-    new_async_value = struct.pack("@l", 0)
-    memmove(id(pgconn) + async_address, new_async_value, sizeoflong)
-    assert pgconn.async == 0
-    error = libpq_PQsetnonblocking(pgconn.pgconn_ptr, 0)
-    assert error == 0
 
 
 def read_salt(pgconn):
     # request many more bytes than necessary. if connection is at the
     # right stage, only the right number of bytes will be received
     NBYTES = 8096
-    if libpq_PQsslInUse(pgconn.pgconn_ptr):
-        buffer = bytearray(NBYTES)
-        c_buffer = create_string_buffer(bytes(buffer), NBYTES)
-        ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
-        nread = libssl_SSL_read(ssl_obj, c_buffer, NBYTES)
-        challenge = bytearray(c_buffer.raw[:nread])
+    challenge = read_from_conn(pgconn, NBYTES)
+    msg_size = read_int32_from_bytes(challenge, 1)
+    auth_type = read_int32_from_bytes(challenge, 5)
+    if challenge[0] != ord("R"):
+        raise Exception("Authentication message not received")
+    if auth_type == AUTH_REQ_MD5 and msg_size == 12:
+        salt = challenge[9 : 9 + 4]
+        return bytes(salt)
+    elif auth_type == AUTH_REQ_SASL and msg_size == 23:
+        if challenge[9:22] != b'SCRAM-SHA-256':
+            raise Exception("Server requested an unsupported SASL authentication method")
+        import pdb; pdb.set_trace()
     else:
-        fd = pgconn.fileno()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", ResourceWarning)
-            sock = fromfd(fd)
-            challenge = sock.recv(NBYTES)
-    assert len(challenge) == 13, "Challenge length is not correct"
-    for index, byte in enumerate(challenge):
-        msg_size = read_int32_from_bytes(challenge, index + 1)
-        auth_type = read_int32_from_bytes(challenge, index + 5)
-        AUTH_MD5 = 5
-        if byte == ord("R") and msg_size == 12 and auth_type == AUTH_MD5:
-            salt = challenge[index + 9 : index + 9 + 4]
-            return bytes(salt)
-        else:
-            raise Exception("Unidentified authentication method")
+        raise Exception("Unidentified authentication method")
 
 
 def wait(pgconn):
@@ -138,17 +70,8 @@ def send_hash(pgconn, hash):
     msg += b"md5"
     msg += hash.encode("ascii")
     msg += b"\0"
-    if libpq_PQsslInUse(pgconn.pgconn_ptr):
-        ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
-        c_buffer = create_string_buffer(msg, len(msg))
-        n = libssl_SSL_write(ssl_obj, c_buffer, len(msg))
-        if n != len(msg):
-            raise ValueError("could not send response")
-    else:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", ResourceWarning)
-            sock = fromfd(pgconn.fileno(), keep_fd=True)
-            sock.sendall(msg)
+    write_to_conn(pgconn, msg)
+
 
 
 def construct_approzium_conn(base, is_sync):
