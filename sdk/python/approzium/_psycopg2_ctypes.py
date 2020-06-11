@@ -1,5 +1,6 @@
 from ctypes import (
     cdll,
+    CDLL,
     create_string_buffer,
     string_at,
     memmove,
@@ -8,6 +9,7 @@ from ctypes import (
     c_char_p,
 )
 from ctypes.util import find_library
+import socket
 import struct
 from sys import getsizeof
 import warnings
@@ -78,21 +80,22 @@ def set_connection_sync(pgconn):
     assert error == 0
 
 
-def read_from_conn(pgconn, nbytes):
+def read_from_conn(pgconn, nbytes, peek=True, justbytes=False):
     ### XXX: replace with conn.info.ssl_in_use
-    if libpq_PQsslInUse(pgconn.pgconn_ptr):
+    if libpq_PQsslInUse(pgconn.pgconn_ptr) and not justbytes:
         buffer = bytearray(nbytes)
         c_buffer = create_string_buffer(bytes(buffer), nbytes)
         ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
         nread = libssl_SSL_read(ssl_obj, c_buffer, nbytes)
-        bytes = bytearray(c_buffer.raw[:nread])
+        msg = bytearray(c_buffer.raw[:nread])
     else:
         fd = pgconn.fileno()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ResourceWarning)
+            flags = [socket.MSG_PEEK] if peek else []
             sock = fromfd(fd)
-            bytes = sock.recv(nbytes)
-            return bytes
+            msg = sock.recv(nbytes, *flags)
+    return msg
 
 def write_to_conn(pgconn, msg):
     if libpq_PQsslInUse(pgconn.pgconn_ptr):
@@ -100,9 +103,14 @@ def write_to_conn(pgconn, msg):
         c_buffer = create_string_buffer(msg, len(msg))
         n = libssl_SSL_write(ssl_obj, c_buffer, len(msg))
         if n != len(msg):
-            raise ValueError("could not send response")
+            raise ValueError("could not send message")
     else:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ResourceWarning)
             sock = fromfd(pgconn.fileno(), keep_fd=True)
             sock.sendall(msg)
+
+def set_debug(conn):
+    libc = CDLL(find_library('c'))
+    stdout = c_void_p.in_dll(libc, 'stdout')
+    libpq.PQtrace(conn.pgconn_ptr, stdout)
