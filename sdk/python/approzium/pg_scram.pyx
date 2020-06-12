@@ -105,7 +105,7 @@ class SCRAMAuthentication:
         self.client_nonce = None
         self.client_proof = None
         self.password_salt = None
-        # self.password_iterations = None
+        self.password_iterations = None
         self.server_first_message = None
         self.server_key = None
         self.server_nonce = None
@@ -130,7 +130,7 @@ class SCRAMAuthentication:
             client_first_message
         return msg
 
-    def create_client_final_message(self, str password):
+    def create_client_final_message(self, bytes salted_password):
         """Create the final client message as part of SCRAM authentication"""
         cdef:
             bytes msg
@@ -140,12 +140,8 @@ class SCRAMAuthentication:
             raise Exception(
                 "you need values from server to generate a client proof")
 
-        # normalize the password using the SASLprep algorithm in RFC 4013
-        # password = self._normalize_password(password)
-        password = 'password'
-
         # generate the client proof
-        self.client_proof = self._generate_client_proof(password=password)
+        self.client_proof = self._generate_client_proof(salted_password)
         msg = bytes()
         msg += b"c=" + base64.b64encode(self.client_channel_binding) + \
             b",r=" + self.server_nonce + \
@@ -202,18 +198,13 @@ class SCRAMAuthentication:
 
         return base64.b64encode(token)
 
-    def _generate_client_proof(self, str password):
+    def _generate_client_proof(self, bytes salted_password):
         """need to ensure a server response exists, i.e. """
-        cdef:
-            bytes salted_password
 
         if any([getattr(self, val) is None for val in
                 self.REQUIREMENTS_CLIENT_PROOF]):
             raise Exception(
                 "you need values from server to generate a client proof")
-        # generate a salt password
-        salted_password = self._generate_salted_password(password,
-            self.password_salt, self.password_iterations)
         # client key is derived from the salted password
         client_key = hmac.new(salted_password, b"Client Key", self.DIGEST)
         # this allows us to compute the stored key that is residing on the server

@@ -87,7 +87,7 @@ def send_hash(pgconn, auth_type, hash):
         select.select([pgconn.fileno()], [], [])
         resp_type, server_final = read_msg(pgconn)
         if resp_type != b'R':
-            raise Exception('Error received unexpected response', server_first)
+            raise Exception('Error received unexpected response', server_final)
         if not auth.verify_server_final_message(server_final):
             raise Exception('Error bad server signature')
 

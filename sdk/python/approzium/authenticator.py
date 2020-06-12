@@ -14,12 +14,13 @@ from .iam import obtain_signed_get_caller_identity
 from . import psycopg2
 
 
-def get_hash(dbhost, dbuser, auth_type, salt, authenticator):
+def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
     iam_arn, signed_gci = obtain_signed_get_caller_identity()
     channel = grpc.insecure_channel(authenticator)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
     if auth_type == psycopg2.AUTH_REQ_MD5:
+        salt = auth_info
         if len(salt) != 4:
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
@@ -32,6 +33,16 @@ def get_hash(dbhost, dbuser, auth_type, salt, authenticator):
         response = stub.GetPGMD5Hash(request)
         return response.hash
     elif auth_type == psycopg2.AUTH_REQ_SASL:
-        auth = salt
-        client_final = auth.create_client_final_message('password')
+        auth = auth_info
+        request = authenticator_pb2.PGSHA256HashRequest(
+            signed_get_caller_identity=signed_gci,
+            claimed_iam_arn=iam_arn,
+            dbhost=dbhost,
+            dbuser=dbuser,
+            salt=auth.password_salt,
+            iterations=auth.password_iterations
+        )
+        response = stub.GetPGSHA256Hash(request)
+        salted_password = response.spassword
+        client_final = auth.create_client_final_message(salted_password)
         return client_final, auth
