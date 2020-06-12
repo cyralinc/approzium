@@ -3,10 +3,11 @@ import logging
 authenticator_addr = "authenticator:1234"
 iam_role = None
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(filename)s:%(lineno)s - %(funcName)10s() ] %(message)s",
-)
+logger = logging.getLogger(__name__)
+ch = logging.StreamHandler()
+formatter = logging.Formatter("[%(filename)s:%(lineno)s - %(funcName)10s() ] %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 def set_authenticator(new_authenticator):

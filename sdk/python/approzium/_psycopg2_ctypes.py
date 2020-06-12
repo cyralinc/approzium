@@ -11,10 +11,13 @@ from ctypes import (
 from ctypes.util import find_library
 import socket
 import struct
+import logging
 from sys import getsizeof
 import warnings
 from .socketfromfd import fromfd
 
+
+logger = logging.getLogger(__name__)
 
 libpq = cdll.LoadLibrary("libpq.so.5")
 libssl = cdll.LoadLibrary(find_library("ssl"))
@@ -95,6 +98,7 @@ def read_from_conn(pgconn, nbytes, peek=True, justbytes=False):
             flags = [socket.MSG_PEEK] if peek else []
             sock = fromfd(fd)
             msg = sock.recv(nbytes, *flags)
+    logger.debug(f'got: {msg}')
     return msg
 
 def write_to_conn(pgconn, msg):
@@ -109,6 +113,7 @@ def write_to_conn(pgconn, msg):
             warnings.simplefilter("ignore", ResourceWarning)
             sock = fromfd(pgconn.fileno(), keep_fd=True)
             sock.sendall(msg)
+    logger.debug(f'sent: {msg}')
 
 def set_debug(conn):
     libc = CDLL(find_library('c'))

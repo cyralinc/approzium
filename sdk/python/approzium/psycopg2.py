@@ -14,11 +14,14 @@ from ._psycopg2_ctypes import (
     set_connection_sync,
     read_from_conn,
     write_to_conn,
+    set_debug
 )
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes, redirect_socket_nowhere
 import approzium
 
+
+logger = logging.getLogger(__name__)
 
 # Postgres protocol constants
 # derived from PGsource/src/include/libpq/pgcomm.h
@@ -50,6 +53,7 @@ def read_salt(pgconn):
         # remove bytes from socket and feed them to libpq through void socket
         read_from_conn(pgconn, NBYTES, peek=False)
         with redirect_socket_nowhere(pgconn.fileno(), feedit=challenge):
+            logging.debug('letting libpq consume MD5 auth request')
             try:
                 _normal_poll(pgconn)
             except:
@@ -96,13 +100,15 @@ def construct_approzium_conn(base, is_sync):
 
         def __init__(self, *args, **kwargs):
             # can safely do so because real async value was caught earlier in our connect method
-            logging.debug("ApproziumConn __init__")
+            logger.debug("ApproziumConn __init__")
             kwargs.pop("async", None)
             kwargs.pop("async_", None)
-            conn = super().__init__(*args, **kwargs, async_=1)
+            super().__init__(*args, **kwargs, async_=1)
             if self.dsn is None:
                 # connection is uninitalized due to an error
                 return
+            if logger.getEffectiveLevel() <= logging.DEBUG:
+                set_debug(self)
             self._salt = None
             self._hash_sent = False
             if is_sync:

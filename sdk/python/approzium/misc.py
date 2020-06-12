@@ -5,7 +5,10 @@ import socket
 from contextlib import contextmanager
 import os
 import queue
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 def read_int32_from_bytes(bytes, index):
     num = struct.unpack("!i", bytes[index : index + 4])[0]
@@ -17,27 +20,28 @@ def redirect_socket_nowhere(fileno, feedit=None):
     void_socket = new_mim_socket(feedit)
     orig_dest = os.dup(fileno)
     os.dup2(void_socket.fileno(), fileno)
+    logger.debug('redirecting socket')
     yield
     os.dup2(orig_dest, fileno)
+    logger.debug('restoring original socket')
 
 
 def mim_conn_listen(clientsocket, feedit):
     child_pid = os.fork()
     if child_pid != 0:
         return
-    shouldfeed = False
-    if feedit is not None:
-        print('feedit', feedit)
-        shouldfeed = True
+    logger.debug('listening on connection')
     while True:
         rlist, wlist = select.select([clientsocket], [clientsocket], [])[0:2]
         if clientsocket in rlist:
             buf = clientsocket.recv(4096)
             if not buf:
                 break
-        if clientsocket in wlist and shouldfeed:
+            logger.debug(f'got {buf} and ignoring it')
+        if clientsocket in wlist and not feedit is None:
+            logging.debug(f'feeding socket client {feedit}')
             clientsocket.sendall(feedit)
-            shouldfeed = False
+            feedit = None
 
 def mim_server_listen(new_server_socket, feedit):
     (clientsocket, address) = new_server_socket.accept()
