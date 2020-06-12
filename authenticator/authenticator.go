@@ -136,12 +136,12 @@ func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
 func newVault() map[vaultKey]string {
 	creds := make(map[vaultKey]string)
 	// for dev purposes: read credentials from a local file
-	type secret struct {
+	type secrets []struct {
 		Dbhost   string `yaml:"dbhost"`
 		Dbuser   string `yaml:"dbuser"`
 		Password string `yaml:"password"`
 	}
-	var devCreds secret
+	var devCreds secrets
 	yamlFile, err := ioutil.ReadFile("secrets.yaml")
 	if err != nil {
 		log.Errorf("yamlFile.Get err #%v ", err)
@@ -150,8 +150,11 @@ func newVault() map[vaultKey]string {
 	if err != nil {
 		log.Errorf("Unmarshal: #%v ", err)
 	}
-	key := vaultKey{"arn:aws:iam::403019568400:role/dev", devCreds.Dbhost, devCreds.Dbuser}
-	creds[key] = devCreds.Password
+	for _, cred := range devCreds {
+		key := vaultKey{"arn:aws:iam::403019568400:role/dev", cred.Dbhost, cred.Dbuser}
+		creds[key] = cred.Password
+		log.Debugf("added dev credential for host %s", cred.Dbhost)
+	}
 	return creds
 }
 
