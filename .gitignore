@@ -2,6 +2,11 @@
 authenticator/authenticator
 main
 
+ssl/*.key
+ssl/*.crt
+ssl/*.srl
+ssl/*.csr
+
 # Prerequisites
 *.d
 
