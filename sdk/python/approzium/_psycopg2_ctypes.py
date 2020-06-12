@@ -82,22 +82,35 @@ def set_connection_sync(pgconn):
     assert error == 0
 
 
-def read_from_conn(pgconn, nbytes):
-    if pgconn.info.ssl_in_use:
-        buffer = bytearray(nbytes)
-        c_buffer = create_string_buffer(bytes(buffer), nbytes)
-        ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
-        nread = -1
-        while nread == -1:
-            nread = libssl_SSL_read(ssl_obj, c_buffer, nbytes)
-        msg = bytearray(c_buffer.raw[:nread])
-        return msg
-    else:
-        fd = pgconn.fileno()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", ResourceWarning)
-            sock = fromfd(fd)
-            return sock.recv(nbytes)
+def read_msg(pgconn):
+    def read_bytes(n):
+        if pgconn.info.ssl_in_use:
+            buffer = bytearray(n)
+            c_buffer = create_string_buffer(bytes(buffer), n)
+            ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
+            nread = -1
+            while nread == -1:
+                nread = libssl_SSL_read(ssl_obj, c_buffer, n)
+            msg = bytes(c_buffer.raw[:nread])
+            return msg
+        else:
+            fd = pgconn.fileno()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", ResourceWarning)
+                sock = fromfd(fd)
+                return sock.recv(n)
+
+    msg_type = read_bytes(1)
+    msg_size = struct.unpack("!i", read_bytes(4))[0]
+    msg_content = read_bytes(msg_size-4)
+    logger.debug(f'read: {msg_type} {msg_content}')
+    return msg_type, msg_content
+
+
+def write_msg(pgconn, msg_header, msg):
+    msg = msg_header + struct.pack("!i", len(msg)+4) + msg
+    write_to_conn(pgconn, msg)
+
 
 def write_to_conn(pgconn, msg):
     if libpq_PQsslInUse(pgconn.pgconn_ptr):
