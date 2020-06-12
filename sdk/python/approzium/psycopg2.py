@@ -17,7 +17,7 @@ from ._psycopg2_ctypes import (
     set_debug
 )
 from .authenticator import get_hash
-from .misc import read_int32_from_bytes, redirect_socket_nowhere
+from .misc import read_int32_from_bytes
 import approzium
 
 
@@ -31,33 +31,18 @@ AUTH_REQ_SASL = 10
 pgconnect = psycopg2.connect
 
 
-def _normal_poll(pgconn):
-    '''Poll an Approzium type connection using just the Psycopg2 poll and not
-    our custom poll function.
-    '''
-    super(type(pgconn), pgconn).poll()
 
 def read_salt(pgconn):
     # request many more bytes than necessary. if connection is at the
     # right stage, only the right number of bytes will be received
     NBYTES = 8096
-    # peek now and only remove data from socket once we are sure that this is
-    # a supported authentication message.
-    challenge = read_from_conn(pgconn, NBYTES, peek=True)
+    challenge = read_from_conn(pgconn, NBYTES)
     msg_size = read_int32_from_bytes(challenge, 1)
     auth_type = read_int32_from_bytes(challenge, 5)
     if challenge[0] != ord("R"):
         raise Exception("Authentication message not received")
     if auth_type == AUTH_REQ_MD5 and msg_size == 12:
         salt = challenge[9 : 9 + 4]
-        # remove bytes from socket and feed them to libpq through void socket
-        read_from_conn(pgconn, NBYTES, peek=False)
-        with redirect_socket_nowhere(pgconn.fileno(), feedit=challenge):
-            logging.debug('letting libpq consume MD5 auth request')
-            try:
-                _normal_poll(pgconn)
-            except:
-                pass
         return bytes(salt)
     elif auth_type == AUTH_REQ_SASL and msg_size == 23:
         if challenge[9:22] != b'SCRAM-SHA-256':
@@ -91,6 +76,7 @@ def send_hash(pgconn, hash):
     write_to_conn(pgconn, msg)
 
 
+
 def construct_approzium_conn(base, is_sync):
     if not base:
         base = psycopg2.extensions.connection
@@ -119,11 +105,11 @@ def construct_approzium_conn(base, is_sync):
         def poll(self):
             status = libpq_PQstatus(self.pgconn_ptr)
             if status == self.CONNECTION_AWAITING_RESPONSE and not self._salt:
-                logger.debug("reading salt")
+                logging.debug("reading salt")
                 self._salt = read_salt(self)
                 return psycopg2.extensions.POLL_WRITE
             elif self._salt and not self._hash_sent:
-                logger.debug("sending hash")
+                logging.debug("sending hash")
                 dbhost = self.get_dsn_parameters()["host"]
                 dbuser = self.get_dsn_parameters()["user"]
                 hash = get_hash(
@@ -133,7 +119,7 @@ def construct_approzium_conn(base, is_sync):
                 self._hash_sent = True
                 return psycopg2.extensions.POLL_WRITE
             else:
-                logger.debug("normal poll")
+                logging.debug("normal poll")
                 return super().poll()
 
     return ApproziumConn
