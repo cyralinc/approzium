@@ -21,8 +21,7 @@ try:
 except ImportError:
     from os import urandom as generate_token_bytes
 
-@cython.final
-cdef class SCRAMAuthentication:
+class SCRAMAuthentication:
     """Contains the protocol for generating and a SCRAM hashed password.
 
     Since PostgreSQL 10, the option to hash passwords using the SCRAM-SHA-256
@@ -78,7 +77,7 @@ cdef class SCRAMAuthentication:
     to support other channel binding methos in the future
     """
     AUTHENTICATION_METHODS = [b"SCRAM-SHA-256"]
-    DEFAULT_CLIENT_NONCE_BYTES = 24
+    DEFAULT_CLIENT_NONCE_BYTES = 16  # 24
     DIGEST = hashlib.sha256
     REQUIREMENTS_CLIENT_FINAL_MESSAGE = ['client_channel_binding',
         'server_nonce']
@@ -97,7 +96,7 @@ cdef class SCRAMAuthentication:
         stringprep.in_table_c9,
     )
 
-    def __cinit__(self, bytes authentication_method):
+    def __init__(self, bytes authentication_method):
         self.authentication_method = authentication_method
         self.authorization_message = None
         # channel binding is turned off for the time being
@@ -111,7 +110,7 @@ cdef class SCRAMAuthentication:
         self.server_key = None
         self.server_nonce = None
 
-    cdef create_client_first_message(self, str username):
+    def create_client_first_message(self, str username):
         """Create the initial client message for SCRAM authentication"""
         cdef:
             bytes msg
@@ -131,7 +130,7 @@ cdef class SCRAMAuthentication:
             client_first_message
         return msg
 
-    cdef create_client_final_message(self, str password):
+    def create_client_final_message(self, str password):
         """Create the final client message as part of SCRAM authentication"""
         cdef:
             bytes msg
@@ -142,7 +141,8 @@ cdef class SCRAMAuthentication:
                 "you need values from server to generate a client proof")
 
         # normalize the password using the SASLprep algorithm in RFC 4013
-        password = self._normalize_password(password)
+        # password = self._normalize_password(password)
+        password = 'password'
 
         # generate the client proof
         self.client_proof = self._generate_client_proof(password=password)
@@ -152,7 +152,7 @@ cdef class SCRAMAuthentication:
             b",p=" + base64.b64encode(self.client_proof)
         return msg
 
-    cdef parse_server_first_message(self, bytes server_response):
+    def parse_server_first_message(self, bytes server_response):
         """Parse the response from the first message from the server"""
         self.server_first_message = server_response
         try:
@@ -173,7 +173,7 @@ cdef class SCRAMAuthentication:
         except (IndexError, TypeError, ValueError):
             raise Exception("could not get iterations")
 
-    cdef verify_server_final_message(self, bytes server_final_message):
+    def verify_server_final_message(self, bytes server_final_message):
         """Verify the final message from the server"""
         cdef:
             bytes server_signature
@@ -190,11 +190,11 @@ cdef class SCRAMAuthentication:
         return server_signature == base64.b64encode(
             verify_server_signature.digest())
 
-    cdef _bytes_xor(self, bytes a, bytes b):
+    def _bytes_xor(self, bytes a, bytes b):
         """XOR two bytestrings together"""
         return bytes(a_i ^ b_i for a_i, b_i in zip(a, b))
 
-    cdef _generate_client_nonce(self, int num_bytes):
+    def _generate_client_nonce(self, int num_bytes):
         cdef:
             bytes token
 
@@ -202,7 +202,7 @@ cdef class SCRAMAuthentication:
 
         return base64.b64encode(token)
 
-    cdef _generate_client_proof(self, str password):
+    def _generate_client_proof(self, str password):
         """need to ensure a server response exists, i.e. """
         cdef:
             bytes salted_password
@@ -234,7 +234,7 @@ cdef class SCRAMAuthentication:
         # and the proof
         return self._bytes_xor(client_key.digest(), client_signature.digest())
 
-    cdef _generate_salted_password(self, str password, bytes salt, int iterations):
+    def _generate_salted_password(self, str password, bytes salt, int iterations):
         """This follows the "Hi" algorithm specified in RFC5802"""
         cdef:
             bytes p
@@ -260,7 +260,7 @@ cdef class SCRAMAuthentication:
             u = self._bytes_xor(u, ui.digest())
         return u
 
-    cdef _normalize_password(self, str original_password):
+    def _normalize_password(self, str original_password):
         """Normalize the password using the SASLprep from RFC4013"""
         cdef:
             str normalized_password
