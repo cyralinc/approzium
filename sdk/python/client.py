@@ -1,15 +1,15 @@
 import psycopg2
+from approzium import Authenticator, set_default_authenticator
 from approzium.psycopg2 import connect
-from approzium import set_authenticator, set_iam_role
 import logging
 
 logger = logging.getLogger('approzium')
 logger.setLevel(logging.DEBUG)
 
 
-set_iam_role('arn:aws:iam::accountid:role/rolename')
-set_authenticator('authenticator:1234')
-conn = connect("")
+auth = Authenticator('authenticator:1234', 'arn:aws:iam::accountid:role/rolename')
+set_default_authenticator(auth)
+conn = connect("")  # or connect("", authenticator=auth)
 print('Connection Established')
 
 def test():
