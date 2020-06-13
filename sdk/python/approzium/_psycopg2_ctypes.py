@@ -130,3 +130,7 @@ def set_debug(conn):
     libc = CDLL(find_library('c'))
     stdout = c_void_p.in_dll(libc, 'stdout')
     libpq.PQtrace(conn.pgconn_ptr, stdout)
+
+def ensure_compatible_ssl(conn):
+    if conn.info.ssl_attribute('library') != 'OpenSSL':
+        raise Exception('Unsupported SSL library')
