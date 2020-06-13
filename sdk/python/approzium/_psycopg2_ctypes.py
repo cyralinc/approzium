@@ -61,25 +61,29 @@ def set_connection_sync(pgconn):
     def intataddress(address):
         return struct.unpack("@i", mem[address : address + sizeofint])[0]
 
+    def ensure(check):
+        if not check:
+            raise Exception('Could not set connection to sync. Unidentified struct field')
+
     # as a check, we check server and protocol version numbers, which succeed
     # the async value in the psycopg connection struct
     server_version_addr = addressofint(pgconn.server_version)
     # check that there is only one match for that value
-    assert (
+    ensure (
         addressofint(pgconn.server_version, mem[server_version_addr + sizeofint :])
         == -1
     )
     protocol_address = server_version_addr - sizeofint
     protocol_version = intataddress(protocol_address)
-    assert protocol_version == pgconn.protocol_version
+    ensure(protocol_version == pgconn.protocol_version)
     async_address = protocol_address - sizeoflong
     async_value = struct.unpack("@l", mem[async_address:protocol_address])[0]
-    assert async_value == pgconn.async
+    ensure(async_value == pgconn.async)
     new_async_value = struct.pack("@l", 0)
     memmove(id(pgconn) + async_address, new_async_value, sizeoflong)
-    assert pgconn.async == 0
+    ensure(pgconn.async == 0)
     error = libpq_PQsetnonblocking(pgconn.pgconn_ptr, 0)
-    assert error == 0
+    ensure(error == 0)
 
 
 def read_msg(pgconn):
