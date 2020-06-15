@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"crypto/md5"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/xml"
 	"fmt"
+	"golang.org/x/crypto/pbkdf2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gopkg.in/yaml.v2"
@@ -95,13 +98,13 @@ func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
 	}
 }
 
-func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5HashResponse, error) {
+func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	a.counter++
 
 	claimed_iam_arn := req.GetClaimedIamArn()
 	dbhost := req.GetDbhost()
 	dbuser := req.GetDbuser()
-	log.Printf("received GetDBHash request with claimed_iam_arn: %s\n", claimed_iam_arn)
+	log.Printf("received GetPGMD5Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
 	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
@@ -121,7 +124,42 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	return &pb.PGMD5HashResponse{Hash: computePGMD5(dbuser, password, salt)}, nil
+	return &pb.PGMD5Response{Hash: computePGMD5(dbuser, password, salt)}, nil
+}
+
+func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
+	a.counter++
+
+	claimed_iam_arn := req.GetClaimedIamArn()
+	dbhost := req.GetDbhost()
+	dbuser := req.GetDbuser()
+	log.Printf("received GetPGSHA256Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
+	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, err.Error())
+	}
+
+	password, err := a.getCreds(vaultKey{claimed_iam_arn, dbhost, dbuser})
+	if err != nil {
+		log.Error(err)
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	salt := req.GetSalt()
+
+	if len(salt) == 0 {
+		msg := fmt.Sprintf("salt not provided")
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+	}
+	iterations := int(req.GetIterations())
+	spassword, err := computePGSHA256(password, salt, iterations)
+	if err != nil {
+		msg := fmt.Sprintf("Could not compute hash %s", err)
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+	}
+	return &pb.PGSHA256Response{Spassword: spassword}, nil
 }
 
 func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
@@ -136,12 +174,12 @@ func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
 func newVault() map[vaultKey]string {
 	creds := make(map[vaultKey]string)
 	// for dev purposes: read credentials from a local file
-	type secret struct {
+	type secrets []struct {
 		Dbhost   string `yaml:"dbhost"`
 		Dbuser   string `yaml:"dbuser"`
 		Password string `yaml:"password"`
 	}
-	var devCreds secret
+	var devCreds secrets
 	yamlFile, err := ioutil.ReadFile("secrets.yaml")
 	if err != nil {
 		log.Errorf("yamlFile.Get err #%v ", err)
@@ -150,8 +188,11 @@ func newVault() map[vaultKey]string {
 	if err != nil {
 		log.Errorf("Unmarshal: #%v ", err)
 	}
-	key := vaultKey{"arn:aws:iam::403019568400:role/dev", devCreds.Dbhost, devCreds.Dbuser}
-	creds[key] = devCreds.Password
+	for _, cred := range devCreds {
+		key := vaultKey{"arn:aws:iam::403019568400:role/dev", cred.Dbhost, cred.Dbuser}
+		creds[key] = cred.Password
+		log.Debugf("added dev credential for host %s", cred.Dbhost)
+	}
 	return creds
 }
 
@@ -167,4 +208,13 @@ func computePGMD5(user, password string, salt []byte) string {
 	first_hash := computeMD5(password, []byte(user))
 	second_hash := computeMD5(first_hash, salt)
 	return second_hash
+}
+
+func computePGSHA256(password string, salt []byte, iterations int) ([]byte, error) {
+	s, err := base64.StdEncoding.DecodeString(string(salt))
+	if err != nil {
+		return nil, fmt.Errorf("Bad salt %s", err)
+	}
+	dk := pbkdf2.Key([]byte(password), s, iterations, 32, sha256.New)
+	return dk, nil
 }

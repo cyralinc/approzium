@@ -17,6 +17,7 @@ setuptools.setup(
         install_requires=[
             'psycopg2',
             'boto3',
-            'grpcio'
+            'grpcio',
+            'cython'
         ]
 )

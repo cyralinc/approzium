@@ -3,7 +3,8 @@ syntax = "proto3";
 package approzium.authenticator.protos;
 
 service Authenticator {
-        rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5HashResponse) {}
+        rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
+        rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
 }
 
 message PGMD5HashRequest {
@@ -14,6 +15,19 @@ message PGMD5HashRequest {
         bytes salt = 5;
 }
 
-message PGMD5HashResponse {
+message PGSHA256HashRequest {
+        string signed_get_caller_identity = 1;
+        string claimed_iam_arn = 2;
+        string dbhost = 3;
+        string dbuser = 4;
+        bytes salt = 5;
+        uint32 iterations = 6;
+}
+
+message PGMD5Response {
         string hash = 1;
+}
+
+message PGSHA256Response {
+        bytes spassword = 1;
 }

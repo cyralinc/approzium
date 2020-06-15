@@ -16,4 +16,4 @@ def obtain_signed_get_caller_identity():
     )
     iam_client = iam_session.client("sts")
     presigned_url = iam_client.generate_presigned_url("get_caller_identity", {})
-    return presigned_url
+    return approzium.iam_role, presigned_url

@@ -2,6 +2,10 @@
 authenticator/authenticator
 main
 
+ssl/*.key
+ssl/*.crt
+ssl/*.srl
+ssl/*.csr
 sdk/python/tests/pg2_testsuite/
 
 # Prerequisites
