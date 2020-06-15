@@ -15,7 +15,8 @@ from ._psycopg2_ctypes import (
     read_msg,
     write_msg,
     write_to_conn,
-    set_debug
+    set_debug,
+    ensure_compatible_ssl
 )
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
@@ -114,6 +115,7 @@ def construct_approzium_conn(base, is_sync, authenticator):
             self._auth_type = None
             self._hash_sent = False
             self._authenticator = authenticator
+            self._checked_ssl = False
             if is_sync:
                 wait(self)
                 set_connection_sync(self)
@@ -121,6 +123,10 @@ def construct_approzium_conn(base, is_sync, authenticator):
 
         def poll(self):
             status = libpq_PQstatus(self.pgconn_ptr)
+            if self.info.ssl_in_use and not self._checked_ssl:
+                ensure_compatible_ssl(self)
+                logging.debug("checked ssl")
+                self._checked_ssl = True
             if status == self.CONNECTION_AWAITING_RESPONSE and not self._salt:
                 logging.debug("reading salt")
                 self._auth_type, self._salt = read_auth(self)
