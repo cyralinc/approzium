@@ -153,12 +153,14 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 	iterations := int(req.GetIterations())
-	spassword, err := computePGSHA256(password, salt, iterations)
+	saltedPass, err := computePGSHA256_SaltedPass(password, salt, iterations)
 	if err != nil {
 		msg := fmt.Sprintf("Could not compute hash %s", err)
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
+
+    cproof := computePGSHA256_cproof(saltedPass)
 	return &pb.PGSHA256Response{Spassword: spassword}, nil
 }
 
@@ -210,11 +212,16 @@ func computePGMD5(user, password string, salt []byte) string {
 	return second_hash
 }
 
-func computePGSHA256(password string, salt []byte, iterations int) ([]byte, error) {
-	s, err := base64.StdEncoding.DecodeString(string(salt))
+func computePGSHA256_SaltedPass(password string, salt string, iterations int) ([]byte, error) {
+	s, err := base64.StdEncoding.DecodeString(salt)
 	if err != nil {
 		return nil, fmt.Errorf("Bad salt %s", err)
 	}
 	dk := pbkdf2.Key([]byte(password), s, iterations, 32, sha256.New)
 	return dk, nil
+}
+
+func computePGSHA256_cproof(spassword string) string {
+    mac := hmac.New(, spassword
+
 }

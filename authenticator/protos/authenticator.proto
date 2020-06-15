@@ -20,8 +20,10 @@ message PGSHA256HashRequest {
         string claimed_iam_arn = 2;
         string dbhost = 3;
         string dbuser = 4;
-        bytes salt = 5;
+        string salt = 5;
         uint32 iterations = 6;
+        string client_first_without_header = 7;
+        string server_first = 8;
 }
 
 message PGMD5Response {
@@ -29,5 +31,6 @@ message PGMD5Response {
 }
 
 message PGSHA256Response {
-        bytes spassword = 1;
+        string cproof = 1;
+        string sproof = 2;
 }
