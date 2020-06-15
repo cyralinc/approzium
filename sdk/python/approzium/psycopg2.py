@@ -93,7 +93,7 @@ def send_hash(pgconn, auth_type, hash):
             raise Exception('Error bad server signature')
 
 
-def construct_approzium_conn(base, is_sync):
+def construct_approzium_conn(base, is_sync, authenticator):
     if not base:
         base = psycopg2.extensions.connection
 
@@ -114,6 +114,7 @@ def construct_approzium_conn(base, is_sync):
             self._salt = None
             self._auth_type = None
             self._hash_sent = False
+            self._authenticator = authenticator
             self._checked_ssl = False
             if is_sync:
                 wait(self)
@@ -135,7 +136,7 @@ def construct_approzium_conn(base, is_sync):
                 dbhost = self.get_dsn_parameters()["host"]
                 dbuser = self.get_dsn_parameters()["user"]
                 hash = get_hash(
-                    dbhost, dbuser, self._auth_type, self._salt, approzium.authenticator_addr
+                    dbhost, dbuser, self._auth_type, self._salt, self._authenticator
                 )
                 send_hash(self, self._auth_type, hash)
                 self._hash_sent = True
@@ -147,12 +148,16 @@ def construct_approzium_conn(base, is_sync):
     return ApproziumConn
 
 
-def connect(dsn=None, connection_factory=None, cursor_factory=None, **kwargs):
+def connect(dsn=None, connection_factory=None, cursor_factory=None, authenticator=None, **kwargs):
     is_sync = True
     if kwargs.get("async", False):
         is_sync = False
     if kwargs.get("async_", False):
         is_sync = False
+    if authenticator is None:
+        authenticator = approzium.default_authenticator
+    if authenticator is None:
+        raise Exception('Authenticator not specified')
     # construct our approzium factory class on top of given connection factory class
-    factory = construct_approzium_conn(connection_factory, is_sync)
+    factory = construct_approzium_conn(connection_factory, is_sync, authenticator)
     return pgconnect(dsn, factory, cursor_factory, **kwargs)

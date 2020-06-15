@@ -11,32 +11,36 @@ sys.path.append(str(Path(__file__).parent / "protos"))
 import authenticator_pb2_grpc
 import authenticator_pb2
 from .iam import obtain_signed_get_caller_identity
-from . import psycopg2
 
+
+class Authenticator(object):
+    def __init__(self, address, iam_role=None):
+        self.address = address
+        self.iam_role = iam_role
 
 def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
-    iam_arn, signed_gci = obtain_signed_get_caller_identity()
-    channel = grpc.insecure_channel(authenticator)
+    signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
+    channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
-    if auth_type == psycopg2.AUTH_REQ_MD5:
+    if auth_type == approzium.psycopg2.AUTH_REQ_MD5:
         salt = auth_info
         if len(salt) != 4:
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
             signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=iam_arn,
+            claimed_iam_arn=authenticator.iam_role,
             dbhost=dbhost,
             dbuser=dbuser,
             salt=salt,
         )
         response = stub.GetPGMD5Hash(request)
         return response.hash
-    elif auth_type == psycopg2.AUTH_REQ_SASL:
+    elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
         auth = auth_info
         request = authenticator_pb2.PGSHA256HashRequest(
             signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=iam_arn,
+            claimed_iam_arn=authenticator.iam_role,
             dbhost=dbhost,
             dbuser=dbuser,
             salt=auth.password_salt,
