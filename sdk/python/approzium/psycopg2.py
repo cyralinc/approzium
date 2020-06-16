@@ -21,9 +21,7 @@ from ._psycopg2_ctypes import (
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 import approzium
-import pyximport
-pyximport.install(language_level=3)
-from .pg_scram import SCRAMAuthentication
+from ._psycopg2_scram import SCRAMAuthentication
 
 
 logger = logging.getLogger(__name__)
