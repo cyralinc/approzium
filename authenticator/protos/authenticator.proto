@@ -22,8 +22,7 @@ message PGSHA256HashRequest {
         string dbuser = 4;
         string salt = 5;
         uint32 iterations = 6;
-        string client_first_without_header = 7;
-        string server_first = 8;
+        string authentication_msg = 7;
 }
 
 message PGMD5Response {
