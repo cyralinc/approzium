@@ -130,7 +130,7 @@ class SCRAMAuthentication:
             client_first_message
         return msg
 
-    def create_client_final_message(self, bytes salted_password):
+    def create_client_final_message(self, str client_proof):
         """Create the final client message as part of SCRAM authentication"""
         cdef:
             bytes msg
@@ -141,11 +141,10 @@ class SCRAMAuthentication:
                 "you need values from server to generate a client proof")
 
         # generate the client proof
-        self.client_proof = self._generate_client_proof(salted_password)
         msg = bytes()
         msg += b"c=" + base64.b64encode(self.client_channel_binding) + \
             b",r=" + self.server_nonce + \
-            b",p=" + base64.b64encode(self.client_proof)
+            b",p=" + client_proof.encode('ascii')
         return msg
 
     def parse_server_first_message(self, bytes server_response):
@@ -180,11 +179,12 @@ class SCRAMAuthentication:
         except IndexError:
             raise Exception("could not get server signature")
 
-        verify_server_signature = hmac.new(self.server_key.digest(),
-            self.authorization_message, self.DIGEST)
-        # validate the server signature against the verifier
-        return server_signature == base64.b64encode(
-            verify_server_signature.digest())
+#        verify_server_signature = hmac.new(self.server_key.digest(),
+#           self.authorization_message, self.DIGEST)
+#       # validate the server signature against the verifier
+#       return server_signature == base64.b64encode(
+#           verify_server_signature.digest())
+        return server_signature == self.server_signature.encode('ascii')
 
     def _bytes_xor(self, bytes a, bytes b):
         """XOR two bytestrings together"""
@@ -197,6 +197,13 @@ class SCRAMAuthentication:
         token = generate_token_bytes(num_bytes)
 
         return base64.b64encode(token)
+
+    def _generate_auth_msg(self):
+        self.authorization_message = self.client_first_message_bare + b"," + \
+            self.server_first_message + b",c=" + \
+            base64.b64encode(self.client_channel_binding) + \
+            b",r=" +  self.server_nonce
+
 
     def _generate_client_proof(self, bytes salted_password):
         """need to ensure a server response exists, i.e. """
@@ -215,10 +222,8 @@ class SCRAMAuthentication:
         # client signature
         # the "c=" portion is for the channel binding, but this is not
         # presently implemented
-        self.authorization_message = self.client_first_message_bare + b"," + \
-            self.server_first_message + b",c=" + \
-            base64.b64encode(self.client_channel_binding) + \
-            b",r=" +  self.server_nonce
+        if self.authorization_message is None:
+            self._generate_auth_msg()
         # sign!
         client_signature = hmac.new(stored_key.digest(),
             self.authorization_message, self.DIGEST)

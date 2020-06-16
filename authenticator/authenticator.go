@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/base64"
@@ -124,7 +125,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	return &pb.PGMD5Response{Hash: computePGMD5(dbuser, password, salt)}, nil
+	return &pb.PGMD5Response{Hash: computePGMD5Hash(dbuser, password, salt)}, nil
 }
 
 func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
@@ -153,15 +154,23 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 	iterations := int(req.GetIterations())
-	saltedPass, err := computePGSHA256_SaltedPass(password, salt, iterations)
+	saltedPass, err := computePGSHA256SaltedPass(password, salt, iterations)
 	if err != nil {
 		msg := fmt.Sprintf("Could not compute hash %s", err)
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-    cproof := computePGSHA256_cproof(saltedPass)
-	return &pb.PGSHA256Response{Spassword: spassword}, nil
+	authMsg := req.GetAuthenticationMsg()
+
+	if len(authMsg) == 0 {
+		msg := fmt.Sprintf("authentication message not provided")
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+	}
+	cproof := computePGSHA256Cproof(saltedPass, authMsg)
+	sproof := computePGSHA256Sproof(saltedPass, authMsg)
+	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
 func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
@@ -206,13 +215,13 @@ func computeMD5(s string, salt []byte) string {
 	return hex.EncodeToString(hashedBytes)
 }
 
-func computePGMD5(user, password string, salt []byte) string {
+func computePGMD5Hash(user, password string, salt []byte) string {
 	first_hash := computeMD5(password, []byte(user))
 	second_hash := computeMD5(first_hash, salt)
 	return second_hash
 }
 
-func computePGSHA256_SaltedPass(password string, salt string, iterations int) ([]byte, error) {
+func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]byte, error) {
 	s, err := base64.StdEncoding.DecodeString(salt)
 	if err != nil {
 		return nil, fmt.Errorf("Bad salt %s", err)
@@ -221,7 +230,36 @@ func computePGSHA256_SaltedPass(password string, salt string, iterations int) ([
 	return dk, nil
 }
 
-func computePGSHA256_cproof(spassword string) string {
-    mac := hmac.New(, spassword
+// assumes a and b are of the same length
+func xorBytes(a, b []byte) []byte {
+	buf := make([]byte, len(a))
 
+	for i, _ := range a {
+		buf[i] = a[i] ^ b[i]
+	}
+
+	return buf
+}
+
+func computePGSHA256Cproof(spassword []byte, authMsg string) string {
+	mac := hmac.New(sha256.New, spassword)
+	mac.Write([]byte("Client Key"))
+	ckey := mac.Sum(nil)
+	ckeyHash := sha256.Sum256(ckey)
+	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
+	cproofHmac.Write([]byte(authMsg))
+	cproof := xorBytes(cproofHmac.Sum(nil), ckey)
+	cproof64 := base64.StdEncoding.EncodeToString(cproof)
+	return cproof64
+}
+
+func computePGSHA256Sproof(spassword []byte, authMsg string) string {
+	mac := hmac.New(sha256.New, spassword)
+	mac.Write([]byte("Server Key"))
+	skey := mac.Sum(nil)
+	sproofHmac := hmac.New(sha256.New, skey)
+	sproofHmac.Write([]byte(authMsg))
+	sproof := sproofHmac.Sum(nil)
+	sproof64 := base64.StdEncoding.EncodeToString(sproof)
+	return sproof64
 }

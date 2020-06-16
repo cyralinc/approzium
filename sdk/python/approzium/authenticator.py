@@ -38,15 +38,17 @@ def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
         return response.hash
     elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
         auth = auth_info
+        auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
             signed_get_caller_identity=signed_gci,
             claimed_iam_arn=authenticator.iam_role,
             dbhost=dbhost,
             dbuser=dbuser,
             salt=auth.password_salt,
-            iterations=auth.password_iterations
+            iterations=auth.password_iterations,
+            authentication_msg=auth.authorization_message
         )
         response = stub.GetPGSHA256Hash(request)
-        salted_password = response.spassword
-        client_final = auth.create_client_final_message(salted_password)
+        client_final = auth.create_client_final_message(response.cproof)
+        auth.server_signature = response.sproof
         return client_final, auth
