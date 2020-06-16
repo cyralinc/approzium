@@ -241,6 +241,7 @@ func xorBytes(a, b []byte) []byte {
 	return buf
 }
 
+// SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
 func computePGSHA256Cproof(spassword []byte, authMsg string) string {
 	mac := hmac.New(sha256.New, spassword)
 	mac.Write([]byte("Client Key"))
