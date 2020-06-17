@@ -1,4 +1,5 @@
-version: '3.4'
+# set COMPOSE_DOCKER_CLI_BUILD=1
+version: '3.5'
 
 x-db-variables: &db-variables
     POSTGRES_PASSWORD: 'password'
@@ -25,17 +26,56 @@ services:
             - VAULT_DEV_ROOT_TOKEN_ID=root
         entrypoint: vault server -dev
     authenticator:
-        build: authenticator
-        image: approzium_authenticator
-        volumes:
-            - .:/usr/src/approzium
+        build:
+            context: ./
+            target: build
         environment:
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
-        command: ./authenticator
-    sdk:
-        build: sdk
-        image: approzium_sdk
+        depends_on:
+            - vault
+        volumes:
+            - ./authenticator/secrets.yaml:/app/secrets.yaml:ro
+    dev:
+        build:
+            context: ./
+            target: dev
         volumes:
             - .:/usr/src/approzium
             - ~/.aws/:/root/.aws/:ro
+    psycopg2-testsuite-md5:
+            build:
+                context: ./
+                target: dev
+            volumes:
+                - .:/usr/src/approzium
+                - ~/.aws/:/root/.aws/:ro
+            working_dir: /usr/src/approzium/sdk/python/
+            command: echo 'run me with make test'
+            environment:
+                - PSYCOPG2_TESTDB=db
+                - PSYCOPG2_TESTDB_HOST=dbmd5
+                - PSYCOPG2_TESTDB_PORT=5432
+                - PSYCOPG2_TESTDB_USER=bob
+                - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
+            depends_on:
+                - authenticator
+                - dbmd5
+    psycopg2-testsuite-sha256:
+            build:
+                context: ./
+                target: dev
+            volumes:
+                - .:/usr/src/approzium
+                - ~/.aws/:/root/.aws/:ro
+            working_dir: /usr/src/approzium/sdk/python/
+            command: echo 'run me with make test'
+            environment:
+                - PSYCOPG2_TESTDB=db
+                - PSYCOPG2_TESTDB_HOST=dbsha256
+                - PSYCOPG2_TESTDB_PORT=5432
+                - PSYCOPG2_TESTDB_USER=bob
+                - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
+            depends_on:
+                - authenticator
+                - dbsha256
