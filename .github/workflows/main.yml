@@ -22,8 +22,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Run E2E test
-        run: make test
+      - name: Test using AWS CLI
+        run: |
+          aws sts get-caller-identity
+ #     - name: Run E2E test
+ #      run: make test
         
   lint:
     runs-on: ubuntu-latest
