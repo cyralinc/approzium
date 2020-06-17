@@ -18,7 +18,7 @@ class Authenticator(object):
         self.address = address
         self.iam_role = iam_role
 
-def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
+def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
     signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
     channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
@@ -32,6 +32,7 @@ def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
             claimed_iam_arn=authenticator.iam_role,
             dbhost=dbhost,
             dbuser=dbuser,
+            dbport=dbport,
             salt=salt,
         )
         response = stub.GetPGMD5Hash(request)
@@ -43,6 +44,7 @@ def get_hash(dbhost, dbuser, auth_type, auth_info, authenticator):
             signed_get_caller_identity=signed_gci,
             claimed_iam_arn=authenticator.iam_role,
             dbhost=dbhost,
+            dbport=dbport,
             dbuser=dbuser,
             salt=auth.password_salt,
             iterations=auth.password_iterations,
