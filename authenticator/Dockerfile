@@ -7,7 +7,7 @@ ENV GOPATH /usr
 ENV GO111MODULE on
 
 # Install protoc-gen-go
-RUN go get -u github.com/golang/protobuf/protoc-gen-go@v1.3.2
+RUN go get -u github.com/golang/protobuf/protoc-gen-go@v1.3.3
 
 # Install protobuf compiler
 RUN apt-get update && apt-get install -y unzip
@@ -27,3 +27,8 @@ RUN mkdir -p cmake/build && \
     make grpc_cli && \
     cp grpc_cli /usr/bin/
 WORKDIR /usr/src/approzium/authenticator
+
+# Install Vault CLI for ease of testing Vault out
+RUN wget https://releases.hashicorp.com/vault/1.4.2/vault_1.4.2_linux_amd64.zip
+RUN unzip vault_1.4.2_linux_amd64.zip
+RUN mv vault /usr/local/bin/

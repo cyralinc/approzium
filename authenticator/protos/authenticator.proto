@@ -13,6 +13,7 @@ message PGMD5HashRequest {
         string dbhost = 3;
         string dbuser = 4;
         bytes salt = 5;
+        string dbport = 7;
 }
 
 message PGSHA256HashRequest {
@@ -22,6 +23,7 @@ message PGSHA256HashRequest {
         string dbuser = 4;
         bytes salt = 5;
         uint32 iterations = 6;
+        string dbport = 7;
 }
 
 message PGMD5Response {
