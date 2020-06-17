@@ -16,19 +16,8 @@ RUN unzip protoc-3.7.0-linux-x86_64.zip -d protoc3
 RUN mv protoc3/bin/* /usr/local/bin/
 RUN mv protoc3/include/* /usr/local/include/
 
-# gRPC CLI
-WORKDIR $HOME/grpc
-RUN git clone https://github.com/grpc/grpc.git .
-RUN git submodule update --init
-RUN apt-get install -y libgflags-dev cmake
-RUN mkdir -p cmake/build && \
-    cd cmake/build && \
-    cmake -DgRPC_BUILD_TESTS=ON ../../ && \
-    make grpc_cli && \
-    cp grpc_cli /usr/bin/
-WORKDIR /usr/src/approzium/authenticator
-
 # Install Vault CLI for ease of testing Vault out
 RUN wget https://releases.hashicorp.com/vault/1.4.2/vault_1.4.2_linux_amd64.zip
 RUN unzip vault_1.4.2_linux_amd64.zip
 RUN mv vault /usr/local/bin/
+WORKDIR /usr/src/approzium/authenticator
