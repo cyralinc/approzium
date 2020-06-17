@@ -16,7 +16,10 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})
-	authenticator := NewAuthenticator()
+	authenticator, err := NewAuthenticator()
+	if err != nil {
+		log.Panicf("failed to create authenticator: %s", err)
+	}
 
 	lis, err := net.Listen("tcp", serviceAddress)
 	if err != nil {
@@ -29,6 +32,6 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterAuthenticatorServer(grpcServer, authenticator)
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Panic("failed to listen on %s", serviceAddress)
+		log.Panicf("failed to listen on %s", serviceAddress)
 	}
 }

@@ -11,18 +11,20 @@ message PGMD5HashRequest {
         string signed_get_caller_identity = 1;
         string claimed_iam_arn = 2;
         string dbhost = 3;
-        string dbuser = 4;
-        bytes salt = 5;
+        string dbport = 4;
+        string dbuser = 5;
+        bytes salt = 6;
 }
 
 message PGSHA256HashRequest {
         string signed_get_caller_identity = 1;
         string claimed_iam_arn = 2;
         string dbhost = 3;
-        string dbuser = 4;
-        string salt = 5;
-        uint32 iterations = 6;
-        string authentication_msg = 7;
+        string dbport = 4;
+        string dbuser = 5;
+        string salt = 6;
+        uint32 iterations = 7;
+        string authentication_msg = 8;
 }
 
 message PGMD5Response {

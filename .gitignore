@@ -173,6 +173,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.idea/
 
 # Spyder project settings
 .spyderproject
@@ -198,3 +199,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 authenticator/secrets.yaml
+
+# Vendored libraries
+vendor/
