@@ -18,6 +18,5 @@ setuptools.setup(
             'psycopg2',
             'boto3',
             'grpcio',
-            'cython'
         ]
 )

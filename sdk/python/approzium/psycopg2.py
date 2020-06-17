@@ -21,9 +21,7 @@ from ._psycopg2_ctypes import (
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 import approzium
-import pyximport
-pyximport.install(language_level=3)
-from .pg_scram import SCRAMAuthentication
+from ._psycopg2_scram import SCRAMAuthentication
 
 
 logger = logging.getLogger(__name__)
@@ -134,9 +132,10 @@ def construct_approzium_conn(base, is_sync, authenticator):
             elif self._salt and not self._hash_sent:
                 logging.debug("sending hash")
                 dbhost = self.get_dsn_parameters()["host"]
+                dbport = self.get_dsn_parameters()["port"]
                 dbuser = self.get_dsn_parameters()["user"]
                 hash = get_hash(
-                    dbhost, dbuser, self._auth_type, self._salt, self._authenticator
+                    dbhost, dbport, dbuser, self._auth_type, self._salt, self._authenticator
                 )
                 send_hash(self, self._auth_type, hash)
                 self._hash_sent = True

@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='approzium.authenticator.protos',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1e\x61pprozium.authenticator.protos\"}\n\x10PGMD5HashRequest\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x04 \x01(\t\x12\x0c\n\x04salt\x18\x05 \x01(\x0c\"\x94\x01\n\x13PGSHA256HashRequest\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x04 \x01(\t\x12\x0c\n\x04salt\x18\x05 \x01(\x0c\x12\x12\n\niterations\x18\x06 \x01(\r\"\x1d\n\rPGMD5Response\x12\x0c\n\x04hash\x18\x01 \x01(\t\"%\n\x10PGSHA256Response\x12\x11\n\tspassword\x18\x01 \x01(\x0c\x32\xfe\x01\n\rAuthenticator\x12q\n\x0cGetPGMD5Hash\x12\x30.approzium.authenticator.protos.PGMD5HashRequest\x1a-.approzium.authenticator.protos.PGMD5Response\"\x00\x12z\n\x0fGetPGSHA256Hash\x12\x33.approzium.authenticator.protos.PGSHA256HashRequest\x1a\x30.approzium.authenticator.protos.PGSHA256Response\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1e\x61pprozium.authenticator.protos\"\x8d\x01\n\x10PGMD5HashRequest\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x0c\n\x04salt\x18\x06 \x01(\x0c\"\xc0\x01\n\x13PGSHA256HashRequest\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x0c\n\x04salt\x18\x06 \x01(\t\x12\x12\n\niterations\x18\x07 \x01(\r\x12\x1a\n\x12\x61uthentication_msg\x18\x08 \x01(\t\"\x1d\n\rPGMD5Response\x12\x0c\n\x04hash\x18\x01 \x01(\t\"2\n\x10PGSHA256Response\x12\x0e\n\x06\x63proof\x18\x01 \x01(\t\x12\x0e\n\x06sproof\x18\x02 \x01(\t2\xfe\x01\n\rAuthenticator\x12q\n\x0cGetPGMD5Hash\x12\x30.approzium.authenticator.protos.PGMD5HashRequest\x1a-.approzium.authenticator.protos.PGMD5Response\"\x00\x12z\n\x0fGetPGSHA256Hash\x12\x33.approzium.authenticator.protos.PGSHA256HashRequest\x1a\x30.approzium.authenticator.protos.PGSHA256Response\"\x00\x62\x06proto3'
 )
 
 
@@ -53,15 +53,22 @@ _PGMD5HASHREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='dbuser', full_name='approzium.authenticator.protos.PGMD5HashRequest.dbuser', index=3,
+      name='dbport', full_name='approzium.authenticator.protos.PGMD5HashRequest.dbport', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='salt', full_name='approzium.authenticator.protos.PGMD5HashRequest.salt', index=4,
-      number=5, type=12, cpp_type=9, label=1,
+      name='dbuser', full_name='approzium.authenticator.protos.PGMD5HashRequest.dbuser', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='salt', full_name='approzium.authenticator.protos.PGMD5HashRequest.salt', index=5,
+      number=6, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -78,8 +85,8 @@ _PGMD5HASHREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=55,
-  serialized_end=180,
+  serialized_start=56,
+  serialized_end=197,
 )
 
 
@@ -112,23 +119,37 @@ _PGSHA256HASHREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='dbuser', full_name='approzium.authenticator.protos.PGSHA256HashRequest.dbuser', index=3,
+      name='dbport', full_name='approzium.authenticator.protos.PGSHA256HashRequest.dbport', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='salt', full_name='approzium.authenticator.protos.PGSHA256HashRequest.salt', index=4,
-      number=5, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
+      name='dbuser', full_name='approzium.authenticator.protos.PGSHA256HashRequest.dbuser', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='iterations', full_name='approzium.authenticator.protos.PGSHA256HashRequest.iterations', index=5,
-      number=6, type=13, cpp_type=3, label=1,
+      name='salt', full_name='approzium.authenticator.protos.PGSHA256HashRequest.salt', index=5,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='iterations', full_name='approzium.authenticator.protos.PGSHA256HashRequest.iterations', index=6,
+      number=7, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='authentication_msg', full_name='approzium.authenticator.protos.PGSHA256HashRequest.authentication_msg', index=7,
+      number=8, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -144,8 +165,8 @@ _PGSHA256HASHREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=183,
-  serialized_end=331,
+  serialized_start=200,
+  serialized_end=392,
 )
 
 
@@ -175,8 +196,8 @@ _PGMD5RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=333,
-  serialized_end=362,
+  serialized_start=394,
+  serialized_end=423,
 )
 
 
@@ -188,9 +209,16 @@ _PGSHA256RESPONSE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='spassword', full_name='approzium.authenticator.protos.PGSHA256Response.spassword', index=0,
-      number=1, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
+      name='cproof', full_name='approzium.authenticator.protos.PGSHA256Response.cproof', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sproof', full_name='approzium.authenticator.protos.PGSHA256Response.sproof', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -206,8 +234,8 @@ _PGSHA256RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=364,
-  serialized_end=401,
+  serialized_start=425,
+  serialized_end=475,
 )
 
 DESCRIPTOR.message_types_by_name['PGMD5HashRequest'] = _PGMD5HASHREQUEST
@@ -252,8 +280,8 @@ _AUTHENTICATOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=404,
-  serialized_end=658,
+  serialized_start=478,
+  serialized_end=732,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetPGMD5Hash',
