@@ -8,10 +8,6 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"fmt"
-	"golang.org/x/crypto/pbkdf2"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,25 +15,27 @@ import (
 	"strings"
 	"time"
 
+	"approzium/authenticator/credmgrs"
 	pb "approzium/authenticator/protos"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/pbkdf2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-type vaultKey struct {
-	iam_arn string
-	dbhost  string
-	dbuser  string
-}
-
 type Authenticator struct {
-	vault   map[vaultKey]string
+	credMgr credmgrs.CredentialManager
 	counter int
 }
 
-func NewAuthenticator() *Authenticator {
-	return &Authenticator{
-		vault: newVault(),
+func NewAuthenticator() (*Authenticator, error) {
+	credMgr, err := credmgrs.RetrieveConfigured()
+	if err != nil {
+		return nil, err
 	}
+	return &Authenticator{
+		credMgr: credMgr,
+	}, nil
 }
 
 func (a *Authenticator) run() {
@@ -103,6 +101,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 
 	claimed_iam_arn := req.GetClaimedIamArn()
 	dbhost := req.GetDbhost()
+	dbport := req.GetDbport()
 	dbuser := req.GetDbuser()
 	log.Printf("received GetPGMD5Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
 	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
@@ -110,7 +109,12 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
-	password, err := a.getCreds(vaultKey{claimed_iam_arn, dbhost, dbuser})
+	password, err := a.getCreds(credmgrs.DBKey{
+		IAMArn: claimed_iam_arn,
+		DBHost: dbhost,
+		DBPort: dbport,
+		DBUser: dbuser,
+	})
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -132,6 +136,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 
 	claimed_iam_arn := req.GetClaimedIamArn()
 	dbhost := req.GetDbhost()
+	dbport := req.GetDbport()
 	dbuser := req.GetDbuser()
 	log.Printf("received GetPGSHA256Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
 	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
@@ -139,7 +144,12 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
-	password, err := a.getCreds(vaultKey{claimed_iam_arn, dbhost, dbuser})
+	password, err := a.getCreds(credmgrs.DBKey{
+		IAMArn: claimed_iam_arn,
+		DBHost: dbhost,
+		DBPort: dbport,
+		DBUser: dbuser,
+	})
 	if err != nil {
 		log.Error(err)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -162,38 +172,14 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return &pb.PGSHA256Response{Spassword: spassword}, nil
 }
 
-func (a *Authenticator) getCreds(identity vaultKey) (string, error) {
-	if creds, ok := a.vault[identity]; ok {
-		return creds, nil
-	}
-	msg := fmt.Errorf("password not found for identity %s", identity)
-	log.Error(msg)
-	return "", msg
-}
-
-func newVault() map[vaultKey]string {
-	creds := make(map[vaultKey]string)
-	// for dev purposes: read credentials from a local file
-	type secrets []struct {
-		Dbhost   string `yaml:"dbhost"`
-		Dbuser   string `yaml:"dbuser"`
-		Password string `yaml:"password"`
-	}
-	var devCreds secrets
-	yamlFile, err := ioutil.ReadFile("secrets.yaml")
+func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
+	creds, err := a.credMgr.Password(identity)
 	if err != nil {
-		log.Errorf("yamlFile.Get err #%v ", err)
+		msg := fmt.Errorf("password not found for identity %s", identity)
+		log.Error(msg)
+		return "", msg
 	}
-	err = yaml.Unmarshal(yamlFile, &devCreds)
-	if err != nil {
-		log.Errorf("Unmarshal: #%v ", err)
-	}
-	for _, cred := range devCreds {
-		key := vaultKey{"arn:aws:iam::403019568400:role/dev", cred.Dbhost, cred.Dbuser}
-		creds[key] = cred.Password
-		log.Debugf("added dev credential for host %s", cred.Dbhost)
-	}
-	return creds
+	return creds, nil
 }
 
 func computeMD5(s string, salt []byte) string {
