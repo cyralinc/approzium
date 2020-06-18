@@ -1,14 +1,15 @@
-# SSL target is required to run Postgres DBs with SSL support
-test-e2e:  ssl/rootCA.key
-	$(pg2_testsuite_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from tests
-
-test: test-e2e
-
-# Starts a bash shell in the `test` service
+# Targets that can be run from host machine
+# Starts a bash shell in the dev environment
 dev:
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml run tests bash
+	$(docker_env) docker-compose $(dc_files) run tests bash
+dev-env: dc-build ssl/rootCA.key 
+	$(docker_env) docker-compose up
+dc-build:
+	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
+# Runs all tests, including E2E tests
+test: run-tests-in-docker
 
-# USER INPUT TEST PARAMETERS
+# PARAMETERS USED FOR TESTS
 TEST_IAM_ROLE=arn:aws:iam::403019568400:role/dev
 TEST_DBHOSTS=dbmd5 dbsha256
 TEST_DB=db
@@ -16,7 +17,17 @@ TEST_DBPORT=5432
 TEST_DBPASS=password
 TEST_DBUSER=bob
 
-# DERIVE OTHER PARAMETERS
+
+### Anything below here is implementation details ###
+
+dc_files=-f docker-compose.yml -f docker-compose.test.yml 
+# Enable Buildkit in docker commands
+docker_env=COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1
+
+run-tests-in-docker:  dc-build  # need SSL certs for Postgres services
+	$(docker_env) $(pg2_testsuite_env) docker-compose $(dc_files) up --exit-code-from tests
+
+
 vault_secret = { $\
 "password": "$(TEST_DBPASS)", $\
 "iam_roles": [ $\
@@ -34,9 +45,14 @@ ssl/rootCA.key:
 
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
-	vault secrets enable -path=approzium -version=1 kv
+	-vault secrets enable -path=approzium -version=1 kv
 
-run-testsuite: enable-vault-path
+run-testsuite: enable-vault-path run-gotests run-pg2tests
+
+run-gotests:
+	CGO_ENABLED=1 go test -v -race authenticator/...
+
+run-pg2tests:
 	for HOST in $(TEST_DBHOSTS); do \
 		vault kv put approzium/$$HOST:$(TEST_DBPORT) $(TEST_DBUSER)='$(vault_secret)'; \
 		echo '###### Testing with DBHOST' $$HOST 'SSL=ON #####'; \
