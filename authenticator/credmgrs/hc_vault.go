@@ -1,8 +1,9 @@
 package credmgrs
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 
 	vault "github.com/hashicorp/vault/api"
 )
@@ -14,6 +15,10 @@ import (
 const mountPath = "approzium"
 
 func newHashiCorpVaultCreds() (CredentialManager, error) {
+	if addr := os.Getenv(vault.EnvVaultAddress); addr == "" {
+		return nil, errors.New("no vault address detected")
+	}
+
 	// This uses a default configuration for Vault. This includes reading
 	// Vault's environment variables and setting them as a configuration.
 	client, err := vault.NewClient(nil)
@@ -44,13 +49,9 @@ func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
 	// Please see tests for examples of the kind of secret data we'd expect
 	// here.
 	userData := secret.Data[identity.DBUser]
-	userDataJSON, ok := userData.(string)
+	userDataMap, ok := userData.(map[string]interface{})
 	if !ok {
 		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
-	}
-	userDataMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(userDataJSON), &userDataMap); err != nil {
-		return "", err
 	}
 
 	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
