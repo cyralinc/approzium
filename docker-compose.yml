@@ -1,7 +1,8 @@
+# Defines common services used for development purposes
 # set COMPOSE_DOCKER_CLI_BUILD=1
 version: '3.5'
 
-x-db-variables: &db-variables
+x-test-variables: &test-variables
     POSTGRES_PASSWORD: 'password'
     POSTGRES_USER: 'bob'
     POSTGRES_DB: 'db'
@@ -11,14 +12,14 @@ services:
         image: approzium_postgres_ssl
         command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
         environment:
-            <<: *db-variables
+            <<: *test-variables
             POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
             POSTGRES_HOST_AUTH_METHOD: 'scram-sha-256'
     dbmd5:
         build: ssl
         image: approzium_postgres_ssl
         command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
-        environment: *db-variables
+        environment: *test-variables
     vault:
         image: "vault:latest"
         environment:
@@ -34,73 +35,3 @@ services:
             - VAULT_TOKEN=root
         depends_on:
             - vault
-#       volumes:
-#           - ./authenticator/secrets.yaml:/app/secrets.yaml:ro
-    dev:
-        build:
-            context: ./
-            target: dev
-        environment:
-            - VAULT_ADDR=http://vault:8200
-            - VAULT_TOKEN=root
-        volumes:
-            - .:/usr/src/approzium
-            - ~/.aws/:/root/.aws/:ro
-    seed:
-        build:
-            context: ./
-            target: dev
-        environment:
-            - VAULT_ADDR=http://vault:8200
-            - VAULT_TOKEN=root
-        command: >
-            bash -c 'vault secrets enable -path=approzium -version=1 kv &&
-                     vault kv put approzium/dbmd5:5432 bob=-<<EOF
-                    {
-                        "password": "password",
-                        "iam_roles": [
-                            "arn:aws:iam::403019568400:role/dev"
-                        ]
-                    }'
-
-    psycopg2-testsuite-md5:
-            build:
-                context: ./
-                target: dev
-            volumes:
-                - .:/usr/src/approzium
-                - ~/.aws/:/root/.aws/:ro
-            working_dir: /usr/src/approzium/sdk/python/
-            command: echo 'run me with make test'
-            environment:
-                - PSYCOPG2_TESTDB=db
-                - PSYCOPG2_TESTDB_HOST=dbmd5
-                - PSYCOPG2_TESTDB_PORT=5432
-                - PSYCOPG2_TESTDB_USER=bob
-                - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
-                - AWS_ACCESS_KEY_ID
-                - AWS_SECRET_ACCESS_KEY
-            depends_on:
-                - authenticator
-                - dbmd5
-                - seed
-    psycopg2-testsuite-sha256:
-            build:
-                context: ./
-                target: dev
-            volumes:
-                - .:/usr/src/approzium
-                - ~/.aws/:/root/.aws/:ro
-            working_dir: /usr/src/approzium/sdk/python/
-            command: echo 'run me with make test'
-            environment:
-                - PSYCOPG2_TESTDB=db
-                - PSYCOPG2_TESTDB_HOST=dbsha256
-                - PSYCOPG2_TESTDB_PORT=5432
-                - PSYCOPG2_TESTDB_USER=bob
-                - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
-                - AWS_ACCESS_KEY_ID
-                - AWS_SECRET_ACCESS_KEY
-            depends_on:
-                - authenticator
-                - dbsha256
