@@ -20,9 +20,10 @@ import psycopg2
 
 
 try:
-    test_iam_role = os.environ['APPZ_TESTIAMROLE']
+    test_iam_role = os.environ['TEST_IAM_ROLE']
 except KeyError:
-    print("Please set env var 'APPZ_TESTIAMROLE' to a valid value")
+    print("Please set env var 'TEST_IAM_ROLE' to a valid value")
+    sys.exit(1)
 
 auth = Authenticator('authenticator:1234', test_iam_role)
 set_default_authenticator(auth)
