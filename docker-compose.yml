@@ -1,5 +1,6 @@
 # Defines common services used for development purposes
 # set COMPOSE_DOCKER_CLI_BUILD=1
+# set DOCKER_BUILDKIT=1
 version: '3.5'
 
 x-test-variables: &test-variables
