@@ -58,6 +58,8 @@ services:
                 - PSYCOPG2_TESTDB_PORT=5432
                 - PSYCOPG2_TESTDB_USER=bob
                 - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
+                - AWS_ACCESS_KEY_ID
+                - AWS_SECRET_ACCESS_KEY
             depends_on:
                 - authenticator
                 - dbmd5
@@ -76,6 +78,8 @@ services:
                 - PSYCOPG2_TESTDB_PORT=5432
                 - PSYCOPG2_TESTDB_USER=bob
                 - APPZ_TESTIAMROLE=arn:aws:iam::403019568400:role/dev
+                - AWS_ACCESS_KEY_ID
+                - AWS_SECRET_ACCESS_KEY
             depends_on:
                 - authenticator
                 - dbsha256
