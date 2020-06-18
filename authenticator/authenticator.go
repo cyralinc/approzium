@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"approzium/authenticator/credmgrs"
-	pb "approzium/authenticator/protos"
+	"github.com/approzium/approzium/authenticator/credmgrs"
+	pb "github.com/approzium/approzium/authenticator/protos"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/pbkdf2"
 	"google.golang.org/grpc/codes"
