@@ -46,8 +46,8 @@ func (a *Authenticator) run() {
 	}
 }
 
-func IAMFormatToSTS(iam_arn string) (string, error) {
-	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(iam_arn)
+func IAMFormatToSTS(iamArn string) (string, error) {
+	matches := regexp.MustCompile(`arn:aws:iam::(.*):role/(.*)`).FindStringSubmatch(iamArn)
 	if matches == nil {
 		return "", fmt.Errorf("provided IAM role ARN is not properly formatted, expected format: arn:aws:iam::accountid:role/rolename")
 	}
@@ -74,14 +74,14 @@ func executeGetCallerIdentity(request string) (string, error) {
 	return iamArn, nil
 }
 
-func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
-	log.Printf("verifying service for role: %s\n", claimed_iam_arn)
-	actual_iam_arn, err := executeGetCallerIdentity(signed_get_caller_identity)
+func verifyService(claimedIamArn, signedGetCallerIdentity string) error {
+	log.Printf("verifying service for role: %s\n", claimedIamArn)
+	actualIamArn, err := executeGetCallerIdentity(signedGetCallerIdentity)
 	if err != nil {
 		return fmt.Errorf("could not execute GetCallerIdentity %s", err)
 	}
 	// have to change formats of arns to be able to do string comparison
-	claimed_iam_arn, err = IAMFormatToSTS(claimed_iam_arn)
+	claimedIamArn, err = IAMFormatToSTS(claimedIamArn)
 	if err != nil {
 		return fmt.Errorf("could not parse claimed IAM ARN %s", err)
 	}
@@ -90,31 +90,31 @@ func verifyService(claimed_iam_arn, signed_get_caller_identity string) error {
 	// for example, the following two IAMs should match
 	// arn:aws:sts::403019568400:assumed-role/dev
 	// arn:aws:sts::403019568400:assumed-role/dev/Service1
-	if strings.HasPrefix(actual_iam_arn, claimed_iam_arn) {
+	if strings.HasPrefix(actualIamArn, claimedIamArn) {
 		return nil
 	} else {
-		return fmt.Errorf("actual IAM ARN %s does not match claimed IAM ARN %s", actual_iam_arn, claimed_iam_arn)
+		return fmt.Errorf("actual IAM ARN %s does not match claimed IAM ARN %s", actualIamArn, claimedIamArn)
 	}
 }
 
 func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	a.counter++
 
-	claimed_iam_arn := req.GetClaimedIamArn()
-	dbhost := req.GetDbhost()
-	dbport := req.GetDbport()
-	dbuser := req.GetDbuser()
-	log.Printf("received GetPGMD5Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
-	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+	claimedIamArn := req.GetClaimedIamArn()
+	dbHost := req.GetDbhost()
+	dbPort := req.GetDbport()
+	dbUser := req.GetDbuser()
+	log.Printf("received GetPGMD5Hash request with claimedIamArn: %s\n", claimedIamArn)
+	err := verifyService(claimedIamArn, req.GetSignedGetCallerIdentity())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
 	password, err := a.getCreds(credmgrs.DBKey{
-		IAMArn: claimed_iam_arn,
-		DBHost: dbhost,
-		DBPort: dbport,
-		DBUser: dbuser,
+		IAMArn: claimedIamArn,
+		DBHost: dbHost,
+		DBPort: dbPort,
+		DBUser: dbUser,
 	})
 	if err != nil {
 		log.Error(err)
@@ -129,27 +129,27 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	return &pb.PGMD5Response{Hash: computePGMD5Hash(dbuser, password, salt)}, nil
+	return &pb.PGMD5Response{Hash: computePGMD5Hash(dbUser, password, salt)}, nil
 }
 
 func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
 	a.counter++
 
-	claimed_iam_arn := req.GetClaimedIamArn()
-	dbhost := req.GetDbhost()
-	dbport := req.GetDbport()
-	dbuser := req.GetDbuser()
-	log.Printf("received GetPGSHA256Hash request with claimed_iam_arn: %s\n", claimed_iam_arn)
-	err := verifyService(claimed_iam_arn, req.GetSignedGetCallerIdentity())
+	claimedIamArn := req.GetClaimedIamArn()
+	dbHost := req.GetDbhost()
+	dbPort := req.GetDbport()
+	dbUser := req.GetDbuser()
+	log.Printf("received GetPGSHA256Hash request with claimedIamArn: %s\n", claimedIamArn)
+	err := verifyService(claimedIamArn, req.GetSignedGetCallerIdentity())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
 	password, err := a.getCreds(credmgrs.DBKey{
-		IAMArn: claimed_iam_arn,
-		DBHost: dbhost,
-		DBPort: dbport,
-		DBUser: dbuser,
+		IAMArn: claimedIamArn,
+		DBHost: dbHost,
+		DBPort: dbPort,
+		DBUser: dbUser,
 	})
 	if err != nil {
 		log.Error(err)
@@ -202,9 +202,9 @@ func computeMD5(s string, salt []byte) string {
 }
 
 func computePGMD5Hash(user, password string, salt []byte) string {
-	first_hash := computeMD5(password, []byte(user))
-	second_hash := computeMD5(first_hash, salt)
-	return second_hash
+	firstHash := computeMD5(password, []byte(user))
+	secondHash := computeMD5(firstHash, salt)
+	return secondHash
 }
 
 func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]byte, error) {
