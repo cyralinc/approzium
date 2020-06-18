@@ -34,15 +34,35 @@ services:
             - VAULT_TOKEN=root
         depends_on:
             - vault
-        volumes:
-            - ./authenticator/secrets.yaml:/app/secrets.yaml:ro
+#       volumes:
+#           - ./authenticator/secrets.yaml:/app/secrets.yaml:ro
     dev:
         build:
             context: ./
             target: dev
+        environment:
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
         volumes:
             - .:/usr/src/approzium
             - ~/.aws/:/root/.aws/:ro
+    seed:
+        build:
+            context: ./
+            target: dev
+        environment:
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
+        command: >
+            bash -c 'vault secrets enable -path=approzium -version=1 kv &&
+                     vault kv put approzium/dbmd5:5432 bob=-<<EOF
+                    {
+                        "password": "password",
+                        "iam_roles": [
+                            "arn:aws:iam::403019568400:role/dev"
+                        ]
+                    }'
+
     psycopg2-testsuite-md5:
             build:
                 context: ./
@@ -63,6 +83,7 @@ services:
             depends_on:
                 - authenticator
                 - dbmd5
+                - seed
     psycopg2-testsuite-sha256:
             build:
                 context: ./
