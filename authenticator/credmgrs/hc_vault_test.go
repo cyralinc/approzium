@@ -3,37 +3,49 @@ package credmgrs
 import (
 	"os"
 	"testing"
+
+	vault "github.com/hashicorp/vault/api"
 )
 
-// For testing, run Vault locally via:
+// To run this test, first start Vault locally like so:
 // "$ vault server -dev -dev-root-token-id=root"
 //
 // Then, in this application's environment, set:
 // 		VAULT_ADDR=http://localhost:8200
 // 		VAULT_TOKEN=root
-//
-// Enable Vault KV Version 1:
-// "$ vault secrets enable -path=approzium -version=1 kv"
-//
-// Create a test secret body:
-// "$ nano test-secret.json"
-// {
-//		"password": "asdfghjkl",
-//		"iam_roles": [
-//			"arn:aws:iam::accountid:role/rolename1",
-//			"arn:aws:iam::accountid:role/rolename2"
-//		]
-//	}
-// "$ vault kv put approzium/postgresql://my-username:my-password@localhost:5432 dbuser1=@test-secret.json"
 func TestHcVaultCredMgr_Password(t *testing.T) {
 	// Ensure we have the necessary test environment.
-	if addr := os.Getenv("VAULT_ADDR"); addr == "" {
+	addr := os.Getenv(vault.EnvVaultAddress)
+	if addr == "" {
 		t.Skip("skipping because VAULT_ADDR is unset")
 	}
-	if token := os.Getenv("VAULT_TOKEN"); token == "" {
-		t.Skip("skipping because VAULT_TOKEN is unset")
+
+	// Plant the necessary secrets for this test.
+	client, err := vault.NewClient(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// We'll try mounting the secrets engine we need, but it might already be
+	// mounted, so if there's an error mounting it we'll just ignore it.
+	_, _ = client.Logical().Write("/sys/mounts/"+mountPath, map[string]interface{}{
+		"type": "kv",
+		"options": map[string]interface{}{
+			"version": "1",
+		},
+	})
+	if _, err := client.Logical().Write("approzium/postgresql://my-username:my-password@localhost:5432", map[string]interface{}{
+		"dbuser1": map[string]interface{}{
+			"password": "asdfghjkl",
+			"iam_roles": []string{
+				"arn:aws:iam::accountid:role/rolename1",
+				"arn:aws:iam::accountid:role/rolename2",
+			},
+		},
+	}); err != nil {
+		t.Fatal(err)
 	}
 
+	// Try to read the creds through the cred manager.
 	credMgr, err := newHashiCorpVaultCreds()
 	if err != nil {
 		t.Fatal(err)

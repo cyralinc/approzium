@@ -18,6 +18,9 @@ services:
             - POSTGRES_PASSWORD=password
             - POSTGRES_USER=bob
             - POSTGRES_DB=db
+    # To interact with Vault from another container, use:
+    # VAULT_ADDR=http://vault:8200
+    # VAULT_TOKEN=root
     vault:
         image: "vault:latest"
         environment:
@@ -29,9 +32,6 @@ services:
         image: approzium_authenticator
         volumes:
             - .:/usr/src/approzium
-        environment:
-            - VAULT_ADDR=http://vault:8200
-            - VAULT_TOKEN=root
         command: ./authenticator
     sdk:
         build: sdk

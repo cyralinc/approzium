@@ -27,8 +27,3 @@ RUN mkdir -p cmake/build && \
     make grpc_cli && \
     cp grpc_cli /usr/bin/
 WORKDIR /usr/src/approzium/authenticator
-
-# Install Vault CLI for ease of testing Vault out
-RUN wget https://releases.hashicorp.com/vault/1.4.2/vault_1.4.2_linux_amd64.zip
-RUN unzip vault_1.4.2_linux_amd64.zip
-RUN mv vault /usr/local/bin/
