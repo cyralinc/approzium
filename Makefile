@@ -2,7 +2,7 @@
 # Starts a bash shell in the dev environment
 dev:
 	$(docker_env) docker-compose $(dc_files) run tests bash
-dev-env: dc-build ssl/rootCA.key 
+dev-env: dc-build ssl/rootCA.key
 	$(docker_env) docker-compose up
 dc-build:
 	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
@@ -45,16 +45,21 @@ ssl/rootCA.key:
 
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
-	-vault secrets enable -path=approzium -version=1 kv
+	vault secrets enable -path=approzium -version=1 kv | true
+seed-vault-host:  # call this with "make seed-vault-host HOST=foo"
+	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
+		vault write approzium/$(HOST):$(TEST_DBPORT) -
 
 run-testsuite: enable-vault-path run-gotests run-pg2tests
 
 run-gotests:
-	CGO_ENABLED=1 go test -v -race authenticator/...
+	echo '###### Running Go tests ######'
+	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
 
 run-pg2tests:
+	echo '###### Running Psycopg2 test suite ######'
 	for HOST in $(TEST_DBHOSTS); do \
-		vault kv put approzium/$$HOST:$(TEST_DBPORT) $(TEST_DBUSER)='$(vault_secret)'; \
+		make seed-vault-host HOST=$$HOST \
 		echo '###### Testing with DBHOST' $$HOST 'SSL=ON #####'; \
 		PGSSLMODE=require PSYCOPG2_TESTDB_HOST=$$HOST make -C sdk/python/ test; \
 		echo '###### Testing with DBHOST' $$HOST 'SSL=OFF #####'; \
