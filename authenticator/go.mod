@@ -1,4 +1,4 @@
-module approzium/authenticator
+module github.com/approzium/approzium/authenticator
 
 go 1.13
 
