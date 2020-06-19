@@ -1,21 +1,10 @@
 # syntax=docker/dockerfile:1.0-experimental
-FROM golang:1.13 AS builder
-WORKDIR /usr/src/approzium/authenticator
+FROM golang:1.13 AS dev
 ENV HOME /root
 ENV GOPATH /usr
 # enable GOMODULES
 ENV GO111MODULE on
 ENV CGO_ENABLED 0
-COPY authenticator/ .
-RUN --mount=type=cache,target=$GOPATH/pkg/mod go build
-
-FROM alpine:latest AS build
-WORKDIR /app/
-COPY --from=builder /usr/src/approzium/authenticator/authenticator .
-ENTRYPOINT ["./authenticator"]
-
-FROM builder AS dev
-WORKDIR /usr/src/approzium/
 # Nice to haves for development
 RUN apt-get update && apt-get install -y iputils-ping vim
 # Install protoc-gen-go
@@ -39,6 +28,18 @@ RUN pip3 install --upgrade pip
 RUN pip3 install pytest
 # Install protobuf compiler for Python
 RUN pip3 install grpcio-tools
-COPY sdk/ ./sdk/
-# Install SDK in editable mode
-RUN pip3 install -e sdk/python
+# Python package dependencies. Repeated here for faster cached build time
+RUN pip3 install psycopg2 boto3 grpcio
+WORKDIR /usr/src/approzium/sdk
+COPY sdk/ .
+# Install Python SDK in editable mode
+RUN pip3 install -e python
+# Build Authenticator Go Binary
+WORKDIR /usr/src/approzium/authenticator
+COPY authenticator/ .
+RUN --mount=type=cache,target=$GOPATH/pkg/mod go build
+
+FROM alpine:latest AS build
+WORKDIR /app/
+COPY --from=dev /usr/src/approzium/authenticator/authenticator .
+ENTRYPOINT ["./authenticator"]
