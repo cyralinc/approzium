@@ -1,26 +1,26 @@
-version: '3'
+# Defines common services used for development purposes
+# set COMPOSE_DOCKER_CLI_BUILD=1
+# set DOCKER_BUILDKIT=1
+version: '3.5'
+
+x-test-variables: &test-variables
+    POSTGRES_PASSWORD: 'password'
+    POSTGRES_USER: 'bob'
+    POSTGRES_DB: 'db'
 services:
     dbsha256:
         build: ssl
         image: approzium_postgres_ssl
         command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
         environment:
-            - POSTGRES_PASSWORD=password
-            - POSTGRES_USER=bob
-            - POSTGRES_DB=db
-            - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
-            - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
+            <<: *test-variables
+            POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
+            POSTGRES_HOST_AUTH_METHOD: 'scram-sha-256'
     dbmd5:
         build: ssl
         image: approzium_postgres_ssl
         command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
-        environment:
-            - POSTGRES_PASSWORD=password
-            - POSTGRES_USER=bob
-            - POSTGRES_DB=db
-    # To interact with Vault from another container, use:
-    # VAULT_ADDR=http://vault:8200
-    # VAULT_TOKEN=root
+        environment: *test-variables
     vault:
         image: "vault:latest"
         environment:
@@ -28,14 +28,11 @@ services:
             - VAULT_DEV_ROOT_TOKEN_ID=root
         entrypoint: vault server -dev
     authenticator:
-        build: authenticator
-        image: approzium_authenticator
-        volumes:
-            - .:/usr/src/approzium
-        command: ./authenticator
-    sdk:
-        build: sdk
-        image: approzium_sdk
-        volumes:
-            - .:/usr/src/approzium
-            - ~/.aws/:/root/.aws/:ro
+        build:
+            context: ./
+            target: build
+        environment:
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
+        depends_on:
+            - vault
