@@ -1,6 +1,7 @@
 import approzium
 import grpc
 from pathlib import Path
+from itertools import count
 from .iam import obtain_signed_get_caller_identity
 
 # needed to be able to import protos code
@@ -11,45 +12,60 @@ import authenticator_pb2_grpc  # noqa: E402
 import authenticator_pb2  # noqa: E402
 
 
-class Authenticator(object):
-    def __init__(self, address, iam_role=None):
-        self.address = address
+class AuthClient(object):
+    def __init__(self, server_address, iam_role=None):
+        self.server_address = server_address
         self.iam_role = iam_role
+        self.authenticated = False
+        self._counter = count(1)
+        self.n_conns = 0
 
+    @property
+    def attribution_info(self):
+        info = {}
+        info['authenticator_address'] = self.server_address
+        info['iam_role'] = self.iam_role
+        info['authenticated'] = self.authenticated
+        info['num_connections'] = self.n_conns
+        return info
 
-def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
-    signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
-    channel = grpc.insecure_channel(authenticator.address)
-    stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
+    def _execute_request(self, request, getmethodname):
+        signed_gci = obtain_signed_get_caller_identity(self.iam_role)
+        channel = grpc.insecure_channel(self.server_address)
+        stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
+        request.signed_get_caller_identity = signed_gci
+        request.claimed_iam_arn = self.iam_role
+        response = getattr(stub, getmethodname)(request)
+        # if no exception is raised, request was successful
+        self.authenticated = True
+        self.n_conns = next(self._counter)
+        return response
 
-    if auth_type == approzium.psycopg2.AUTH_REQ_MD5:
-        salt = auth_info
-        if len(salt) != 4:
-            raise Exception("salt not right size")
-        request = authenticator_pb2.PGMD5HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
-            dbhost=dbhost,
-            dbuser=dbuser,
-            dbport=dbport,
-            salt=salt,
-        )
-        response = stub.GetPGMD5Hash(request)
-        return response.hash
-    elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
-        auth = auth_info
-        auth._generate_auth_msg()
-        request = authenticator_pb2.PGSHA256HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
-            dbhost=dbhost,
-            dbport=dbport,
-            dbuser=dbuser,
-            salt=auth.password_salt,
-            iterations=auth.password_iterations,
-            authentication_msg=auth.authorization_message,
-        )
-        response = stub.GetPGSHA256Hash(request)
-        client_final = auth.create_client_final_message(response.cproof)
-        auth.server_signature = response.sproof
-        return client_final, auth
+    def _get_pg2_hash(self, dbhost, dbport, dbuser, auth_type, auth_info):
+        if auth_type == approzium.psycopg2.AUTH_REQ_MD5:
+            salt = auth_info
+            if len(salt) != 4:
+                raise Exception("salt not right size")
+            request = authenticator_pb2.PGMD5HashRequest(
+                dbhost=dbhost,
+                dbuser=dbuser,
+                dbport=dbport,
+                salt=salt,
+            )
+            response = self._execute_request(request, 'GetPGMD5Hash')
+            return response.hash
+        elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
+            auth = auth_info
+            auth._generate_auth_msg()
+            request = authenticator_pb2.PGSHA256HashRequest(
+                dbhost=dbhost,
+                dbport=dbport,
+                dbuser=dbuser,
+                salt=auth.password_salt,
+                iterations=auth.password_iterations,
+                authentication_msg=auth.authorization_message,
+            )
+            response = self._execute_request(request, 'GetPGSHA256Hash')
+            client_final = auth.create_client_final_message(response.cproof)
+            auth.server_signature = response.sproof
+            return client_final, auth

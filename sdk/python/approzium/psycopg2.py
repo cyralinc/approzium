@@ -9,7 +9,6 @@ from ._psycopg2_ctypes import (
     set_debug,
     ensure_compatible_ssl,
 )
-from .authenticator import get_hash
 from .misc import read_int32_from_bytes
 import approzium
 from ._psycopg2_scram import SCRAMAuthentication
@@ -81,7 +80,7 @@ def send_hash(pgconn, auth_type, hash):
             raise Exception("Error bad server signature")
 
 
-def construct_approzium_conn(base, is_sync, authenticator):
+def construct_approzium_conn(base, is_sync, auth_client):
     if not base:
         base = psycopg2.extensions.connection
 
@@ -101,7 +100,7 @@ def construct_approzium_conn(base, is_sync, authenticator):
             self._salt = None
             self._auth_type = None
             self._hash_sent = False
-            self._authenticator = authenticator
+            self._auth_client = auth_client
             self._checked_ssl = False
             if is_sync:
                 wait(self)
@@ -123,13 +122,12 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 dbhost = self.get_dsn_parameters()["host"]
                 dbport = self.get_dsn_parameters()["port"]
                 dbuser = self.get_dsn_parameters()["user"]
-                hash = get_hash(
+                hash = self._auth_client._get_pg2_hash(
                     dbhost,
                     dbport,
                     dbuser,
                     self._auth_type,
                     self._salt,
-                    self._authenticator,
                 )
                 send_hash(self, self._auth_type, hash)
                 self._hash_sent = True
@@ -142,17 +140,18 @@ def construct_approzium_conn(base, is_sync, authenticator):
 
 
 def connect(
-    dsn=None, connection_factory=None, cursor_factory=None, authenticator=None, **kwargs
+    dsn=None, connection_factory=None, cursor_factory=None, auth=None, **kwargs
 ):
     is_sync = True
     if kwargs.get("async", False):
         is_sync = False
     if kwargs.get("async_", False):
         is_sync = False
-    if authenticator is None:
-        authenticator = approzium.default_authenticator
-    if authenticator is None:
-        raise Exception("Authenticator not specified")
+    if auth is None:
+        auth = approzium.default_auth_client
+    if auth is None:
+        raise Exception("Authenticator client not specified. Define an `auth`\
+argument or set approzium.default_auth_client")
     # construct our approzium factory class on top of given connection factory class
-    factory = construct_approzium_conn(connection_factory, is_sync, authenticator)
+    factory = construct_approzium_conn(connection_factory, is_sync, auth)
     return pgconnect(dsn, factory, cursor_factory, **kwargs)
