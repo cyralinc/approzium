@@ -16,4 +16,4 @@ def set_default_authenticator(new_authenticator):
     default_authenticator = new_authenticator
 
 
-__all__ = ['set_default_authenticator', 'Authenticator']
+__all__ = ["set_default_authenticator", "Authenticator"]
