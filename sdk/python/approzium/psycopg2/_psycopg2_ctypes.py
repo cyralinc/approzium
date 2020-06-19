@@ -13,7 +13,7 @@ import struct
 import logging
 from sys import getsizeof
 import warnings
-from .socketfromfd import fromfd
+from ..socketfromfd import fromfd
 
 
 logger = logging.getLogger(__name__)

@@ -9,8 +9,8 @@ from ._psycopg2_ctypes import (
     set_debug,
     ensure_compatible_ssl,
 )
-from .authenticator import get_hash
-from .misc import read_int32_from_bytes
+from ..authenticator import get_hash
+from ..misc import read_int32_from_bytes
 import approzium
 from ._psycopg2_scram import SCRAMAuthentication
 
