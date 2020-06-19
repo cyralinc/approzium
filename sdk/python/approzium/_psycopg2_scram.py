@@ -95,7 +95,7 @@ class SCRAMAuthentication:
             raise Exception("could not get salt")
         try:
             self.password_iterations = int(
-                re.search(b"i=(\d+),?", self.server_first_message).group(1)
+                re.search(b"i=(\d+),?", self.server_first_message).group(1)  # noqa:W605
             )
         except (IndexError, TypeError, ValueError):
             raise Exception("could not get iterations")

@@ -63,13 +63,13 @@ def set_connection_sync(pgconn):
 
     def ensure(check):
         if not check:
-            raise Exception('Could not set connection to sync. Unidentified struct field')
+            raise Exception('Could not set connection to sync. Unidentified struct')
 
     # as a check, we check server and protocol version numbers, which succeed
     # the async value in the psycopg connection struct
     server_version_addr = addressofint(pgconn.server_version)
     # check that there is only one match for that value
-    ensure (
+    ensure(
         addressofint(pgconn.server_version, mem[server_version_addr + sizeofint :])
         == -1
     )
@@ -130,10 +130,12 @@ def write_to_conn(pgconn, msg):
             sock.sendall(msg)
     logger.debug(f'sent: {msg}')
 
+
 def set_debug(conn):
     libc = CDLL(find_library('c'))
     stdout = c_void_p.in_dll(libc, 'stdout')
     libpq.PQtrace(conn.pgconn_ptr, stdout)
+
 
 def ensure_compatible_ssl(conn):
     if conn.info.ssl_attribute('library') != 'OpenSSL':
