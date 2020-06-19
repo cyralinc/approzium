@@ -2,6 +2,7 @@ import approzium
 import grpc
 from pathlib import Path
 from .iam import obtain_signed_get_caller_identity
+
 # needed to be able to import protos code
 import sys
 
@@ -46,7 +47,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbuser=dbuser,
             salt=auth.password_salt,
             iterations=auth.password_iterations,
-            authentication_msg=auth.authorization_message
+            authentication_msg=auth.authorization_message,
         )
         response = stub.GetPGSHA256Hash(request)
         client_final = auth.create_client_final_message(response.cproof)

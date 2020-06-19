@@ -7,7 +7,7 @@ from ._psycopg2_ctypes import (
     read_msg,
     write_msg,
     set_debug,
-    ensure_compatible_ssl
+    ensure_compatible_ssl,
 )
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
@@ -30,23 +30,23 @@ def read_auth(pgconn):
     # right stage, only the right number of bytes will be received
     msg_type, msg = read_msg(pgconn)
     auth_type = read_int32_from_bytes(msg, 0)
-    if msg_type != b'R':
+    if msg_type != b"R":
         raise Exception("Authentication message not received")
     if auth_type == AUTH_REQ_MD5:
         salt = msg[-4:]
         return auth_type, bytes(salt)
     elif auth_type == AUTH_REQ_SASL:
-        if not msg[4:].startswith(b'SCRAM-SHA-256'):
+        if not msg[4:].startswith(b"SCRAM-SHA-256"):
             raise Exception("Server requested an unsupported SASL auth method")
-        auth = SCRAMAuthentication(b'SCRAM-SHA-256')
+        auth = SCRAMAuthentication(b"SCRAM-SHA-256")
         dbuser = pgconn.get_dsn_parameters()["user"]
         client_first = auth.create_client_first_message(dbuser)
         select.select([], [pgconn.fileno()], [])
-        write_msg(pgconn, b'p', client_first)
+        write_msg(pgconn, b"p", client_first)
         select.select([pgconn.fileno()], [], [])
         resp_type, server_first = read_msg(pgconn)
-        if resp_type != b'R':
-            raise Exception('Error received unexpected response', server_first)
+        if resp_type != b"R":
+            raise Exception("Error received unexpected response", server_first)
         # the part that is relevant is the part that starts with r=
         auth.parse_server_first_message(server_first[4:])
         return auth_type, auth
@@ -69,16 +69,16 @@ def wait(pgconn):
 
 def send_hash(pgconn, auth_type, hash):
     if auth_type == AUTH_REQ_MD5:
-        write_msg(pgconn, b'p', b'md5'+hash.encode('ascii')+b'\0')
+        write_msg(pgconn, b"p", b"md5" + hash.encode("ascii") + b"\0")
     elif auth_type == AUTH_REQ_SASL:
         client_final, auth = hash
-        write_msg(pgconn, b'p', client_final)
+        write_msg(pgconn, b"p", client_final)
         select.select([pgconn.fileno()], [], [])
         resp_type, server_final = read_msg(pgconn)
-        if resp_type != b'R':
-            raise Exception('Error received unexpected response', server_final)
+        if resp_type != b"R":
+            raise Exception("Error received unexpected response", server_final)
         if not auth.verify_server_final_message(server_final):
-            raise Exception('Error bad server signature')
+            raise Exception("Error bad server signature")
 
 
 def construct_approzium_conn(base, is_sync, authenticator):
@@ -124,8 +124,12 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 dbport = self.get_dsn_parameters()["port"]
                 dbuser = self.get_dsn_parameters()["user"]
                 hash = get_hash(
-                    dbhost, dbport, dbuser, self._auth_type, self._salt,
-                    self._authenticator
+                    dbhost,
+                    dbport,
+                    dbuser,
+                    self._auth_type,
+                    self._salt,
+                    self._authenticator,
                 )
                 send_hash(self, self._auth_type, hash)
                 self._hash_sent = True
@@ -137,8 +141,9 @@ def construct_approzium_conn(base, is_sync, authenticator):
     return ApproziumConn
 
 
-def connect(dsn=None, connection_factory=None, cursor_factory=None, authenticator=None,
-            **kwargs):
+def connect(
+    dsn=None, connection_factory=None, cursor_factory=None, authenticator=None, **kwargs
+):
     is_sync = True
     if kwargs.get("async", False):
         is_sync = False
@@ -147,7 +152,7 @@ def connect(dsn=None, connection_factory=None, cursor_factory=None, authenticato
     if authenticator is None:
         authenticator = approzium.default_authenticator
     if authenticator is None:
-        raise Exception('Authenticator not specified')
+        raise Exception("Authenticator not specified")
     # construct our approzium factory class on top of given connection factory class
     factory = construct_approzium_conn(connection_factory, is_sync, authenticator)
     return pgconnect(dsn, factory, cursor_factory, **kwargs)
