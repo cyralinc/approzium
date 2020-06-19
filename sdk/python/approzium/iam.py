@@ -1,10 +1,9 @@
 import boto3
-import approzium
 
 
 def obtain_signed_get_caller_identity(iam_role):
     if iam_role is None:
-        raise NotImplementedError('Automatic IAM ARN determination is not implemented yet')
+        raise NotImplementedError('Automatic IAM ARN determination is not implemented')
     sts_client = boto3.client("sts")
     credentials = sts_client.assume_role(
         DurationSeconds=3600, RoleArn=iam_role, RoleSessionName="Service1",

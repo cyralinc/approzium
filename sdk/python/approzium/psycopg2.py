@@ -1,20 +1,11 @@
 import psycopg2
 import select
 import logging
-import struct
-from sys import getsizeof
-import warnings
 from ._psycopg2_ctypes import (
     libpq_PQstatus,
-    libpq_PQsslInUse,
-    libpq_PQgetssl,
-    libpq_PQsetnonblocking,
-    libssl_SSL_read,
-    libssl_SSL_write,
     set_connection_sync,
     read_msg,
     write_msg,
-    write_to_conn,
     set_debug,
     ensure_compatible_ssl
 )
@@ -34,7 +25,6 @@ AUTH_REQ_SASL = 10
 pgconnect = psycopg2.connect
 
 
-
 def read_auth(pgconn):
     # request many more bytes than necessary. if connection is at the
     # right stage, only the right number of bytes will be received
@@ -47,7 +37,7 @@ def read_auth(pgconn):
         return auth_type, bytes(salt)
     elif auth_type == AUTH_REQ_SASL:
         if not msg[4:].startswith(b'SCRAM-SHA-256'):
-            raise Exception("Server requested an unsupported SASL authentication method")
+            raise Exception("Server requested an unsupported SASL auth method")
         auth = SCRAMAuthentication(b'SCRAM-SHA-256')
         dbuser = pgconn.get_dsn_parameters()["user"]
         client_first = auth.create_client_first_message(dbuser)
@@ -99,7 +89,6 @@ def construct_approzium_conn(base, is_sync, authenticator):
         CONNECTION_AWAITING_RESPONSE = 4
 
         def __init__(self, *args, **kwargs):
-            # can safely do so because real async value was caught earlier in our connect method
             logger.debug("ApproziumConn __init__")
             kwargs.pop("async", None)
             kwargs.pop("async_", None)
@@ -135,7 +124,8 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 dbport = self.get_dsn_parameters()["port"]
                 dbuser = self.get_dsn_parameters()["user"]
                 hash = get_hash(
-                    dbhost, dbport, dbuser, self._auth_type, self._salt, self._authenticator
+                    dbhost, dbport, dbuser, self._auth_type, self._salt,
+                    self._authenticator
                 )
                 send_hash(self, self._auth_type, hash)
                 self._hash_sent = True
@@ -147,7 +137,8 @@ def construct_approzium_conn(base, is_sync, authenticator):
     return ApproziumConn
 
 
-def connect(dsn=None, connection_factory=None, cursor_factory=None, authenticator=None, **kwargs):
+def connect(dsn=None, connection_factory=None, cursor_factory=None, authenticator=None,
+            **kwargs):
     is_sync = True
     if kwargs.get("async", False):
         is_sync = False
