@@ -1,22 +1,21 @@
 import approzium
-import logging
-import hashlib
 import grpc
 from pathlib import Path
+from .iam import obtain_signed_get_caller_identity
 
 # needed to be able to import protos code
 import sys
 
 sys.path.append(str(Path(__file__).parent / "protos"))
-import authenticator_pb2_grpc
-import authenticator_pb2
-from .iam import obtain_signed_get_caller_identity
+import authenticator_pb2_grpc  # noqa: E402
+import authenticator_pb2  # noqa: E402
 
 
 class Authenticator(object):
     def __init__(self, address, iam_role=None):
         self.address = address
         self.iam_role = iam_role
+
 
 def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
     signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
@@ -48,7 +47,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbuser=dbuser,
             salt=auth.password_salt,
             iterations=auth.password_iterations,
-            authentication_msg=auth.authorization_message
+            authentication_msg=auth.authorization_message,
         )
         response = stub.GetPGSHA256Hash(request)
         client_final = auth.create_client_final_message(response.cproof)

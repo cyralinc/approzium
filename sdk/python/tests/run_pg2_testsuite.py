@@ -7,25 +7,24 @@ from unittest import SkipTest
 import os
 from os.path import abspath
 import logging
-import sys
-
-sys.path.append(abspath("pg2_testsuite"))
-import hashlib
 from approzium import Authenticator, set_default_authenticator
 
 # once get hash is mocked, import connect method
 from approzium.psycopg2 import connect as approzium_pg2_connect
-import pg2_testsuite
 import psycopg2
+import sys
+
+sys.path.append(abspath("pg2_testsuite"))
+import pg2_testsuite  # noqa: E402 F401
 
 
 try:
-    test_iam_role = os.environ['TEST_IAM_ROLE']
+    test_iam_role = os.environ["TEST_IAM_ROLE"]
 except KeyError:
     print("Please set env var 'TEST_IAM_ROLE' to a valid value")
     sys.exit(1)
 
-auth = Authenticator('authenticator:1234', test_iam_role)
+auth = Authenticator("authenticator:1234", test_iam_role)
 set_default_authenticator(auth)
 
 # replace connect method
@@ -34,7 +33,8 @@ psycopg2.connect = approzium_pg2_connect
 
 def skip_tests(ids, pg2_suites):
     filtered_suite = unittest.TestSuite()
-    # the way the Psycopg2 test suite is setup, there are many layers of organization
+    # the way the Psycopg2 test suite is setup, there are many layers of
+    # organization
     for suites in pg2_suites:
         for suite in suites:
             for test in suite:
