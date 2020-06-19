@@ -2,7 +2,7 @@
 # Starts a bash shell in the dev environment
 dev:
 	$(docker_env) docker-compose $(dc_files) run tests bash
-dev-env: dc-build ssl/rootCA.key
+dev-env: dc-build
 	$(docker_env) docker-compose up
 dc-build: ssl/rootCA.key
 	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
