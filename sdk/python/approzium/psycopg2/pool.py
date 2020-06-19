@@ -17,5 +17,8 @@ class AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):
 class SimpleConnectionPool(AbstractConnectionPool, psycopg2.pool.SimpleConnectionPool):
     pass
 
-class ThreadedConnectionPool(AbstractConnectionPool, psycopg2.pool.ThreadedConnectionPool):
+
+class ThreadedConnectionPool(
+    AbstractConnectionPool, psycopg2.pool.ThreadedConnectionPool
+):
     pass
