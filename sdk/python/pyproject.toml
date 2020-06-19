@@ -1,0 +1,19 @@
+[tool.black]
+target-version = ['py37']
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.hg          # root of the project
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | approzium/protos
+)
+'''
