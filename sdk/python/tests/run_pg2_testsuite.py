@@ -13,17 +13,18 @@ from approzium import Authenticator, set_default_authenticator
 from approzium.psycopg2 import connect as approzium_pg2_connect
 import psycopg2
 import sys
+
 sys.path.append(abspath("pg2_testsuite"))
 import pg2_testsuite  # noqa: E402 F401
 
 
 try:
-    test_iam_role = os.environ['TEST_IAM_ROLE']
+    test_iam_role = os.environ["TEST_IAM_ROLE"]
 except KeyError:
     print("Please set env var 'TEST_IAM_ROLE' to a valid value")
     sys.exit(1)
 
-auth = Authenticator('authenticator:1234', test_iam_role)
+auth = Authenticator("authenticator:1234", test_iam_role)
 set_default_authenticator(auth)
 
 # replace connect method

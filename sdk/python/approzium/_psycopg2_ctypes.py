@@ -63,7 +63,7 @@ def set_connection_sync(pgconn):
 
     def ensure(check):
         if not check:
-            raise Exception('Could not set connection to sync. Unidentified struct')
+            raise Exception("Could not set connection to sync. Unidentified struct")
 
     # as a check, we check server and protocol version numbers, which succeed
     # the async value in the psycopg connection struct
@@ -106,13 +106,13 @@ def read_msg(pgconn):
 
     msg_type = read_bytes(1)
     msg_size = struct.unpack("!i", read_bytes(4))[0]
-    msg_content = read_bytes(msg_size-4)
-    logger.debug(f'read: {msg_type} {msg_content}')
+    msg_content = read_bytes(msg_size - 4)
+    logger.debug(f"read: {msg_type} {msg_content}")
     return msg_type, msg_content
 
 
 def write_msg(pgconn, msg_header, msg):
-    msg = msg_header + struct.pack("!i", len(msg)+4) + msg
+    msg = msg_header + struct.pack("!i", len(msg) + 4) + msg
     write_to_conn(pgconn, msg)
 
 
@@ -128,15 +128,15 @@ def write_to_conn(pgconn, msg):
             warnings.simplefilter("ignore", ResourceWarning)
             sock = fromfd(pgconn.fileno(), keep_fd=True)
             sock.sendall(msg)
-    logger.debug(f'sent: {msg}')
+    logger.debug(f"sent: {msg}")
 
 
 def set_debug(conn):
-    libc = CDLL(find_library('c'))
-    stdout = c_void_p.in_dll(libc, 'stdout')
+    libc = CDLL(find_library("c"))
+    stdout = c_void_p.in_dll(libc, "stdout")
     libpq.PQtrace(conn.pgconn_ptr, stdout)
 
 
 def ensure_compatible_ssl(conn):
-    if conn.info.ssl_attribute('library') != 'OpenSSL':
-        raise Exception('Unsupported SSL library')
+    if conn.info.ssl_attribute("library") != "OpenSSL":
+        raise Exception("Unsupported SSL library")
