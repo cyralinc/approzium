@@ -2,12 +2,9 @@
 # events but only for the master branch
 on:
   push:
-    branches: [ 'continuous-BIG' ]
+    branches: [ '*' ]
   pull_request:
-    branches: [ 'continuous-BIG' ]
-env:
-  DOCKER_BUILDKIT: 1
-  COMPOSE_DOCKER_CLI_BUILD: 1
+    branches: [ 'develop' ]
 
 jobs:
   test:
@@ -66,8 +63,6 @@ jobs:
 
           # Optional commit user and author settings
           commit_user_name: GitHub Actions Bot
-          commit_user_email: my-github-actions-bot@example.org
-          commit_author: Author <actions@github.com>
 
           # Optional options appended
           # push_options: '--force'
