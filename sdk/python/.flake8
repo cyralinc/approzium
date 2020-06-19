@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 88
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    tests/pg2_testsuite/
+    approzium/protos/
+    setup.py
+extend-ignore =
+    E203

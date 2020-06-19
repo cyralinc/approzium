@@ -1,5 +1,3 @@
-import approzium
-import approzium.misc
 from approzium.misc import read_int32_from_bytes
 
 
