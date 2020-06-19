@@ -1,4 +1,5 @@
 import logging
+from .authenticator import Authenticator
 
 
 default_authenticator = None
@@ -13,3 +14,6 @@ logger.addHandler(ch)
 def set_default_authenticator(new_authenticator):
     global default_authenticator
     default_authenticator = new_authenticator
+
+
+__all__ = ['set_default_authenticator', 'Authenticator']
