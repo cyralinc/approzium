@@ -78,10 +78,10 @@ def set_connection_sync(pgconn):
     ensure(protocol_version == pgconn.protocol_version)
     async_address = protocol_address - sizeoflong
     async_value = struct.unpack("@l", mem[async_address:protocol_address])[0]
-    ensure(async_value == pgconn.async)
+    ensure(async_value == pgconn.async_)
     new_async_value = struct.pack("@l", 0)
     memmove(id(pgconn) + async_address, new_async_value, sizeoflong)
-    ensure(pgconn.async == 0)
+    ensure(pgconn.async_ == 0)
     error = libpq_PQsetnonblocking(pgconn.pgconn_ptr, 0)
     ensure(error == 0)
 
