@@ -27,19 +27,18 @@ type CredentialManager interface {
 // RetrieveConfigured checks the environment for configured cred
 // providers, and selects the first working configuration.
 func RetrieveConfigured() (CredentialManager, error) {
-    credMgr, err := newLocalFileCreds()
-	if err != nil {
-		log.Debugf("didn't select local file as credential manager due to err: %s", err)
-	} else {
-		return credMgr, err
-	}
-
-	credMgr, err = newHashiCorpVaultCreds()
+	credMgr, err := newHashiCorpVaultCreds()
 	if err != nil {
 		log.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
 	} else {
 		return credMgr, nil
 	}
 
+	credMgr, err = newLocalFileCreds()
+	if err != nil {
+		log.Debugf("didn't select local file as credential manager due to err: %s", err)
+	} else {
+		return credMgr, err
+	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
 }
