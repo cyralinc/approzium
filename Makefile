@@ -61,6 +61,9 @@ run-gotests:
 	echo '###### Running Go tests ######'
 	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
 
+run-pythontests:
+	cd sdk/python && pytest
+
 run-pg2tests:
 	echo '###### Running Psycopg2 test suite ######'
 	for HOST in $(TEST_DBHOSTS); do \
