@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ 'develop' ]
 
+env:
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_BUILDKIT: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
