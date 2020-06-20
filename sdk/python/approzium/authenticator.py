@@ -1,14 +1,15 @@
-import approzium
-import grpc
-from pathlib import Path
-from .iam import obtain_signed_get_caller_identity
-
 # needed to be able to import protos code
 import sys
+from pathlib import Path
+
+import approzium
+import authenticator_pb2  # noqa: E402
+import authenticator_pb2_grpc  # noqa: E402
+import grpc
+
+from .iam import obtain_signed_get_caller_identity
 
 sys.path.append(str(Path(__file__).parent / "protos"))
-import authenticator_pb2_grpc  # noqa: E402
-import authenticator_pb2  # noqa: E402
 
 
 class Authenticator(object):
