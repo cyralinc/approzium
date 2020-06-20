@@ -1,7 +1,7 @@
 # Targets that can be run from host machine
 # Starts a bash shell in the dev environment
 dev:
-	$(docker_env) docker-compose $(dc_files) run tests bash
+	make run-in-docker CMD="bash"
 dev-env: dc-build
 	$(docker_env) docker-compose up
 dc-build: ssl/rootCA.key
@@ -20,12 +20,17 @@ TEST_DBUSER=bob
 
 ### Anything below here is implementation details ###
 
-dc_files=-f docker-compose.yml -f docker-compose.test.yml 
+# This target just saves a bit of typing
+# It takes argument CMD and runs it in the tests service
+run-in-docker:
+	$(docker_env) $(pg2_testsuite_env) docker-compose $(dc_files) run tests $(CMD)
+
+dc_files=-f docker-compose.yml -f docker-compose.test.yml
 # Enable Buildkit in docker commands
 docker_env=COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1
 
 run-tests-in-docker:  dc-build  # need SSL certs for Postgres services
-	$(docker_env) $(pg2_testsuite_env) docker-compose $(dc_files) up --exit-code-from tests
+	make run-in-docker CMD=""
 
 
 vault_secret = { $\
