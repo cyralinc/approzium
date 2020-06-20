@@ -21,6 +21,7 @@ jobs:
           username: diogado
           password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
           image_name: approzium
+          build_extra_args: "--compress=true --target=dev"
         
       - name: Run docker-compose build
         run: make dc-build
