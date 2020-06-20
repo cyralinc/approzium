@@ -14,9 +14,9 @@ jobs:
       
       - uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: approzium
+          username: diogado
           password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
-          image_name: hello-world
+          image_name: approzium
         
       - name: Run docker-compose build
         run: make dc-build
