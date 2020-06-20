@@ -1,7 +1,7 @@
-from select import select
 from os import environ
-import psycopg2
+from select import select
 
+import psycopg2
 import pytest
 from approzium import Authenticator
 from approzium.psycopg2 import connect
@@ -34,8 +34,9 @@ def wait(conn):
 @pytest.mark.parametrize("sslmode", ["require", "disable"])
 @pytest.mark.parametrize("async_", [1, 0])
 def test_connect(dbhost, sslmode, async_):
-    conn = connect(**connopts, host=dbhost, sslmode=sslmode, async_=async_,
-                   authenticator=auth)
+    conn = connect(
+        **connopts, host=dbhost, sslmode=sslmode, async_=async_, authenticator=auth
+    )
     if async_:
         wait(conn)
     cur = conn.cursor()
