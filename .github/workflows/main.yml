@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      - uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: approzium
+          password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
+          image_name: hello-world
         
       - name: Run docker-compose build
         run: make dc-build
