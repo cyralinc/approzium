@@ -21,10 +21,19 @@ RUN unzip vault_1.4.2_linux_amd64.zip
 RUN mv vault /usr/local/bin/
 RUN apt-get install -y \
   build-essential \
-  libpq-dev \
-  python3.7 \
-  python3.7-dev \
-  python3-pip
+  libpq-dev
+# Use Pyenv to install multiple Python versions for testing
+RUN apt-get install -y libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python-openssl
+RUN git clone git://github.com/yyuu/pyenv.git $HOME/.pyenv
+ENV PYENV_ROOT $HOME/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+RUN pyenv install 3.5.9
+RUN pyenv install 3.6.10
+RUN pyenv install 3.7.7
+RUN pyenv install 3.8.3
+RUN pyenv global 3.7.7
 RUN pip3 install --upgrade pip
 RUN pip3 install pytest
 # Install protobuf compiler for Python
