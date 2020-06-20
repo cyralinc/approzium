@@ -54,18 +54,20 @@ enable-vault-path:
 seed-vault-host:  # call this with "make seed-vault-host HOST=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
 		vault write approzium/$(HOST):$(TEST_DBPORT) -
+seed-vault-all-hosts:
+	for HOST in $(TEST_DBHOSTS); do \
+		make seed-vault-host HOST=$$HOST; \
+	done
 
-run-testsuite: enable-vault-path run-gotests run-pg2tests
+run-testsuite: run-gotests run-pg2tests
 
 run-gotests:
-	echo '###### Running Go tests ######'
 	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
 
-run-pythontests:
+run-pythontests: enable-vault-path seed-vault-all-hosts
 	cd sdk/python && pytest
 
-run-pg2tests:
-	echo '###### Running Psycopg2 test suite ######'
+run-pg2tests: enable-vault-path seed-vault-all-hosts
 	for HOST in $(TEST_DBHOSTS); do \
 		make seed-vault-host HOST=$$HOST \
 		echo '###### Testing with DBHOST' $$HOST 'SSL=ON #####'; \
