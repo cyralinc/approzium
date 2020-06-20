@@ -39,7 +39,7 @@ jobs:
         run: |
           pip install isort black flake8
 
-      - run: cd sdk/python && isort --recursive --diff
+      - run: cd sdk/python && isort --recursive
       - run: cd sdk/python && black .
       - run: cd sdk/python && flake8
 
