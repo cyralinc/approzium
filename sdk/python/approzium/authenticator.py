@@ -2,17 +2,14 @@
 import sys
 from pathlib import Path
 
-import grpc
-
 import approzium
+import grpc
 
 from .iam import obtain_signed_get_caller_identity
 
 sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
 import authenticator_pb2  # noqa: E402 isort:skip
 import authenticator_pb2_grpc  # noqa: E402 isort:skip
-
-
 
 
 class Authenticator(object):
