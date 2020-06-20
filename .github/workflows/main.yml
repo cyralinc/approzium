@@ -11,12 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
-        # Avoid caching pull-only images.(docker pull is faster than caching.)
-      - run: docker-compose pull
-
-      # Images created after this action is called are cached.
-      - uses: satackey/action-docker-layer-caching@v0.0
         
       - name: Run docker-compose build
         run: make dc-build
