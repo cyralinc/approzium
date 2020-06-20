@@ -17,10 +17,9 @@ jobs:
 
       # Images created after this action is called are cached.
       - uses: satackey/action-docker-layer-caching@v0.0
-      - run: make dc-build
         
-  #    - name: Run docker-compose build
-  #      run: make dc-build
+      - name: Run docker-compose build
+        run: make dc-build
      
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
