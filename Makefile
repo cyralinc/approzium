@@ -22,7 +22,7 @@ TEST_DBUSER=bob
 
 # This target just saves a bit of typing
 # It takes argument CMD and runs it in the tests service
-run-in-docker:
+run-in-docker: dc-build
 	$(docker_env) $(pg2_testsuite_env) docker-compose $(dc_files) run tests $(CMD)
 
 dc_files=-f docker-compose.yml -f docker-compose.test.yml
