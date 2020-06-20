@@ -23,6 +23,9 @@ jobs:
         
       - name: Run Go tests
         run: make run-in-docker CMD="make run-gotests"
+    
+      - name: Run Python tests
+        run: make run-in-docker CMD="make run-pythontests"
         
       #- name: Run E2E test
       #  run: make test
