@@ -4,14 +4,8 @@ import select
 import approzium
 import psycopg2
 
-from ._psycopg2_ctypes import (
-    ensure_compatible_ssl,
-    libpq_PQstatus,
-    read_msg,
-    set_connection_sync,
-    set_debug,
-    write_msg,
-)
+from ._psycopg2_ctypes import (ensure_compatible_ssl, libpq_PQstatus, read_msg,
+                               set_connection_sync, set_debug, write_msg)
 from ._psycopg2_scram import SCRAMAuthentication
 from .authenticator import get_hash
 from .misc import read_int32_from_bytes
