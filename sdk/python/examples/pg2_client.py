@@ -1,4 +1,3 @@
-import logging
 from os import environ
 
 from approzium import Authenticator, set_default_authenticator
