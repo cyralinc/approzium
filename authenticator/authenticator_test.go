@@ -39,7 +39,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 	}
 	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
 		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
+		ClaimedIamArn:           "arn:aws:iam::403019568400:assumed-role/dev",
 		Dbhost:                  "dbmd5",
 		Dbport:                  "5432",
 		Dbuser:                  "bob",
@@ -82,7 +82,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 	}
 	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
 		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
+		ClaimedIamArn:           "arn:aws:iam::403019568400:assumed-role/dev",
 		Dbhost:                  "dbsha256",
 		Dbport:                  "5432",
 		Dbuser:                  "bob",
@@ -135,7 +135,7 @@ func TestVerifyService(t *testing.T) {
 		{
 			TestName:                "Sunny path, regular ARN",
 			SignedGetCallerIdentity: validTestRequest,
-			ExpectedArn:             "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
+			ExpectedArn:             "arn:aws:iam::403019568400:assumed-role/dev",
 			ExpectErr:               false,
 		},
 		{
@@ -230,7 +230,7 @@ func setup(t *testing.T) *httptest.Server {
 	os.Setenv(vault.EnvVaultAddress, "")
 
 	// Now mock the AWS server.
-	defaultArn := "arn:aws:sts::123456789012:federated-user/my-federated-user-name"
+	defaultArn := "arn:aws:iam::403019568400:assumed-role/dev"
 	unauthorizedArn := "arn:aws:sts::123456789012:federated-user/malicious-user"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

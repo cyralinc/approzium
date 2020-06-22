@@ -158,10 +158,16 @@ func toDatabaseARN(fullIAMArn string) (string, error) {
 	// For assumed-role arns, they may have a session tag that we want to strip off
 	// for accessing database credentials.
 	fields := strings.Split(parsedArn.Resource, "/")
-	if len(fields) != 3 {
+	switch len(fields) {
+	case 2:
+		// No session tags are added, use it as-is.
+		return fullIAMArn, nil
+	case 3:
+		// Strip the session tag because they won't be included in the database.
+		return fmt.Sprintf("arn:%s:%s::%s:%s/%s", parsedArn.Partition, parsedArn.Service, parsedArn.AccountID, fields[0], fields[1]), nil
+	default:
 		return "", fmt.Errorf("unexpected resource format for %s", parsedArn.Resource)
 	}
-	return fmt.Sprintf("arn:%s:%s::%s:%s/%s", parsedArn.Partition, parsedArn.Service, parsedArn.AccountID, fields[0], fields[1]), nil
 }
 
 func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {

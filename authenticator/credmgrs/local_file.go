@@ -26,7 +26,7 @@ func newLocalFileCreds() (CredentialManager, error) {
 	}
 	for _, cred := range devCreds {
 		key := DBKey{
-			IAMArn: "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
+			IAMArn: "arn:aws:iam::403019568400:assumed-role/dev",
 			DBHost: cred.Dbhost,
 			DBPort: cred.Dbport,
 			DBUser: cred.Dbuser,
