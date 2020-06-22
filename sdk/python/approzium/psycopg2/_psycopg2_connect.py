@@ -1,14 +1,18 @@
-import psycopg2
-import select
 import logging
+import select
+
+import approzium
+import psycopg2
+
 from ._psycopg2_ctypes import (
-    libpq_PQstatus,
-    set_connection_sync,
-    read_msg,
-    write_msg,
-    set_debug,
     ensure_compatible_ssl,
+    libpq_PQstatus,
+    read_msg,
+    set_connection_sync,
+    set_debug,
+    write_msg,
 )
+
 from ..authenticator import get_hash
 from ..misc import read_int32_from_bytes
 import approzium

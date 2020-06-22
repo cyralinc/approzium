@@ -33,7 +33,7 @@ func TestHcVaultCredMgr_Password(t *testing.T) {
 			"version": "1",
 		},
 	})
-	if _, err := client.Logical().Write("approzium/postgresql://my-username:my-password@localhost:5432", map[string]interface{}{
+	if _, err := client.Logical().Write("approzium/localhost:5432", map[string]interface{}{
 		"dbuser1": map[string]interface{}{
 			"password": "asdfghjkl",
 			"iam_roles": []string{
@@ -52,7 +52,7 @@ func TestHcVaultCredMgr_Password(t *testing.T) {
 	}
 	identity := DBKey{
 		IAMArn: "arn:aws:iam::accountid:role/rolename2",
-		DBHost: "postgresql://my-username:my-password@localhost",
+		DBHost: "localhost",
 		DBPort: "5432",
 		DBUser: "dbuser1",
 	}

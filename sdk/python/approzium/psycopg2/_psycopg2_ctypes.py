@@ -1,16 +1,17 @@
+import logging
+import struct
+import warnings
 from ctypes import (
     CDLL,
+    c_char_p,
+    c_int,
+    c_void_p,
     cdll,
     create_string_buffer,
-    string_at,
     memmove,
-    c_void_p,
-    c_int,
-    c_char_p,
+    string_at,
 )
 from ctypes.util import find_library
-import struct
-import logging
 from sys import getsizeof
 import warnings
 from ..socketfromfd import fromfd
