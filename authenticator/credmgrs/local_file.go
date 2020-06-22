@@ -16,7 +16,7 @@ func newLocalFileCreds() (CredentialManager, error) {
 		Password string `yaml:"password"`
 	}
 	var devCreds secrets
-	yamlFile, err := ioutil.ReadFile("secrets.yaml")
+	yamlFile, err := ioutil.ReadFile("testing/secrets.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func newLocalFileCreds() (CredentialManager, error) {
 	}
 	for _, cred := range devCreds {
 		key := DBKey{
-			IAMArn: "arn:aws:iam::403019568400:role/dev",
+			IAMArn: "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
 			DBHost: cred.Dbhost,
 			DBPort: cred.Dbport,
 			DBUser: cred.Dbuser,

@@ -1,7 +1,7 @@
 import approzium
 import grpc
 from pathlib import Path
-from .iam import obtain_signed_get_caller_identity
+from .iam import assume_role, obtain_credentials, obtain_claimed_arn, obtain_signed_get_caller_identity
 
 # needed to be able to import protos code
 import sys
@@ -18,7 +18,9 @@ class Authenticator(object):
 
 
 def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
-    signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
+    response = assume_role(authenticator.iam_role)
+    credentials = obtain_credentials(response)
+    signed_gci = obtain_signed_get_caller_identity(credentials)
     channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
@@ -28,7 +30,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
             signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
+            claimed_iam_arn=obtain_claimed_arn(response),
             dbhost=dbhost,
             dbuser=dbuser,
             dbport=dbport,
@@ -41,7 +43,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
             signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
+            claimed_iam_arn=obtain_claimed_arn(response),
             dbhost=dbhost,
             dbport=dbport,
             dbuser=dbuser,
