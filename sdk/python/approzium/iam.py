@@ -10,11 +10,14 @@ def assume_role(iam_role):
     )
     return response
 
+
 def obtain_credentials(response):
     return response["Credentials"]
 
+
 def obtain_claimed_arn(response):
     return response["AssumedRoleUser"]["Arn"]
+
 
 def obtain_signed_get_caller_identity(credentials):
     iam_session = boto3.Session(

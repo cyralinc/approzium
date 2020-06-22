@@ -1,7 +1,12 @@
 import approzium
 import grpc
 from pathlib import Path
-from .iam import assume_role, obtain_credentials, obtain_claimed_arn, obtain_signed_get_caller_identity
+from .iam import (
+    assume_role,
+    obtain_credentials,
+    obtain_claimed_arn,
+    obtain_signed_get_caller_identity,
+)
 
 # needed to be able to import protos code
 import sys
