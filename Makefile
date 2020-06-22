@@ -10,7 +10,7 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_IAM_ROLE=arn:aws:iam::403019568400:assumed-role/dev
+TEST_IAM_ROLE=arn:aws:iam::403019568400:role/dev
 TEST_DBHOSTS=dbmd5 dbsha256
 TEST_DB=db
 TEST_DBPORT=5432
