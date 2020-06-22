@@ -5,6 +5,7 @@ import psycopg2
 import pytest
 from approzium import Authenticator
 from approzium.psycopg2 import connect
+from approzium.psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 
 auth = Authenticator("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
 # use Psycopg2 defined test environment variables
@@ -37,6 +38,23 @@ def test_connect(dbhost, sslmode, async_):
     conn = connect(
         **connopts, host=dbhost, sslmode=sslmode, async_=async_, authenticator=auth
     )
+    if async_:
+        wait(conn)
+    cur = conn.cursor()
+    cur.execute("SELECT 1")
+    if async_:
+        wait(conn)
+    assert cur.fetchone() == (1,)
+
+
+@pytest.mark.parametrize("dbhost", ["dbmd5", "dbsha256"])
+@pytest.mark.parametrize("sslmode", ["require", "disable"])
+@pytest.mark.parametrize("async_", [1, 0])
+@pytest.mark.parametrize("Pool", [ThreadedConnectionPool, SimpleConnectionPool])
+def test_pool(dbhost, sslmode, async_, Pool):
+    conns = Pool(1, 5, "", **connopts, host=dbhost, sslmode=sslmode,
+                 async_=async_, authenticator=auth)
+    conn = conns.getconn()
     if async_:
         wait(conn)
     cur = conn.cursor()
