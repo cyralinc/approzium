@@ -4,6 +4,8 @@ import select
 import approzium
 import psycopg2
 
+from ..authenticator import get_hash
+from ..misc import read_int32_from_bytes
 from ._psycopg2_ctypes import (
     ensure_compatible_ssl,
     libpq_PQstatus,
@@ -12,12 +14,7 @@ from ._psycopg2_ctypes import (
     set_debug,
     write_msg,
 )
-
-from ..authenticator import get_hash
-from ..misc import read_int32_from_bytes
-import approzium
 from ._psycopg2_scram import SCRAMAuthentication
-
 
 logger = logging.getLogger(__name__)
 

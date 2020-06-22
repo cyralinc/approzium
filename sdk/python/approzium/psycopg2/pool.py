@@ -1,5 +1,6 @@
-from . import connect
 import psycopg2.pool
+
+from . import connect
 
 
 class AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):

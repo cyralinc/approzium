@@ -1,4 +1,5 @@
 from os import environ
+
 from approzium import Authenticator
 from approzium.psycopg2.pool import ThreadedConnectionPool
 

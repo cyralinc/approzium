@@ -52,8 +52,16 @@ def test_connect(dbhost, sslmode, async_):
 @pytest.mark.parametrize("async_", [1, 0])
 @pytest.mark.parametrize("Pool", [ThreadedConnectionPool, SimpleConnectionPool])
 def test_pool(dbhost, sslmode, async_, Pool):
-    conns = Pool(1, 5, "", **connopts, host=dbhost, sslmode=sslmode,
-                 async_=async_, authenticator=auth)
+    conns = Pool(
+        1,
+        5,
+        "",
+        **connopts,
+        host=dbhost,
+        sslmode=sslmode,
+        async_=async_,
+        authenticator=auth,
+    )
     conn = conns.getconn()
     if async_:
         wait(conn)

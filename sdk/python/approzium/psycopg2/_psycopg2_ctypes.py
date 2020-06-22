@@ -13,9 +13,8 @@ from ctypes import (
 )
 from ctypes.util import find_library
 from sys import getsizeof
-import warnings
-from ..socketfromfd import fromfd
 
+from ..socketfromfd import fromfd
 
 logger = logging.getLogger(__name__)
 
