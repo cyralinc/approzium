@@ -1,8 +1,16 @@
 import logging
 import struct
 import warnings
-from ctypes import (CDLL, c_char_p, c_int, c_void_p, cdll,
-                    create_string_buffer, memmove, string_at)
+from ctypes import (
+    CDLL,
+    c_char_p,
+    c_int,
+    c_void_p,
+    cdll,
+    create_string_buffer,
+    memmove,
+    string_at,
+)
 from ctypes.util import find_library
 from sys import getsizeof
 

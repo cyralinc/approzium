@@ -2,9 +2,8 @@
 import sys
 from pathlib import Path
 
-import grpc
-
 import approzium
+import grpc
 
 from .iam import obtain_signed_get_caller_identity
 
