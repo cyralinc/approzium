@@ -35,15 +35,15 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         if len(salt) != 4:
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
-            authdata={
-                "auth_type": "aws",
-                "client_language": "python",
-                "signed_get_caller_identity": signed_gci,
-                "claimed_iam_arn": obtain_claimed_arn(response),
-            },
             dbhost=dbhost,
             dbuser=dbuser,
             dbport=dbport,
+            authdata=[
+                authenticator_pb2.AuthData(key="auth_type", value="aws"),
+                authenticator_pb2.AuthData(key="client_language", value="python"),
+                authenticator_pb2.AuthData(key="signed_get_caller_identity", value=signed_gci),
+                authenticator_pb2.AuthData(key="claimed_iam_arn", value=obtain_claimed_arn(response)),
+            ],
             salt=salt,
         )
         response = stub.GetPGMD5Hash(request)
@@ -52,15 +52,15 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         auth = auth_info
         auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
-            authdata={
-                "auth_type": "aws",
-                "client_language": "python",
-                "signed_get_caller_identity": signed_gci,
-                "claimed_iam_arn": obtain_claimed_arn(response),
-            },
             dbhost=dbhost,
             dbport=dbport,
             dbuser=dbuser,
+            authdata=[
+                authenticator_pb2.AuthData(key="auth_type", value="aws"),
+                authenticator_pb2.AuthData(key="client_language", value="python"),
+                authenticator_pb2.AuthData(key="signed_get_caller_identity", value=signed_gci),
+                authenticator_pb2.AuthData(key="claimed_iam_arn", value=obtain_claimed_arn(response)),
+            ],
             salt=auth.password_salt,
             iterations=auth.password_iterations,
             authentication_msg=auth.authorization_message,
