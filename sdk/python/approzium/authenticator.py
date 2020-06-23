@@ -4,11 +4,11 @@ from pathlib import Path
 
 import approzium
 import grpc
-from pathlib import Path
+
 from .iam import (
     assume_role,
-    obtain_credentials,
     obtain_claimed_arn,
+    obtain_credentials,
     obtain_signed_get_caller_identity,
 )
 
