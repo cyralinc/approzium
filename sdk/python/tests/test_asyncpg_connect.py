@@ -14,12 +14,10 @@ connopts = {
 
 
 @pytest.mark.parametrize("host", ["dbmd5", "dbsha256"])
-@pytest.mark.parametrize("sslmode", ['disable', 'require'])
+@pytest.mark.parametrize("sslmode", ["disable", "require"])
 @pytest.mark.asyncio
 async def test_connect(host, sslmode):
     # set SSL mode using env variable because there is no better way
-    environ['PGSSLMODE'] = sslmode
-    conn = await connect(
-        **connopts, host=host, authenticator=auth
-    )
+    environ["PGSSLMODE"] = sslmode
+    conn = await connect(**connopts, host=host, authenticator=auth)
     await conn.fetch("SELECT 1")
