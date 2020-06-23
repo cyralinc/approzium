@@ -23,7 +23,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
     channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
-    if auth_type == approzium.psycopg2.AUTH_REQ_MD5:
+    if auth_type == approzium._postgres.AUTH_REQ_MD5:
         salt = auth_info
         if len(salt) != 4:
             raise Exception("salt not right size")
@@ -37,7 +37,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         )
         response = stub.GetPGMD5Hash(request)
         return response.hash
-    elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
+    elif auth_type == approzium._postgres.AUTH_REQ_SASL:
         auth = auth_info
         auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
