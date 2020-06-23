@@ -89,18 +89,18 @@ func (a *Authenticator) run() {
 	}
 }
 
-func executeGetCallerIdentity(authData map[string]string) (string, error) {
-	request := authData[KeySignedGetCallerIdentity]
-
+func executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
 	var resp *http.Response
 	var err error
-	switch authData[KeyClientLang] {
-	case ValClientLangGo:
-		resp, err = http.Get(request)
-	case ValClientLangPython:
-		resp, err = http.Post(request, "", nil)
+	switch clientLanguage {
+	case pb.ClientLanguage_GO:
+		resp, err = http.Get(signedGetCallerIdentity)
+	case pb.ClientLanguage_PYTHON:
+		resp, err = http.Post(signedGetCallerIdentity, "", nil)
+	case pb.ClientLanguage_LANGUAGE_NOT_PROVIDED:
+		return "", fmt.Errorf("client language must be provided for AWS authentication")
 	default:
-		return "", fmt.Errorf("unsupported SDK type of %s", authData[KeyClientLang])
+		return "", fmt.Errorf("unsupported SDK type of %d", clientLanguage)
 	}
 	if err != nil {
 		return "", err
@@ -123,15 +123,11 @@ func executeGetCallerIdentity(authData map[string]string) (string, error) {
 	return response.IamArn, nil
 }
 
-// getIdentity takes a signed get caller identity string and executes
+// getAwsIdentity takes a signed get caller identity string and executes
 // the request to the given AWS STS endpoint. It returns the caller's
 // full IAM arn.
-func getIdentity(authData map[string]string) (string, error) {
-	if authData[KeyAuthType] != ValAuthTypeAWS {
-		return "", fmt.Errorf("unexpected auth type of %s, must use %s", authData[KeyAuthType], ValAuthTypeAWS)
-	}
-
-	u, err := url.Parse(authData[KeySignedGetCallerIdentity])
+func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
+	u, err := url.Parse(signedGetCallerIdentity)
 	if err != nil {
 		return "", err
 	}
@@ -155,7 +151,7 @@ func getIdentity(authData map[string]string) (string, error) {
 	if query.Get("Action") != "GetCallerIdentity" {
 		return "", fmt.Errorf("invalid action for GetCallerIdentity: %s", query.Get("Action"))
 	}
-	return executeGetCallerIdentity(authData)
+	return executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
 }
 
 func toDatabaseARN(fullIAMArn string) (string, error) {
@@ -194,14 +190,17 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
-	authData := toMap(req.GetAuthdata())
+
+	if req.Awsauth == nil {
+		return nil, fmt.Errorf("AWS auth info is required")
+	}
 
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := getIdentity(authData)
+		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -210,7 +209,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	}()
 
 	// Get the credentials.
-	claimedIamArn := authData[KeyClaimedIamArn]
+	claimedIamArn := req.Awsauth.ClaimedIamArn
 	dbHost := req.GetDbhost()
 	dbPort := req.GetDbport()
 	dbUser := req.GetDbuser()
@@ -275,14 +274,16 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	authData := toMap(req.GetAuthdata())
+	if req.Awsauth == nil {
+		return nil, fmt.Errorf("AWS auth info is required")
+	}
 
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := getIdentity(authData)
+		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -291,7 +292,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	}()
 
 	// Get the credentials.
-	claimedIamArn := authData[KeyClaimedIamArn]
+	claimedIamArn := req.Awsauth.ClaimedIamArn
 	dbHost := req.GetDbhost()
 	dbPort := req.GetDbport()
 	dbUser := req.GetDbuser()

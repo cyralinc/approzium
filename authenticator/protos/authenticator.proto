@@ -3,44 +3,53 @@ syntax = "proto3";
 package approzium.authenticator.protos;
 
 service Authenticator {
-        rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
-        rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
+    rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
+    rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
 }
 
-// AuthData is essentially an object that can be used to hold flexible
-// maps of data. Expected fields and example values:
-//  - "auth_type": "aws", the auth type used by the client SDK.
-//  - "client_language": "go", the language used in the client SDK.
-//  - (AWS only) "signed_get_caller_identity": "...", a signed get caller identity request.
-//  - (AWS only) "claimed_iam_arn": "arn:aws:iam::403019568400:assumed-role/dev", the arn expected to be returned by the signed request.
-message AuthData {
-    string key = 1;
-    string value = 2;
+enum AuthType {
+    TYPE_NOT_PROVIDED = 0;
+    AWS = 1;
+}
+
+enum ClientLanguage {
+    LANGUAGE_NOT_PROVIDED = 0;
+    PYTHON = 1;
+    GO = 2;
 }
 
 message PGMD5HashRequest {
-        string dbhost = 1;
-        string dbport = 2;
-        string dbuser = 3;
-        repeated AuthData authdata = 4;
-        bytes salt = 5;
+    AuthType authtype = 1;
+    ClientLanguage client_language = 2;
+    string dbhost = 3;
+    string dbport = 4;
+    string dbuser = 5;
+    AWSAuth awsauth = 6;
+    bytes salt = 7;
 }
 
 message PGSHA256HashRequest {
-        string dbhost = 1;
-        string dbport = 2;
-        string dbuser = 3;
-        repeated AuthData authdata = 4;
-        string salt = 5;
-        uint32 iterations = 6;
-        string authentication_msg = 7;
+    AuthType authtype = 1;
+    ClientLanguage client_language = 2;
+    string dbhost = 3;
+    string dbport = 4;
+    string dbuser = 5;
+    AWSAuth awsauth = 6;
+    string salt = 7;
+    uint32 iterations = 8;
+    string authentication_msg = 9;
 }
 
 message PGMD5Response {
-        string hash = 1;
+    string hash = 1;
 }
 
 message PGSHA256Response {
-        string cproof = 1;
-        string sproof = 2;
+    string cproof = 1;
+    string sproof = 2;
+}
+
+message AWSAuth {
+    string signed_get_caller_identity = 1;
+    string claimed_iam_arn = 2;
 }
