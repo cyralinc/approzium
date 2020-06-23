@@ -35,16 +35,16 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authdata: []*pb.AuthData{
-			{Key: KeyAuthType, Value: ValAuthTypeAWS},
-			{Key: KeyClientLang, Value: ValClientLangGo},
-			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
-			{Key: KeyClaimedIamArn, Value: testEnv.ClaimedArn()},
+		Authtype:       pb.AuthType_AWS,
+		ClientLanguage: pb.ClientLanguage_GO,
+		Dbhost:         "dbmd5",
+		Dbport:         "5432",
+		Dbuser:         "bob",
+		Awsauth: &pb.AWSAuth{
+			SignedGetCallerIdentity: signedGetCallerIdentity,
+			ClaimedIamArn:           testEnv.ClaimedArn(),
 		},
-		Dbhost: "dbmd5",
-		Dbport: "5432",
-		Dbuser: "bob",
-		Salt:   []byte{1, 2, 3, 4},
+		Salt: []byte{1, 2, 3, 4},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -55,16 +55,16 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authdata: []*pb.AuthData{
-			{Key: KeyAuthType, Value: ValAuthTypeAWS},
-			{Key: KeyClientLang, Value: ValClientLangGo},
-			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
-			{Key: KeyClaimedIamArn, Value: "arn:partition:service:region:account-id:arn-thats-not-mine"},
+		Authtype:       pb.AuthType_AWS,
+		ClientLanguage: pb.ClientLanguage_GO,
+		Dbhost:         "foo",
+		Dbport:         "5432",
+		Dbuser:         "bob",
+		Awsauth: &pb.AWSAuth{
+			SignedGetCallerIdentity: signedGetCallerIdentity,
+			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
 		},
-		Dbhost: "foo",
-		Dbport: "5432",
-		Dbuser: "bob",
-		Salt:   []byte{1, 2, 3, 4},
+		Salt: []byte{1, 2, 3, 4},
 	})
 	if err == nil {
 		t.Fatal("using a claimed arn that doesn't belong to me should fail")
@@ -87,15 +87,15 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authdata: []*pb.AuthData{
-			{Key: KeyAuthType, Value: ValAuthTypeAWS},
-			{Key: KeyClientLang, Value: ValClientLangGo},
-			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
-			{Key: KeyClaimedIamArn, Value: testEnv.ClaimedArn()},
+		Authtype:       pb.AuthType_AWS,
+		ClientLanguage: pb.ClientLanguage_GO,
+		Dbhost:         "dbsha256",
+		Dbport:         "5432",
+		Dbuser:         "bob",
+		Awsauth: &pb.AWSAuth{
+			SignedGetCallerIdentity: signedGetCallerIdentity,
+			ClaimedIamArn:           testEnv.ClaimedArn(),
 		},
-		Dbhost:            "dbsha256",
-		Dbport:            "5432",
-		Dbuser:            "bob",
 		Salt:              "1234",
 		Iterations:        0,
 		AuthenticationMsg: "hello, world!",
@@ -112,15 +112,15 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authdata: []*pb.AuthData{
-			{Key: KeyAuthType, Value: ValAuthTypeAWS},
-			{Key: KeyClientLang, Value: ValClientLangGo},
-			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
-			{Key: KeyClaimedIamArn, Value: "arn:partition:service:region:account-id:arn-thats-not-mine"},
+		Authtype:       pb.AuthType_AWS,
+		ClientLanguage: pb.ClientLanguage_GO,
+		Dbhost:         "foo",
+		Dbport:         "5432",
+		Dbuser:         "bob",
+		Awsauth: &pb.AWSAuth{
+			SignedGetCallerIdentity: signedGetCallerIdentity,
+			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
 		},
-		Dbhost:            "foo",
-		Dbport:            "5432",
-		Dbuser:            "bob",
 		Salt:              "1234",
 		Iterations:        0,
 		AuthenticationMsg: "hello, world!",
@@ -165,12 +165,7 @@ func TestVerifyService(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.TestName, func(t *testing.T) {
-			authData := map[string]string{
-				KeyAuthType:                ValAuthTypeAWS,
-				KeyClientLang:              ValClientLangGo,
-				KeySignedGetCallerIdentity: testCase.SignedGetCallerIdentity,
-			}
-			verifiedARN, err := getAwsIdentity(authData)
+			verifiedARN, err := getAwsIdentity(testCase.SignedGetCallerIdentity, pb.ClientLanguage_GO)
 			if testCase.ExpectErr {
 				if err == nil {
 					t.Fatal("expected err")
