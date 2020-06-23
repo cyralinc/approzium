@@ -170,7 +170,7 @@ func TestVerifyService(t *testing.T) {
 				KeyClientLang:              ValClientLangGo,
 				KeySignedGetCallerIdentity: testCase.SignedGetCallerIdentity,
 			}
-			verifiedARN, err := verifyIdentity(authData)
+			verifiedARN, err := getIdentity(authData)
 			if testCase.ExpectErr {
 				if err == nil {
 					t.Fatal("expected err")

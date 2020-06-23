@@ -123,10 +123,10 @@ func executeGetCallerIdentity(authData map[string]string) (string, error) {
 	return response.IamArn, nil
 }
 
-// verifyIdentity takes a signed get caller identity string and executes
+// getIdentity takes a signed get caller identity string and executes
 // the request to the given AWS STS endpoint. It returns the caller's
 // full IAM WrappedARN.
-func verifyIdentity(authData map[string]string) (string, error) {
+func getIdentity(authData map[string]string) (string, error) {
 	if authData[KeyAuthType] != ValAuthTypeAWS {
 		return "", fmt.Errorf("unexpected auth type of %s, must use %s", authData[KeyAuthType], ValAuthTypeAWS)
 	}
@@ -201,7 +201,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := verifyIdentity(authData)
+		verifiedIAMArn, err := getIdentity(authData)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -282,7 +282,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := verifyIdentity(authData)
+		verifiedIAMArn, err := getIdentity(authData)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
