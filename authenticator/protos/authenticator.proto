@@ -7,24 +7,33 @@ service Authenticator {
         rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
 }
 
+// AuthData is essentially an object that can be used to hold flexible
+// maps of data. Expected fields and example values:
+//  - "auth_type": "aws", the auth type used by the client SDK.
+//  - "client_language": "go", the language used in the client SDK.
+//  - (AWS only) "signed_get_caller_identity": "...", a signed get caller identity request.
+//  - (AWS only) "claimed_iam_arn": "arn:aws:iam::403019568400:assumed-role/dev", the arn expected to be returned by the signed request.
+message AuthData {
+    string key = 1;
+    string value = 2;
+}
+
 message PGMD5HashRequest {
-        string signed_get_caller_identity = 1;
-        string claimed_iam_arn = 2;
-        string dbhost = 3;
-        string dbport = 4;
-        string dbuser = 5;
-        bytes salt = 6;
+        string dbhost = 1;
+        string dbport = 2;
+        string dbuser = 3;
+        repeated AuthData authData = 4;
+        bytes salt = 5;
 }
 
 message PGSHA256HashRequest {
-        string signed_get_caller_identity = 1;
-        string claimed_iam_arn = 2;
-        string dbhost = 3;
-        string dbport = 4;
-        string dbuser = 5;
-        string salt = 6;
-        uint32 iterations = 7;
-        string authentication_msg = 8;
+        string dbhost = 1;
+        string dbport = 2;
+        string dbuser = 3;
+        repeated AuthData authData = 4;
+        string salt = 5;
+        uint32 iterations = 6;
+        string authentication_msg = 7;
 }
 
 message PGMD5Response {

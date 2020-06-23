@@ -24,23 +24,75 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// AuthData is essentially an object that can be used to hold flexible
+// maps of data. Expected fields and example values:
+//  - "auth_type": "aws", the auth type used by the client SDK.
+//  - "client_language": "go", the language used in the client SDK.
+//  - (AWS only) "signed_get_caller_identity": "...", a signed get caller identity request.
+//  - (AWS only) "claimed_iam_arn": "arn:aws:iam::403019568400:assumed-role/dev", the arn expected to be returned by the signed request.
+type AuthData struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AuthData) Reset()         { *m = AuthData{} }
+func (m *AuthData) String() string { return proto.CompactTextString(m) }
+func (*AuthData) ProtoMessage()    {}
+func (*AuthData) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e86ec39f7c35dea3, []int{0}
+}
+
+func (m *AuthData) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AuthData.Unmarshal(m, b)
+}
+func (m *AuthData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AuthData.Marshal(b, m, deterministic)
+}
+func (m *AuthData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AuthData.Merge(m, src)
+}
+func (m *AuthData) XXX_Size() int {
+	return xxx_messageInfo_AuthData.Size(m)
+}
+func (m *AuthData) XXX_DiscardUnknown() {
+	xxx_messageInfo_AuthData.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AuthData proto.InternalMessageInfo
+
+func (m *AuthData) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *AuthData) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
 type PGMD5HashRequest struct {
-	SignedGetCallerIdentity string   `protobuf:"bytes,1,opt,name=signed_get_caller_identity,json=signedGetCallerIdentity,proto3" json:"signed_get_caller_identity,omitempty"`
-	ClaimedIamArn           string   `protobuf:"bytes,2,opt,name=claimed_iam_arn,json=claimedIamArn,proto3" json:"claimed_iam_arn,omitempty"`
-	Dbhost                  string   `protobuf:"bytes,3,opt,name=dbhost,proto3" json:"dbhost,omitempty"`
-	Dbport                  string   `protobuf:"bytes,4,opt,name=dbport,proto3" json:"dbport,omitempty"`
-	Dbuser                  string   `protobuf:"bytes,5,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
-	Salt                    []byte   `protobuf:"bytes,6,opt,name=salt,proto3" json:"salt,omitempty"`
-	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
-	XXX_unrecognized        []byte   `json:"-"`
-	XXX_sizecache           int32    `json:"-"`
+	Dbhost               string      `protobuf:"bytes,1,opt,name=dbhost,proto3" json:"dbhost,omitempty"`
+	Dbport               string      `protobuf:"bytes,2,opt,name=dbport,proto3" json:"dbport,omitempty"`
+	Dbuser               string      `protobuf:"bytes,3,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
+	AuthData             []*AuthData `protobuf:"bytes,4,rep,name=authData,proto3" json:"authData,omitempty"`
+	Salt                 []byte      `protobuf:"bytes,5,opt,name=salt,proto3" json:"salt,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
 func (m *PGMD5HashRequest) Reset()         { *m = PGMD5HashRequest{} }
 func (m *PGMD5HashRequest) String() string { return proto.CompactTextString(m) }
 func (*PGMD5HashRequest) ProtoMessage()    {}
 func (*PGMD5HashRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{0}
+	return fileDescriptor_e86ec39f7c35dea3, []int{1}
 }
 
 func (m *PGMD5HashRequest) XXX_Unmarshal(b []byte) error {
@@ -60,20 +112,6 @@ func (m *PGMD5HashRequest) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_PGMD5HashRequest proto.InternalMessageInfo
-
-func (m *PGMD5HashRequest) GetSignedGetCallerIdentity() string {
-	if m != nil {
-		return m.SignedGetCallerIdentity
-	}
-	return ""
-}
-
-func (m *PGMD5HashRequest) GetClaimedIamArn() string {
-	if m != nil {
-		return m.ClaimedIamArn
-	}
-	return ""
-}
 
 func (m *PGMD5HashRequest) GetDbhost() string {
 	if m != nil {
@@ -96,6 +134,13 @@ func (m *PGMD5HashRequest) GetDbuser() string {
 	return ""
 }
 
+func (m *PGMD5HashRequest) GetAuthData() []*AuthData {
+	if m != nil {
+		return m.AuthData
+	}
+	return nil
+}
+
 func (m *PGMD5HashRequest) GetSalt() []byte {
 	if m != nil {
 		return m.Salt
@@ -104,24 +149,23 @@ func (m *PGMD5HashRequest) GetSalt() []byte {
 }
 
 type PGSHA256HashRequest struct {
-	SignedGetCallerIdentity string   `protobuf:"bytes,1,opt,name=signed_get_caller_identity,json=signedGetCallerIdentity,proto3" json:"signed_get_caller_identity,omitempty"`
-	ClaimedIamArn           string   `protobuf:"bytes,2,opt,name=claimed_iam_arn,json=claimedIamArn,proto3" json:"claimed_iam_arn,omitempty"`
-	Dbhost                  string   `protobuf:"bytes,3,opt,name=dbhost,proto3" json:"dbhost,omitempty"`
-	Dbport                  string   `protobuf:"bytes,4,opt,name=dbport,proto3" json:"dbport,omitempty"`
-	Dbuser                  string   `protobuf:"bytes,5,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
-	Salt                    string   `protobuf:"bytes,6,opt,name=salt,proto3" json:"salt,omitempty"`
-	Iterations              uint32   `protobuf:"varint,7,opt,name=iterations,proto3" json:"iterations,omitempty"`
-	AuthenticationMsg       string   `protobuf:"bytes,8,opt,name=authentication_msg,json=authenticationMsg,proto3" json:"authentication_msg,omitempty"`
-	XXX_NoUnkeyedLiteral    struct{} `json:"-"`
-	XXX_unrecognized        []byte   `json:"-"`
-	XXX_sizecache           int32    `json:"-"`
+	Dbhost               string      `protobuf:"bytes,1,opt,name=dbhost,proto3" json:"dbhost,omitempty"`
+	Dbport               string      `protobuf:"bytes,2,opt,name=dbport,proto3" json:"dbport,omitempty"`
+	Dbuser               string      `protobuf:"bytes,3,opt,name=dbuser,proto3" json:"dbuser,omitempty"`
+	AuthData             []*AuthData `protobuf:"bytes,4,rep,name=authData,proto3" json:"authData,omitempty"`
+	Salt                 string      `protobuf:"bytes,5,opt,name=salt,proto3" json:"salt,omitempty"`
+	Iterations           uint32      `protobuf:"varint,6,opt,name=iterations,proto3" json:"iterations,omitempty"`
+	AuthenticationMsg    string      `protobuf:"bytes,7,opt,name=authentication_msg,json=authenticationMsg,proto3" json:"authentication_msg,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
 func (m *PGSHA256HashRequest) Reset()         { *m = PGSHA256HashRequest{} }
 func (m *PGSHA256HashRequest) String() string { return proto.CompactTextString(m) }
 func (*PGSHA256HashRequest) ProtoMessage()    {}
 func (*PGSHA256HashRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{1}
+	return fileDescriptor_e86ec39f7c35dea3, []int{2}
 }
 
 func (m *PGSHA256HashRequest) XXX_Unmarshal(b []byte) error {
@@ -142,20 +186,6 @@ func (m *PGSHA256HashRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PGSHA256HashRequest proto.InternalMessageInfo
 
-func (m *PGSHA256HashRequest) GetSignedGetCallerIdentity() string {
-	if m != nil {
-		return m.SignedGetCallerIdentity
-	}
-	return ""
-}
-
-func (m *PGSHA256HashRequest) GetClaimedIamArn() string {
-	if m != nil {
-		return m.ClaimedIamArn
-	}
-	return ""
-}
-
 func (m *PGSHA256HashRequest) GetDbhost() string {
 	if m != nil {
 		return m.Dbhost
@@ -175,6 +205,13 @@ func (m *PGSHA256HashRequest) GetDbuser() string {
 		return m.Dbuser
 	}
 	return ""
+}
+
+func (m *PGSHA256HashRequest) GetAuthData() []*AuthData {
+	if m != nil {
+		return m.AuthData
+	}
+	return nil
 }
 
 func (m *PGSHA256HashRequest) GetSalt() string {
@@ -209,7 +246,7 @@ func (m *PGMD5Response) Reset()         { *m = PGMD5Response{} }
 func (m *PGMD5Response) String() string { return proto.CompactTextString(m) }
 func (*PGMD5Response) ProtoMessage()    {}
 func (*PGMD5Response) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{2}
+	return fileDescriptor_e86ec39f7c35dea3, []int{3}
 }
 
 func (m *PGMD5Response) XXX_Unmarshal(b []byte) error {
@@ -249,7 +286,7 @@ func (m *PGSHA256Response) Reset()         { *m = PGSHA256Response{} }
 func (m *PGSHA256Response) String() string { return proto.CompactTextString(m) }
 func (*PGSHA256Response) ProtoMessage()    {}
 func (*PGSHA256Response) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e86ec39f7c35dea3, []int{3}
+	return fileDescriptor_e86ec39f7c35dea3, []int{4}
 }
 
 func (m *PGSHA256Response) XXX_Unmarshal(b []byte) error {
@@ -285,6 +322,7 @@ func (m *PGSHA256Response) GetSproof() string {
 }
 
 func init() {
+	proto.RegisterType((*AuthData)(nil), "approzium.authenticator.protos.AuthData")
 	proto.RegisterType((*PGMD5HashRequest)(nil), "approzium.authenticator.protos.PGMD5HashRequest")
 	proto.RegisterType((*PGSHA256HashRequest)(nil), "approzium.authenticator.protos.PGSHA256HashRequest")
 	proto.RegisterType((*PGMD5Response)(nil), "approzium.authenticator.protos.PGMD5Response")
@@ -294,40 +332,39 @@ func init() {
 func init() { proto.RegisterFile("authenticator.proto", fileDescriptor_e86ec39f7c35dea3) }
 
 var fileDescriptor_e86ec39f7c35dea3 = []byte{
-	// 383 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x52, 0xcb, 0x8e, 0xda, 0x30,
-	0x14, 0x6d, 0x28, 0x4d, 0xcb, 0x15, 0x11, 0xad, 0x91, 0xa8, 0xc5, 0x02, 0xa1, 0x54, 0xaa, 0xd8,
-	0x10, 0x21, 0x10, 0xdd, 0x74, 0x45, 0x3b, 0x52, 0x60, 0x81, 0x84, 0x32, 0x1f, 0x10, 0x99, 0xc4,
-	0x93, 0x58, 0x4a, 0xe2, 0x60, 0x3b, 0x8b, 0xe1, 0x7f, 0xe6, 0x8b, 0xe6, 0x7f, 0x46, 0xa3, 0x38,
-	0xe1, 0x31, 0x0f, 0xcd, 0xb0, 0x9e, 0x9d, 0xcf, 0x39, 0xf7, 0xf8, 0xda, 0xf7, 0x1e, 0xe8, 0x92,
-	0x42, 0xc5, 0x34, 0x53, 0x2c, 0x20, 0x8a, 0x0b, 0x27, 0x17, 0x5c, 0x71, 0x34, 0x20, 0x79, 0x2e,
-	0xf8, 0x9e, 0x15, 0xa9, 0xf3, 0x8a, 0x2c, 0xed, 0x7b, 0x03, 0xbe, 0x6f, 0xdc, 0xf5, 0xd5, 0x7c,
-	0x49, 0x64, 0xec, 0xd1, 0x5d, 0x41, 0xa5, 0x42, 0x7f, 0xa1, 0x2f, 0x59, 0x94, 0xd1, 0xd0, 0x8f,
-	0xa8, 0xf2, 0x03, 0x92, 0x24, 0x54, 0xf8, 0x2c, 0x2c, 0xcd, 0xea, 0x16, 0x1b, 0x43, 0x63, 0xd4,
-	0xf2, 0x7e, 0x56, 0x15, 0x2e, 0x55, 0xff, 0xb5, 0xbe, 0xaa, 0x65, 0xf4, 0x1b, 0x3a, 0x41, 0x42,
-	0x58, 0x4a, 0x43, 0x9f, 0x91, 0xd4, 0x27, 0x22, 0xc3, 0x0d, 0xed, 0xb0, 0x6a, 0x7a, 0x45, 0xd2,
-	0x85, 0xc8, 0x50, 0x0f, 0xcc, 0x70, 0x1b, 0x73, 0xa9, 0xf0, 0x67, 0x2d, 0xd7, 0xa8, 0xe2, 0x73,
-	0x2e, 0x14, 0x6e, 0x1e, 0xf8, 0x12, 0x55, 0x7c, 0x21, 0xa9, 0xc0, 0x5f, 0x0e, 0x7c, 0x89, 0x10,
-	0x82, 0xa6, 0x24, 0x89, 0xc2, 0xe6, 0xd0, 0x18, 0xb5, 0x3d, 0x7d, 0xb6, 0xef, 0x1a, 0xd0, 0xdd,
-	0xb8, 0xd7, 0xcb, 0xc5, 0x74, 0xfe, 0xe7, 0x43, 0x7c, 0xac, 0x55, 0x7d, 0x0c, 0x0d, 0x00, 0x98,
-	0xa2, 0x82, 0x28, 0xc6, 0x33, 0x89, 0xbf, 0x0e, 0x8d, 0x91, 0xe5, 0x9d, 0x31, 0x68, 0x0c, 0xe8,
-	0x6c, 0xcd, 0x8c, 0x67, 0x7e, 0x2a, 0x23, 0xfc, 0x4d, 0xdf, 0xf0, 0xe3, 0xa9, 0xb2, 0x96, 0x91,
-	0xfd, 0x0b, 0x2c, 0xbd, 0x7c, 0x8f, 0xca, 0x9c, 0x67, 0x92, 0x96, 0x3d, 0x63, 0x22, 0xe3, 0x7a,
-	0x14, 0xfa, 0x6c, 0xff, 0x2b, 0x13, 0x52, 0xcd, 0xf2, 0x58, 0xd7, 0x03, 0x33, 0xc8, 0x05, 0xe7,
-	0x37, 0x75, 0x65, 0x8d, 0x4a, 0x5e, 0x56, 0x7c, 0x35, 0x9a, 0x1a, 0x4d, 0x1f, 0x0c, 0xb0, 0x16,
-	0xe7, 0xf9, 0x43, 0x3b, 0x68, 0xbb, 0x54, 0x1d, 0xa3, 0x87, 0x26, 0xce, 0xdb, 0x49, 0x75, 0x9e,
-	0xa7, 0xb4, 0x3f, 0xbe, 0xc8, 0x71, 0x78, 0xb2, 0xfd, 0x09, 0xed, 0xa1, 0xa3, 0x5b, 0x9e, 0x72,
-	0x81, 0x66, 0xef, 0xdf, 0xf1, 0x22, 0x45, 0xfd, 0xc9, 0xa5, 0xa6, 0x53, 0xef, 0xad, 0xa9, 0xa5,
-	0xd9, 0x63, 0x00, 0x00, 0x00, 0xff, 0xff, 0x3f, 0x6c, 0x95, 0xa3, 0xa5, 0x03, 0x00, 0x00,
+	// 364 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x52, 0xcb, 0x4e, 0xc2, 0x40,
+	0x14, 0xb5, 0x3c, 0x2a, 0x5c, 0x21, 0xe2, 0xc5, 0x90, 0x86, 0x05, 0x69, 0xea, 0xa6, 0x1b, 0x1a,
+	0x52, 0x82, 0x7b, 0x0c, 0x09, 0x6c, 0x48, 0x48, 0xfd, 0x00, 0x33, 0xe0, 0x48, 0x1b, 0xa1, 0x53,
+	0x3a, 0x53, 0x13, 0xf9, 0x00, 0xbf, 0xc8, 0xef, 0x33, 0xa6, 0x9d, 0x29, 0xe0, 0x23, 0xc2, 0xd6,
+	0xdd, 0x9c, 0x73, 0xe7, 0x3e, 0xce, 0xb9, 0x17, 0x9a, 0x24, 0x11, 0x3e, 0x0d, 0x45, 0xb0, 0x20,
+	0x82, 0xc5, 0x4e, 0x14, 0x33, 0xc1, 0xb0, 0x43, 0xa2, 0x28, 0x66, 0xdb, 0x20, 0x59, 0x3b, 0xbf,
+	0x84, 0xb9, 0xe5, 0x42, 0x65, 0x98, 0x08, 0x7f, 0x44, 0x04, 0xc1, 0x06, 0x14, 0x9f, 0xe9, 0xab,
+	0xa1, 0x99, 0x9a, 0x5d, 0xf5, 0xd2, 0x27, 0x5e, 0x43, 0xf9, 0x85, 0xac, 0x12, 0x6a, 0x14, 0x32,
+	0x4e, 0x02, 0xeb, 0x5d, 0x83, 0xc6, 0x6c, 0x3c, 0x1d, 0x0d, 0x26, 0x84, 0xfb, 0x1e, 0xdd, 0x24,
+	0x94, 0x0b, 0x6c, 0x81, 0xfe, 0x38, 0xf7, 0x19, 0x17, 0x2a, 0x5f, 0x21, 0xc9, 0x47, 0x2c, 0x16,
+	0xaa, 0x86, 0x42, 0x92, 0x4f, 0x38, 0x8d, 0x8d, 0x62, 0xce, 0xa7, 0x08, 0x47, 0x50, 0x21, 0x6a,
+	0x20, 0xa3, 0x64, 0x16, 0xed, 0x0b, 0xd7, 0x76, 0xfe, 0xd6, 0xe0, 0xe4, 0x02, 0xbc, 0x5d, 0x26,
+	0x22, 0x94, 0x38, 0x59, 0x09, 0xa3, 0x6c, 0x6a, 0x76, 0xcd, 0xcb, 0xde, 0xd6, 0x5b, 0x01, 0x9a,
+	0xb3, 0xf1, 0xfd, 0x64, 0xe8, 0x0e, 0x6e, 0xff, 0xc7, 0xe4, 0x55, 0x39, 0x39, 0x76, 0x00, 0x02,
+	0x41, 0x63, 0x22, 0x02, 0x16, 0x72, 0x43, 0x37, 0x35, 0xbb, 0xee, 0x1d, 0x30, 0xd8, 0x05, 0x3c,
+	0x28, 0x1f, 0xb0, 0xf0, 0x61, 0xcd, 0x97, 0xc6, 0x79, 0x56, 0xe1, 0xea, 0x6b, 0x64, 0xca, 0x97,
+	0xd6, 0x0d, 0xd4, 0xb3, 0xf5, 0x79, 0x94, 0x47, 0x2c, 0xe4, 0x34, 0xed, 0xe9, 0x13, 0xee, 0x2b,
+	0xfd, 0xd9, 0xdb, 0xba, 0x4b, 0x77, 0x2c, 0xcd, 0xda, 0xfd, 0x6b, 0x81, 0xbe, 0x88, 0x62, 0xc6,
+	0x9e, 0x72, 0xa7, 0x24, 0x4a, 0x79, 0x2e, 0x79, 0xe5, 0x94, 0x44, 0xee, 0x87, 0x06, 0xf5, 0xe1,
+	0xa1, 0x6e, 0xdc, 0x40, 0x6d, 0x4c, 0xc5, 0xee, 0x78, 0xb0, 0x77, 0xcc, 0xa1, 0xef, 0x77, 0xd6,
+	0xee, 0x9e, 0x94, 0x91, 0x8f, 0x6c, 0x9d, 0xe1, 0x16, 0x2e, 0xb3, 0x96, 0xfb, 0xc5, 0x63, 0xff,
+	0x78, 0x8d, 0x1f, 0x67, 0xd2, 0xee, 0x9d, 0x9a, 0xb4, 0xef, 0x3d, 0xd7, 0xb3, 0x50, 0xff, 0x33,
+	0x00, 0x00, 0xff, 0xff, 0x24, 0x7c, 0xb5, 0x6b, 0x9b, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // AuthenticatorClient is the client API for Authenticator service.
 //
@@ -338,10 +375,10 @@ type AuthenticatorClient interface {
 }
 
 type authenticatorClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewAuthenticatorClient(cc *grpc.ClientConn) AuthenticatorClient {
+func NewAuthenticatorClient(cc grpc.ClientConnInterface) AuthenticatorClient {
 	return &authenticatorClient{cc}
 }
 

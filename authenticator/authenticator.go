@@ -89,14 +89,24 @@ func (a *Authenticator) run() {
 	}
 }
 
-func executeGetCallerIdentity(request string) (string, error) {
-	resp, err := http.Post(request, "", nil)
+func executeGetCallerIdentity(authData map[string]string) (string, error) {
+	request := authData[KeySignedGetCallerIdentity]
+
+	var resp *http.Response
+	var err error
+	switch authData[KeyClientLang] {
+	case ValClientLangGo:
+		resp, err = http.Get(request)
+	case ValClientLangPython:
+		resp, err = http.Post(request, "", nil)
+	default:
+		return "", fmt.Errorf("unsupported SDK type of %s", authData[KeyClientLang])
+	}
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 
-	// We can ignore errors here because if it's not a valid response body, we'll still error
-	// below when we try to unmarshal the XML.
 	respBody, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("received unexpected get caller identity response %d: %s", resp.StatusCode, respBody)
@@ -115,9 +125,13 @@ func executeGetCallerIdentity(request string) (string, error) {
 
 // verifyIdentity takes a signed get caller identity string and executes
 // the request to the given AWS STS endpoint. It returns the caller's
-// full IAM ARN.
-func verifyIdentity(signedGetCallerIdentity string) (string, error) {
-	u, err := url.Parse(signedGetCallerIdentity)
+// full IAM WrappedARN.
+func verifyIdentity(authData map[string]string) (string, error) {
+	if authData[KeyAuthType] != ValAuthTypeAWS {
+		return "", fmt.Errorf("unexpected auth type of %s, must use %s", authData[KeyAuthType], ValAuthTypeAWS)
+	}
+
+	u, err := url.Parse(authData[KeySignedGetCallerIdentity])
 	if err != nil {
 		return "", err
 	}
@@ -141,7 +155,7 @@ func verifyIdentity(signedGetCallerIdentity string) (string, error) {
 	if query.Get("Action") != "GetCallerIdentity" {
 		return "", fmt.Errorf("invalid action for GetCallerIdentity: %s", query.Get("Action"))
 	}
-	return executeGetCallerIdentity(signedGetCallerIdentity)
+	return executeGetCallerIdentity(authData)
 }
 
 func toDatabaseARN(fullIAMArn string) (string, error) {
@@ -151,7 +165,7 @@ func toDatabaseARN(fullIAMArn string) (string, error) {
 	}
 	log.Debugf("received login attempt from %+v", parsedArn)
 	if !strings.HasPrefix(parsedArn.Resource, "assumed-role") {
-		// This is a regular ARN, so we should return it as-is for use in accessing
+		// This is a regular WrappedARN, so we should return it as-is for use in accessing
 		// database credentials.
 		return fullIAMArn, nil
 	}
@@ -180,13 +194,14 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
+	authData := toMap(req.GetAuthData())
 
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := verifyIdentity(req.GetSignedGetCallerIdentity())
+		verifiedIAMArn, err := verifyIdentity(authData)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -195,7 +210,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	}()
 
 	// Get the credentials.
-	claimedIamArn := req.GetClaimedIamArn()
+	claimedIamArn := authData[KeyClaimedIamArn]
 	dbHost := req.GetDbhost()
 	dbPort := req.GetDbport()
 	dbUser := req.GetDbuser()
@@ -215,11 +230,15 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	// Make sure the ARN they claimed they had to get the creds was their actual ARN.
+	// Make sure the WrappedARN they claimed they had to get the creds was their actual WrappedARN.
 	select {
 	case verifiedIAMArn := <-verifiedIAMArnChan:
-		if verifiedIAMArn != claimedIamArn {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM ARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
+		if err != nil {
+			return nil, err
+		}
+		if !match {
+			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM WrappedARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
 		}
 	case err = <-verificationErrChan:
 		return nil, err
@@ -256,12 +275,14 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
+	authData := toMap(req.GetAuthData())
+
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIAMArn, err := verifyIdentity(req.GetSignedGetCallerIdentity())
+		verifiedIAMArn, err := verifyIdentity(authData)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -270,7 +291,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	}()
 
 	// Get the credentials.
-	claimedIamArn := req.GetClaimedIamArn()
+	claimedIamArn := authData[KeyClaimedIamArn]
 	dbHost := req.GetDbhost()
 	dbPort := req.GetDbport()
 	dbUser := req.GetDbuser()
@@ -301,11 +322,15 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	cproof := computePGSHA256Cproof(saltedPass, authMsg)
 	sproof := computePGSHA256Sproof(saltedPass, authMsg)
 
-	// Make sure the ARN they claimed they had to get the creds was their actual ARN.
+	// Make sure the WrappedARN they claimed they had to get the creds was their actual WrappedARN.
 	select {
 	case verifiedIAMArn := <-verifiedIAMArnChan:
-		if verifiedIAMArn != claimedIamArn {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM ARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
+		if err != nil {
+			return nil, err
+		}
+		if !match {
+			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM WrappedARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
 		}
 	case err = <-verificationErrChan:
 		return nil, err
@@ -379,4 +404,80 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 	sproof := sproofHmac.Sum(nil)
 	sproof64 := base64.StdEncoding.EncodeToString(sproof)
 	return sproof64
+}
+
+// arnsMatch compares a claimed arn that the caller states they'll
+// have, and an actual arn returned by the AWS get caller identity call.
+func arnsMatch(claimedArn, actualArn string) (bool, error) {
+	if claimedArn == actualArn {
+		return true, nil
+	}
+
+	// If they're not immediately equal, check for special situations
+	// where we would still allow a match.
+	// We allow role arn to match the assumed role arn folks would have
+	// for that role.
+	type WrappedARN struct {
+		arn.ARN
+		RoleName string
+	}
+
+	var assumedRole *WrappedARN
+	var role *WrappedARN
+	for _, rawArn := range []string{claimedArn, actualArn} {
+		parsed, err := arn.Parse(rawArn)
+		if err != nil {
+			return false, err
+		}
+		wrappedARN := &WrappedARN{
+			ARN: parsed,
+		}
+		if strings.HasPrefix(wrappedARN.Resource, "assumed-role/") {
+			fields := strings.Split(wrappedARN.Resource, "/")
+			// Assumed role resource strings look like "assumed-role/rolename/session",
+			// but they may not have session on the end.
+			if len(fields) < 2 {
+				return false, fmt.Errorf("received assumed role arn that doesn't match the expected format: %s", rawArn)
+			}
+			wrappedARN.RoleName = fields[1]
+			assumedRole = wrappedARN
+			continue
+		}
+		if strings.HasPrefix(wrappedARN.Resource, "role/") {
+			fields := strings.Split(wrappedARN.Resource, "/")
+			// Role resource strings look like "role/rolename".
+			if len(fields) != 2 {
+				return false, fmt.Errorf("received role arn that doesn't match the expected format: %s", rawArn)
+			}
+			wrappedARN.RoleName = fields[1]
+			role = wrappedARN
+			continue
+		}
+	}
+	if assumedRole == nil || role == nil {
+		// Since we only special case matching role arns with assumed role arns,
+		// we can conclude that these don't match.
+		return false, nil
+	}
+
+	// Compare the role arn and the assumed role arn to ensure they match.
+	if role.Partition != assumedRole.Partition {
+		return false, fmt.Errorf("partitions don't match, claimed arn %s, actual arn %s", claimedArn, actualArn)
+	}
+	if role.Service != "iam" {
+		return false, fmt.Errorf("received unexpected service for role: %s", role.String())
+	}
+	if assumedRole.Service != "sts" {
+		return false, fmt.Errorf("received unexpected service for assumed role: %s", assumedRole.String())
+	}
+	if role.Region != assumedRole.Region {
+		return false, fmt.Errorf("regions don't match, claimed arn %s, actual arn %s", claimedArn, actualArn)
+	}
+	if role.AccountID != assumedRole.AccountID {
+		return false, fmt.Errorf("account IDs don't match, claimed arn %s, actual arn %s", claimedArn, actualArn)
+	}
+	if role.RoleName != assumedRole.RoleName {
+		return false, fmt.Errorf("role names don't match, claimed arn %s, actual arn %s", claimedArn, actualArn)
+	}
+	return true, nil
 }

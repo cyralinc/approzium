@@ -1,49 +1,50 @@
 package main
 
 import (
-	"fmt"
-	vault "github.com/hashicorp/vault/api"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	pb "github.com/approzium/approzium/authenticator/protos"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sts"
+	vault "github.com/hashicorp/vault/api"
 )
 
-const exampleSTSReq = "https://sts.amazonaws.com/?" +
-	"Action=GetCallerIdentity&" +
-	"Version=2011-06-15&" +
-	"X-Amz-Algorithm=AWS4-HMAC-SHA256&" +
-	"X-Amz-Credential=ASIA2VNACNFCQTKAMK7P%2F20200619%2Fus-east-1%2Fsts%2Faws4_request&" +
-	"X-Amz-Date=20200619T213034Z&" +
-	"X-Amz-Expires=3600&" +
-	"X-Amz-SignedHeaders=host&" +
-	"X-Amz-Security-Token=FwoGZXIvYXdzEKf%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDI3Fc5sH4PVjCltv%2BCKsAZJbeqGXFK4iRoGzVACyFb1lirj1pCg278WgTVOEwA9cbSaSz%2FbLSXjsWAwbQGTo8KzcqLuvHV9IALku5ncJz4XXJ2WQtN7S5qpv%2BJ%2BK0U7hA%2Bk0ktRlhpoUWbJJeV7RCkMF5xSkOSQ3T4RB0PVH3kALjAcEhrEXwMAHD%2FU7RUXQaQkJYNA%2Ba7InAU8%2BorE4Ksuw4YKZGPYaHaEEnDIq7x0phmY0PFcqqor9mSMo%2Bty09wUyLX4CJ2MtA4fowq5hUuIluUPoVNM1Tk9YWY31VcWeakteFoSOHNqoo4kvwcNMVQ%3D%3D&" +
-	"X-Amz-Signature=26cccaf1eb751690921676ce3bb8272f3dd3119d7c93995aa468da356814a17"
+const envVarTestRole = "TEST_IAM_ROLE"
 
-var returnUnauthorizedArn = false
+var testEnv = &env{}
 
+// TestAuthenticator_GetPGMD5Hash issues real STS GetCallerIdentity because at the
+// time of writing there were no documented limits. Hitting the real API will allow
+// us to catch if it changes.
 func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
-	mockAwsServer := setup(t)
-	defer mockAwsServer.Close()
-
-	validTestRequest := strings.ReplaceAll(exampleSTSReq, "https://sts.amazonaws.com", mockAwsServer.URL)
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	authenticator, err := NewAuthenticator()
 	if err != nil {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:iam::403019568400:assumed-role/dev",
-		Dbhost:                  "dbmd5",
-		Dbport:                  "5432",
-		Dbuser:                  "bob",
-		Salt:                    []byte{1, 2, 3, 4},
+		AuthData: []*pb.AuthData{
+			{Key: KeyAuthType, Value: ValAuthTypeAWS},
+			{Key: KeyClientLang, Value: ValClientLangGo},
+			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
+			{Key: KeyClaimedIamArn, Value: testEnv.ClaimedArn()},
+		},
+		Dbhost: "dbmd5",
+		Dbport: "5432",
+		Dbuser: "bob",
+		Salt:   []byte{1, 2, 3, 4},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -52,43 +53,52 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatalf("expected %s but received %s", "d576ce99165615bb3f4331154ca6660c", resp.Hash)
 	}
 
-	// Now use a bad claimed ARN and make sure we fail.
-	returnUnauthorizedArn = true
-	defer func() {
-		returnUnauthorizedArn = false
-	}()
+	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
-		Dbhost:                  "dbmd5",
-		Dbport:                  "5432",
-		Dbuser:                  "bob",
-		Salt:                    []byte{1, 2, 3, 4},
+		AuthData: []*pb.AuthData{
+			{Key: KeyAuthType, Value: ValAuthTypeAWS},
+			{Key: KeyClientLang, Value: ValClientLangGo},
+			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
+			{Key: KeyClaimedIamArn, Value: "arn:partition:service:region:account-id:arn-thats-not-mine"},
+		},
+		Dbhost: "foo",
+		Dbport: "5432",
+		Dbuser: "bob",
+		Salt:   []byte{1, 2, 3, 4},
 	})
 	if err == nil {
-		t.Fatal("using a claimed ARN that doesn't belong to me should fail")
+		t.Fatal("using a claimed arn that doesn't belong to me should fail")
 	}
 }
 
+// TestAuthenticator_GetPGSHA256Hash issues real STS GetCallerIdentity because at the
+// time of writing there were no documented limits. Hitting the real API will allow
+// us to catch if it changes.
 func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
-	mockAwsServer := setup(t)
-	defer mockAwsServer.Close()
-
-	validTestRequest := strings.ReplaceAll(exampleSTSReq, "https://sts.amazonaws.com", mockAwsServer.URL)
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	authenticator, err := NewAuthenticator()
 	if err != nil {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:iam::403019568400:assumed-role/dev",
-		Dbhost:                  "dbsha256",
-		Dbport:                  "5432",
-		Dbuser:                  "bob",
-		Salt:                    "1234",
-		Iterations:              0,
-		AuthenticationMsg:       "hello, world!",
+		AuthData: []*pb.AuthData{
+			{Key: KeyAuthType, Value: ValAuthTypeAWS},
+			{Key: KeyClientLang, Value: ValClientLangGo},
+			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
+			{Key: KeyClaimedIamArn, Value: testEnv.ClaimedArn()},
+		},
+		Dbhost:            "dbsha256",
+		Dbport:            "5432",
+		Dbuser:            "bob",
+		Salt:              "1234",
+		Iterations:        0,
+		AuthenticationMsg: "hello, world!",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -100,32 +110,31 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatalf("expected %s but received %s", "/N4NMwnT+TeFI4Ymbaj0nk5sjJQTCrwnvaXhApkjRYo=", resp.Sproof)
 	}
 
-	// Now use a bad claimed ARN and make sure we fail.
-	returnUnauthorizedArn = true
-	defer func() {
-		returnUnauthorizedArn = false
-	}()
+	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		SignedGetCallerIdentity: validTestRequest,
-		ClaimedIamArn:           "arn:aws:sts::123456789012:federated-user/my-federated-user-name",
-		Dbhost:                  "dbsha256",
-		Dbport:                  "5432",
-		Dbuser:                  "bob",
-		Salt:                    "1234",
-		Iterations:              0,
-		AuthenticationMsg:       "hello, world!",
+		AuthData: []*pb.AuthData{
+			{Key: KeyAuthType, Value: ValAuthTypeAWS},
+			{Key: KeyClientLang, Value: ValClientLangGo},
+			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
+			{Key: KeyClaimedIamArn, Value: "arn:partition:service:region:account-id:arn-thats-not-mine"},
+		},
+		Dbhost:            "foo",
+		Dbport:            "5432",
+		Dbuser:            "bob",
+		Salt:              "1234",
+		Iterations:        0,
+		AuthenticationMsg: "hello, world!",
 	})
 	if err == nil {
-		t.Fatal("using a claimed ARN that doesn't belong to me should fail")
+		t.Fatal("using a claimed arn that doesn't belong to me should fail")
 	}
 }
 
 func TestVerifyService(t *testing.T) {
-	// Create a mock test server where we'll receive AWS calls.
-	mockAwsServer := setup(t)
-	defer mockAwsServer.Close()
-
-	validTestRequest := strings.ReplaceAll(exampleSTSReq, "https://sts.amazonaws.com", mockAwsServer.URL)
+	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
+	if err != nil {
+		t.Fatal(err)
+	}
 	testCases := []struct {
 		TestName                string
 		SignedGetCallerIdentity string
@@ -133,9 +142,9 @@ func TestVerifyService(t *testing.T) {
 		ExpectErr               bool
 	}{
 		{
-			TestName:                "Sunny path, regular ARN",
-			SignedGetCallerIdentity: validTestRequest,
-			ExpectedArn:             "arn:aws:iam::403019568400:assumed-role/dev",
+			TestName:                "Sunny path, regular arn",
+			SignedGetCallerIdentity: signedGetCallerIdentity,
+			ExpectedArn:             testEnv.ClaimedArn(),
 			ExpectErr:               false,
 		},
 		{
@@ -145,18 +154,23 @@ func TestVerifyService(t *testing.T) {
 		},
 		{
 			TestName:                "Malicious base URL injected",
-			SignedGetCallerIdentity: strings.ReplaceAll(validTestRequest, mockAwsServer.URL, "127.0.0.1"),
+			SignedGetCallerIdentity: strings.ReplaceAll(signedGetCallerIdentity, "sts", "somewhere-else"),
 			ExpectErr:               true,
 		},
 		{
 			TestName:                "Different call than GetCallerIdentity",
-			SignedGetCallerIdentity: strings.ReplaceAll(validTestRequest, "GetCallerIdentity", "GetSessionToken"),
+			SignedGetCallerIdentity: strings.ReplaceAll(signedGetCallerIdentity, "GetCallerIdentity", "GetSessionToken"),
 			ExpectErr:               true,
 		},
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.TestName, func(t *testing.T) {
-			verifiedARN, err := verifyIdentity(testCase.SignedGetCallerIdentity)
+			authData := map[string]string{
+				KeyAuthType:                ValAuthTypeAWS,
+				KeyClientLang:              ValClientLangGo,
+				KeySignedGetCallerIdentity: testCase.SignedGetCallerIdentity,
+			}
+			verifiedARN, err := verifyIdentity(authData)
 			if testCase.ExpectErr {
 				if err == nil {
 					t.Fatal("expected err")
@@ -166,12 +180,17 @@ func TestVerifyService(t *testing.T) {
 					return
 				}
 			}
-			// We don't expect an error. Let's make sure we got the expected response.
-			if verifiedARN != testCase.ExpectedArn {
-				t.Fatalf("expected %s but received %s", testCase.ExpectedArn, verifiedARN)
-			}
 			if err != nil {
 				t.Fatal(err)
+			}
+
+			// We don't expect an error. Let's make sure we got the expected response.
+			match, err := arnsMatch(testCase.ExpectedArn, verifiedARN)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !match {
+				t.Fatalf("expected %s but received %s", testCase.ExpectedArn, verifiedARN)
 			}
 		})
 	}
@@ -225,42 +244,44 @@ func TestXorBytes(t *testing.T) {
 	}
 }
 
-func setup(t *testing.T) *httptest.Server {
-	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
-	os.Setenv(vault.EnvVaultAddress, "")
+// This allows us to only get the signedGetCallerIdentity string once, but
+// to reuse it throughout tests through the testEnv variable, reducing load
+// on AWS.
+type env struct {
+	signedGetCallerIdentity string
+}
 
-	// Now mock the AWS server.
-	defaultArn := "arn:aws:iam::403019568400:assumed-role/dev"
-	unauthorizedArn := "arn:aws:sts::123456789012:federated-user/malicious-user"
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (e *env) ClaimedArn() string {
+	return os.Getenv(envVarTestRole)
+}
 
-		responseTemplate := `<GetCallerIdentityResponse xmlns="https://sts.amazonaws.com/doc/2011-06-15/">
-  <GetCallerIdentityResult>
-    <Arn>%s</Arn>
-    <UserId>123456789012:my-federated-user-name</UserId>
-    <Account>123456789012</Account>
-  </GetCallerIdentityResult>
-  <ResponseMetadata>
-    <RequestId>01234567-89ab-cdef-0123-456789abcdef</RequestId>
-  </ResponseMetadata>
-</GetCallerIdentityResponse>`
-		if returnUnauthorizedArn {
-			w.Write([]byte(fmt.Sprintf(responseTemplate, unauthorizedArn)))
-			return
-		} else {
-			w.Write([]byte(fmt.Sprintf(responseTemplate, defaultArn)))
-			return
-		}
-	}))
+func (e *env) SignedGetCallerIdentity(t *testing.T) (string, error) {
 
-	tsUrl, err := url.Parse(ts.URL)
+	if os.Getenv(envVarTestRole) == "" {
+		t.Fatalf("skipping because %s is unset", envVarTestRole)
+	}
+
+	// If it's cached, return it.
+	if e.signedGetCallerIdentity != "" {
+		return e.signedGetCallerIdentity, nil
+	}
+
+	// If it's uncached, get it, cache it, and return it.
+	sess, err := session.NewSession()
 	if err != nil {
-		t.Fatal(err)
+		return "", err
 	}
+	creds := stscreds.NewCredentials(sess, os.Getenv(envVarTestRole))
 
-	// Overwrite the valid baseURLs to fire requests at our test server.
-	validSTSEndpoints = []string{
-		tsUrl.Host,
+	// Create service client value configured for credentials
+	// from assumed role.
+	svc := sts.New(sess, &aws.Config{Credentials: creds})
+
+	req, _ := svc.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
+	signedGetCallerIdentity, err := req.Presign(time.Minute * 15)
+	if err != nil {
+		return "", err
 	}
-	return ts
+	e.signedGetCallerIdentity = signedGetCallerIdentity
+	return e.signedGetCallerIdentity, nil
 }
