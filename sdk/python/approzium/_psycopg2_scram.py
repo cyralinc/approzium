@@ -1,7 +1,6 @@
 import base64
 import re
 
-
 # try to import the secrets library from Python 3.6+ for the
 # cryptographic token generator for generating nonces as part of SCRAM
 # Otherwise fall back on os.urandom

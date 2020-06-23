@@ -1,6 +1,6 @@
 import logging
-from .authenticator import Authenticator
 
+from .authenticator import Authenticator
 
 default_authenticator = None
 logger = logging.getLogger(__name__)

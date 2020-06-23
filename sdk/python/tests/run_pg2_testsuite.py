@@ -2,20 +2,21 @@
 This script runs the Psycopg2 test suite without a running authenticator
 service. Therefore, it only tests the client SDK and a password is needed
 """
-import unittest
-from unittest import SkipTest
-import os
-from os.path import abspath
 import logging
+import os
+import sys
+import unittest
+from os.path import abspath
+from unittest import SkipTest
+
+import pg2_testsuite  # noqa: E402 F401
+import psycopg2
 from approzium import Authenticator, set_default_authenticator
 
 # once get hash is mocked, import connect method
 from approzium.psycopg2 import connect as approzium_pg2_connect
-import psycopg2
-import sys
 
 sys.path.append(abspath("pg2_testsuite"))
-import pg2_testsuite  # noqa: E402 F401
 
 
 try:
