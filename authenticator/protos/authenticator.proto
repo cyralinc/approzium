@@ -22,7 +22,7 @@ message PGMD5HashRequest {
         string dbhost = 1;
         string dbport = 2;
         string dbuser = 3;
-        repeated AuthData authData = 4;
+        repeated AuthData authdata = 4;
         bytes salt = 5;
 }
 
@@ -30,7 +30,7 @@ message PGSHA256HashRequest {
         string dbhost = 1;
         string dbport = 2;
         string dbuser = 3;
-        repeated AuthData authData = 4;
+        repeated AuthData authdata = 4;
         string salt = 5;
         uint32 iterations = 6;
         string authentication_msg = 7;

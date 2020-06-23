@@ -34,8 +34,12 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         if len(salt) != 4:
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=obtain_claimed_arn(response),
+            authdata={
+                "auth_type": "aws",
+                "client_language": "python",
+                "signed_get_caller_identity": signed_gci,
+                "claimed_iam_arn": obtain_claimed_arn(response),
+            },
             dbhost=dbhost,
             dbuser=dbuser,
             dbport=dbport,
@@ -47,8 +51,12 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         auth = auth_info
         auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=obtain_claimed_arn(response),
+            authdata={
+                "auth_type": "aws",
+                "client_language": "python",
+                "signed_get_caller_identity": signed_gci,
+                "claimed_iam_arn": obtain_claimed_arn(response),
+            },
             dbhost=dbhost,
             dbport=dbport,
             dbuser=dbuser,
