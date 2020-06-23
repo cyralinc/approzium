@@ -3,7 +3,6 @@ package main
 import pb "github.com/approzium/approzium/authenticator/protos"
 
 const (
-	// Example value: "aws".
 	KeyAuthType    = "auth_type"
 	ValAuthTypeAWS = "aws"
 

@@ -125,7 +125,7 @@ func executeGetCallerIdentity(authData map[string]string) (string, error) {
 
 // getIdentity takes a signed get caller identity string and executes
 // the request to the given AWS STS endpoint. It returns the caller's
-// full IAM WrappedARN.
+// full IAM arn.
 func getIdentity(authData map[string]string) (string, error) {
 	if authData[KeyAuthType] != ValAuthTypeAWS {
 		return "", fmt.Errorf("unexpected auth type of %s, must use %s", authData[KeyAuthType], ValAuthTypeAWS)
@@ -165,7 +165,7 @@ func toDatabaseARN(fullIAMArn string) (string, error) {
 	}
 	log.Debugf("received login attempt from %+v", parsedArn)
 	if !strings.HasPrefix(parsedArn.Resource, "assumed-role") {
-		// This is a regular WrappedARN, so we should return it as-is for use in accessing
+		// This is a regular arn, so we should return it as-is for use in accessing
 		// database credentials.
 		return fullIAMArn, nil
 	}
@@ -230,7 +230,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	// Make sure the WrappedARN they claimed they had to get the creds was their actual WrappedARN.
+	// Make sure the arn they claimed they had to get the creds was their actual arn.
 	select {
 	case verifiedIAMArn := <-verifiedIAMArnChan:
 		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
@@ -238,7 +238,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 			return nil, err
 		}
 		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM WrappedARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
 		}
 	case err = <-verificationErrChan:
 		return nil, err
@@ -322,7 +322,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	cproof := computePGSHA256Cproof(saltedPass, authMsg)
 	sproof := computePGSHA256Sproof(saltedPass, authMsg)
 
-	// Make sure the WrappedARN they claimed they had to get the creds was their actual WrappedARN.
+	// Make sure the arn they claimed they had to get the creds was their actual arn.
 	select {
 	case verifiedIAMArn := <-verifiedIAMArnChan:
 		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
@@ -330,7 +330,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 			return nil, err
 		}
 		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM WrappedARN %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
 		}
 	case err = <-verificationErrChan:
 		return nil, err
