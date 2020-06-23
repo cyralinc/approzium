@@ -194,7 +194,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
-	authData := toMap(req.GetAuthData())
+	authData := toMap(req.GetAuthdata())
 
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
@@ -275,7 +275,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	authData := toMap(req.GetAuthData())
+	authData := toMap(req.GetAuthdata())
 
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.

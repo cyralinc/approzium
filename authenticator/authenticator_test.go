@@ -35,7 +35,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		AuthData: []*pb.AuthData{
+		Authdata: []*pb.AuthData{
 			{Key: KeyAuthType, Value: ValAuthTypeAWS},
 			{Key: KeyClientLang, Value: ValClientLangGo},
 			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
@@ -55,7 +55,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		AuthData: []*pb.AuthData{
+		Authdata: []*pb.AuthData{
 			{Key: KeyAuthType, Value: ValAuthTypeAWS},
 			{Key: KeyClientLang, Value: ValClientLangGo},
 			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
@@ -87,7 +87,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		AuthData: []*pb.AuthData{
+		Authdata: []*pb.AuthData{
 			{Key: KeyAuthType, Value: ValAuthTypeAWS},
 			{Key: KeyClientLang, Value: ValClientLangGo},
 			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
@@ -112,7 +112,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		AuthData: []*pb.AuthData{
+		Authdata: []*pb.AuthData{
 			{Key: KeyAuthType, Value: ValAuthTypeAWS},
 			{Key: KeyClientLang, Value: ValClientLangGo},
 			{Key: KeySignedGetCallerIdentity, Value: signedGetCallerIdentity},
