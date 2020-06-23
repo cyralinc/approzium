@@ -1,3 +1,3 @@
-from ._psycopg2_connect import AUTH_REQ_MD5, AUTH_REQ_SASL, connect
+from ._psycopg2_connect import connect
 
-__all__ = ["connect", "AUTH_REQ_MD5", "AUTH_REQ_SASL"]
+__all__ = ["connect"]
