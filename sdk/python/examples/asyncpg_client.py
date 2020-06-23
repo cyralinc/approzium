@@ -1,6 +1,5 @@
 from os import environ
 import asyncio
-import asyncpg
 
 from approzium import Authenticator
 from approzium.asyncpg import connect
@@ -12,7 +11,7 @@ async def run():
     conn = await connect(user='bob', database='db', host='dbmd5',
                          authenticator=auth)
     print('Connection Established!')
-    values = await conn.fetch('''SELECT 1''')
+    await conn.fetch('''SELECT 1''')
     await conn.close()
 
 loop = asyncio.get_event_loop()

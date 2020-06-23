@@ -1,10 +1,7 @@
-import struct
 import asyncpg
 from asyncpg.connect_utils import _connect_addr
 from asyncpg.protocol import Protocol
 import logging
-import hashlib
-from ..misc import read_int32_from_bytes
 from .._postgres import PGAuthClient, parse_msg, construct_msg
 
 
@@ -38,7 +35,7 @@ def new_data_received(self, data):
         msg_type, msg_content = parse_msg(data)
         first_msg_bytes = construct_msg(msg_type, msg_content)
         rest_bytes = data[len(first_msg_bytes):]
-        read_bytes = lambda: first_msg_bytes
+        read_bytes = lambda: first_msg_bytes  # noqa: E731
         if context['authclient'] is None:
             context['authclient'] = PGAuthClient(
                 read_bytes,

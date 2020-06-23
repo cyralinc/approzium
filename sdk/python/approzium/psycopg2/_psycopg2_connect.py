@@ -4,7 +4,6 @@ import select
 import approzium
 import psycopg2
 
-from ..misc import read_int32_from_bytes
 from ._psycopg2_ctypes import (
     ensure_compatible_ssl,
     libpq_PQstatus,
@@ -13,8 +12,7 @@ from ._psycopg2_ctypes import (
     set_debug,
     write_msg,
 )
-from .._postgres import parse_auth_msg, AUTH_REQ_MD5, AUTH_REQ_SASL, PGAuthClient
-from .._postgres.scram import SCRAMAuthentication
+from .._postgres import PGAuthClient
 
 logger = logging.getLogger(__name__)
 

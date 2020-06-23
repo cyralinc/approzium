@@ -16,7 +16,6 @@ from ctypes.util import find_library
 from sys import getsizeof
 
 from ..socketfromfd import fromfd
-from .._postgres import construct_msg
 
 logger = logging.getLogger(__name__)
 

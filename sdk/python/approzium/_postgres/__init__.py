@@ -112,7 +112,7 @@ class PGAuthClient(object):
     def scram_stage_3(self):
         msg_type, server_final = parse_msg(self.read_bytes())
         if msg_type != ord("R"):
-            raise Exception("Error received unexpected response", server_first)
+            raise Exception("Error received unexpected response", server_final)
         scram_state = self.auth_info["scram"]
         if not scram_state.verify_server_final_message(server_final):
             raise Exception("Error bad server signature")
