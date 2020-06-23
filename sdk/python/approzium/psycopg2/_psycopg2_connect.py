@@ -4,6 +4,7 @@ import select
 import approzium
 import psycopg2
 
+from .._postgres import PGAuthClient
 from ._psycopg2_ctypes import (
     ensure_compatible_ssl,
     libpq_PQstatus,
@@ -12,7 +13,6 @@ from ._psycopg2_ctypes import (
     set_debug,
     write_msg,
 )
-from .._postgres import PGAuthClient
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 authenticator,
                 dbhost,
                 dbport,
-                dbuser
+                dbuser,
             )
             self._checked_ssl = False
             if is_sync:
@@ -73,8 +73,10 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 ensure_compatible_ssl(self)
                 logging.debug("checked ssl")
                 self._checked_ssl = True
-            if status == self.CONNECTION_AWAITING_RESPONSE and \
-                not self._pgauthclient.done:
+            if (
+                status == self.CONNECTION_AWAITING_RESPONSE
+                and not self._pgauthclient.done
+            ):
                 next(self._pgauthclient)
                 return psycopg2.extensions.POLL_WRITE
             else:

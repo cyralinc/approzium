@@ -1,6 +1,6 @@
 import logging
-import struct
 import select
+import struct
 import warnings
 from ctypes import (
     CDLL,
