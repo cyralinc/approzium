@@ -4,3 +4,20 @@ edit: false
 ---
 
 # Examples
+
+```python
+# client.py
+
+from approzium import Authenticator
+from approzium.psycopg2 import connect
+
+# create an Authenticator client
+auth = Authenticator('authenticator:1234')
+
+# connect using Approzium's connect method
+conn = connect("", authenticator=auth)
+
+# use the connection cas you typically would. very cool!
+cur = conn.cursor()
+cur.execute('SELECT 1')
+```
