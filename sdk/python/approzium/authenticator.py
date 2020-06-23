@@ -41,8 +41,12 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             authdata=[
                 authenticator_pb2.AuthData(key="auth_type", value="aws"),
                 authenticator_pb2.AuthData(key="client_language", value="python"),
-                authenticator_pb2.AuthData(key="signed_get_caller_identity", value=signed_gci),
-                authenticator_pb2.AuthData(key="claimed_iam_arn", value=obtain_claimed_arn(response)),
+                authenticator_pb2.AuthData(
+                    key="signed_get_caller_identity", value=signed_gci
+                ),
+                authenticator_pb2.AuthData(
+                    key="claimed_iam_arn", value=obtain_claimed_arn(response)
+                ),
             ],
             salt=salt,
         )
@@ -58,8 +62,12 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             authdata=[
                 authenticator_pb2.AuthData(key="auth_type", value="aws"),
                 authenticator_pb2.AuthData(key="client_language", value="python"),
-                authenticator_pb2.AuthData(key="signed_get_caller_identity", value=signed_gci),
-                authenticator_pb2.AuthData(key="claimed_iam_arn", value=obtain_claimed_arn(response)),
+                authenticator_pb2.AuthData(
+                    key="signed_get_caller_identity", value=signed_gci
+                ),
+                authenticator_pb2.AuthData(
+                    key="claimed_iam_arn", value=obtain_claimed_arn(response)
+                ),
             ],
             salt=auth.password_salt,
             iterations=auth.password_iterations,
