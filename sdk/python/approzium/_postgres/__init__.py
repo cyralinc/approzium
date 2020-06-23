@@ -19,11 +19,13 @@ AUTH_REQ_SASL = 10
 def parse_msg(msg):
     msg_type = msg[0]
     msg_size = struct.unpack("!i", msg[1:1+4])[0]
-    msg_content = msg[5:5+msg_size]
+    msg_content = msg[5:5+msg_size-4]
     return msg_type, msg_content
 
 
 def construct_msg(header, msg):
+    if isinstance(header, int):
+        header = header.to_bytes(1, 'big')
     return header + struct.pack("!i", len(msg) + 4) + msg
 
 
