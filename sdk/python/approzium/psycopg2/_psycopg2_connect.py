@@ -4,7 +4,6 @@ import select
 import approzium
 import psycopg2
 
-from ..authenticator import get_hash
 from ..misc import read_int32_from_bytes
 from ._psycopg2_ctypes import (
     ensure_compatible_ssl,
@@ -14,45 +13,13 @@ from ._psycopg2_ctypes import (
     set_debug,
     write_msg,
 )
-from ._psycopg2_scram import SCRAMAuthentication
+from .._postgres import parse_auth_msg, AUTH_REQ_MD5, AUTH_REQ_SASL, PGAuthClient
+from .._postgres.scram import SCRAMAuthentication
 
 logger = logging.getLogger(__name__)
 
-# Postgres protocol constants
-# derived from PGsource/src/include/libpq/pgcomm.h
-AUTH_REQ_MD5 = 5
-AUTH_REQ_SASL = 10
 
 pgconnect = psycopg2.connect
-
-
-def read_auth(pgconn):
-    # request many more bytes than necessary. if connection is at the
-    # right stage, only the right number of bytes will be received
-    msg_type, msg = read_msg(pgconn)
-    auth_type = read_int32_from_bytes(msg, 0)
-    if msg_type != b"R":
-        raise Exception("Authentication message not received")
-    if auth_type == AUTH_REQ_MD5:
-        salt = msg[-4:]
-        return auth_type, bytes(salt)
-    elif auth_type == AUTH_REQ_SASL:
-        if not msg[4:].startswith(b"SCRAM-SHA-256"):
-            raise Exception("Server requested an unsupported SASL auth method")
-        auth = SCRAMAuthentication(b"SCRAM-SHA-256")
-        dbuser = pgconn.get_dsn_parameters()["user"]
-        client_first = auth.create_client_first_message(dbuser)
-        select.select([], [pgconn.fileno()], [])
-        write_msg(pgconn, b"p", client_first)
-        select.select([pgconn.fileno()], [], [])
-        resp_type, server_first = read_msg(pgconn)
-        if resp_type != b"R":
-            raise Exception("Error received unexpected response", server_first)
-        # the part that is relevant is the part that starts with r=
-        auth.parse_server_first_message(server_first[4:])
-        return auth_type, auth
-    else:
-        raise Exception("Unidentified authentication method")
 
 
 def wait(pgconn):
@@ -66,20 +33,6 @@ def wait(pgconn):
             select.select([pgconn.fileno()], [], [])
         else:
             raise psycopg2.OperationalError("poll() returned %s" % state)
-
-
-def send_hash(pgconn, auth_type, hash):
-    if auth_type == AUTH_REQ_MD5:
-        write_msg(pgconn, b"p", b"md5" + hash.encode("ascii") + b"\0")
-    elif auth_type == AUTH_REQ_SASL:
-        client_final, auth = hash
-        write_msg(pgconn, b"p", client_final)
-        select.select([pgconn.fileno()], [], [])
-        resp_type, server_final = read_msg(pgconn)
-        if resp_type != b"R":
-            raise Exception("Error received unexpected response", server_final)
-        if not auth.verify_server_final_message(server_final):
-            raise Exception("Error bad server signature")
 
 
 def construct_approzium_conn(base, is_sync, authenticator):
@@ -99,10 +52,17 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 return
             if logger.getEffectiveLevel() <= logging.DEBUG:
                 set_debug(self)
-            self._salt = None
-            self._auth_type = None
-            self._hash_sent = False
-            self._authenticator = authenticator
+            dbhost = self.get_dsn_parameters()["host"]
+            dbport = self.get_dsn_parameters()["port"]
+            dbuser = self.get_dsn_parameters()["user"]
+            self._pgauthclient = PGAuthClient(
+                lambda: read_msg(self),
+                lambda msg: write_msg(self, msg),
+                authenticator,
+                dbhost,
+                dbport,
+                dbuser
+            )
             self._checked_ssl = False
             if is_sync:
                 wait(self)
@@ -115,25 +75,9 @@ def construct_approzium_conn(base, is_sync, authenticator):
                 ensure_compatible_ssl(self)
                 logging.debug("checked ssl")
                 self._checked_ssl = True
-            if status == self.CONNECTION_AWAITING_RESPONSE and not self._salt:
-                logging.debug("reading salt")
-                self._auth_type, self._salt = read_auth(self)
-                return psycopg2.extensions.POLL_WRITE
-            elif self._salt and not self._hash_sent:
-                logging.debug("sending hash")
-                dbhost = self.get_dsn_parameters()["host"]
-                dbport = self.get_dsn_parameters()["port"]
-                dbuser = self.get_dsn_parameters()["user"]
-                hash = get_hash(
-                    dbhost,
-                    dbport,
-                    dbuser,
-                    self._auth_type,
-                    self._salt,
-                    self._authenticator,
-                )
-                send_hash(self, self._auth_type, hash)
-                self._hash_sent = True
+            if status == self.CONNECTION_AWAITING_RESPONSE and \
+                not self._pgauthclient.done:
+                next(self._pgauthclient)
                 return psycopg2.extensions.POLL_WRITE
             else:
                 logging.debug("normal poll")
