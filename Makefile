@@ -10,7 +10,6 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_IAM_ROLE=${TEST_IAM_ROLE}
 TEST_DBHOSTS=dbmd5 dbsha256
 TEST_DB=db
 TEST_DBPORT=5432
@@ -36,10 +35,10 @@ run-tests-in-docker:  dc-build  # need SSL certs for Postgres services
 vault_secret = { $\
 "password": "$(TEST_DBPASS)", $\
 "iam_arns": [ $\
-	"$(TEST_IAM_ROLE)" $\
+	"${TEST_IAM_ROLE}" $\
 ] $\
 }
-pg2_testsuite_env = TEST_IAM_ROLE=$(TEST_IAM_ROLE) PSYCOPG2_TESTDB=$(TEST_DB) $\
+pg2_testsuite_env = TEST_IAM_ROLE=${TEST_IAM_ROLE} PSYCOPG2_TESTDB=$(TEST_DB) $\
 		PSYCOPG2_TESTDB_HOST=$(TEST_DBHOST) PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT)
 		PSYCOPG2_TESTDB_USER=$(TEST_DBUSER)
 
