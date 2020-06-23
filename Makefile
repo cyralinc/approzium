@@ -10,7 +10,6 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_IAM_ROLE=arn:aws:iam::403019568400:role/dev
 TEST_DBHOSTS=dbmd5 dbsha256
 TEST_DB=db
 TEST_DBPORT=5432
@@ -35,7 +34,7 @@ run-tests-in-docker:  dc-build  # need SSL certs for Postgres services
 
 vault_secret = { $\
 "password": "$(TEST_DBPASS)", $\
-"iam_roles": [ $\
+"iam_arns": [ $\
 	"$(TEST_IAM_ROLE)" $\
 ] $\
 }
