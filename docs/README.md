@@ -10,12 +10,12 @@ git clone https://github.com/approzium/approzium-docs
 cd approzium-docs
 ```
 
-Install project dependencies ([install yarn](https://classic.yarnpkg.com/en/docs/install) if you don't already have it)
-```sh
-yarn install
+Run the site in development mode (hot-reloading)
+```
+make website-dev
 ```
 
-Run the site in development mode
-```sh
-gatsby develop
+Build and serve a deployment version of the site
+```
+make website-build
 ```
