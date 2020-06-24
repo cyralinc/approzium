@@ -247,7 +247,11 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	}
 
 	// Everything checked out.
-	return &pb.PGMD5Response{Hash: computePGMD5Hash(dbUser, password, salt)}, nil
+	hash, err := computePGMD5Hash(dbUser, password, salt)
+	if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+	return &pb.PGMD5Response{Hash: hash}, nil
 }
 
 func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
@@ -357,18 +361,26 @@ func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	return creds, nil
 }
 
-func computeMD5(s string, salt []byte) string {
+func computeMD5(s string, salt []byte) (string, error) {
 	hasher := md5.New()
-	io.WriteString(hasher, s)
+	if _, err := io.WriteString(hasher, s); err != nil {
+		return "", err
+	}
 	hasher.Write(salt)
 	hashedBytes := hasher.Sum(nil)
-	return hex.EncodeToString(hashedBytes)
+	return hex.EncodeToString(hashedBytes), nil
 }
 
-func computePGMD5Hash(user, password string, salt []byte) string {
-	firstHash := computeMD5(password, []byte(user))
-	secondHash := computeMD5(firstHash, salt)
-	return secondHash
+func computePGMD5Hash(user, password string, salt []byte) (string, error) {
+	firstHash, err := computeMD5(password, []byte(user))
+	if err != nil {
+		return "", err
+	}
+	secondHash, err := computeMD5(firstHash, salt)
+	if err != nil {
+		return "", err
+	}
+	return secondHash, nil
 }
 
 func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]byte, error) {
