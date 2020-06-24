@@ -3,7 +3,7 @@ website-dev:
 	gatsby clean
 	gatsby develop
 
-website-dev:
+website-build:
 	yarn install
 	gatsby clean
 	gatsby build
