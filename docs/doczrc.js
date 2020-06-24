@@ -4,7 +4,7 @@ export default {
   title: 'Approzium',
   menu: [
     'Overview',
-    'Getting Started',
+    'Quickstart',
     'Architecture',
     'Examples',
     'Compatibility'
