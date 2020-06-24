@@ -239,6 +239,85 @@ func TestXorBytes(t *testing.T) {
 	}
 }
 
+// TestNoRaces is intended to be run via "$ go test -v -race" and will
+// fail if a race is detected.
+func TestNoRaces(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+
+	// Get these in advance so they'll be only read. You can't have
+	// races with objects that are only read.
+	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	claimedARN := testEnv.ClaimedArn()
+
+	// Create and start the authenticator as we normally would.
+	authenticator, err := NewAuthenticator()
+	if err != nil {
+		t.Fatal(err)
+	}
+	go authenticator.run()
+
+	// Try to create a race.
+	start := make(chan interface{})
+	done := make(chan interface{})
+	for i := 0; i < 1000; i++ {
+		go func() {
+			<-start
+			// We don't care about the response, we just want to hit as much
+			// of the authenticator's code as possible.
+			authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
+				Authtype:       pb.AuthType_AWS,
+				ClientLanguage: pb.ClientLanguage_GO,
+				Dbhost:         "dbsha256",
+				Dbport:         "5432",
+				Dbuser:         "bob",
+				Awsauth: &pb.AWSAuth{
+					SignedGetCallerIdentity: signedGetCallerIdentity,
+					ClaimedIamArn:           claimedARN,
+				},
+				Salt:              "1234",
+				Iterations:        0,
+				AuthenticationMsg: "hello, world!",
+			})
+			done <- true
+		}()
+		go func() {
+			<-start
+			// We don't care about the response, we just want to hit as much
+			// of the authenticator's code as possible.
+			authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
+				Authtype:       pb.AuthType_AWS,
+				ClientLanguage: pb.ClientLanguage_GO,
+				Dbhost:         "dbmd5",
+				Dbport:         "5432",
+				Dbuser:         "bob",
+				Awsauth: &pb.AWSAuth{
+					SignedGetCallerIdentity: signedGetCallerIdentity,
+					ClaimedIamArn:           testEnv.ClaimedArn(),
+				},
+				Salt: []byte{1, 2, 3, 4},
+			})
+			done <- true
+		}()
+	}
+	// Close the start chan to fire all these calls at once.
+	close(start)
+
+	// Wait for them to finish, but in case they deadlock, time out.
+	timer := time.NewTimer(10 * time.Second)
+	for i := 0; i < 2000; i++ {
+		select {
+		case <-done:
+		case <-timer.C:
+			t.Fatal("over ten seconds elapsed")
+		default:
+		}
+	}
+}
+
 // This allows us to only get the signedGetCallerIdentity string once, but
 // to reuse it throughout tests through the testEnv variable, reducing load
 // on AWS.
