@@ -16,7 +16,6 @@ from ._psycopg2_ctypes import (
 
 logger = logging.getLogger(__name__)
 
-
 pgconnect = psycopg2.connect
 
 

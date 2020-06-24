@@ -114,6 +114,7 @@ def read_msg(pgconn):
     return msg_type + msg_size_b + msg_content
 
 
+
 def write_msg(pgconn, msg):
     select.select([], [pgconn.fileno()], [])
     if libpq_PQsslInUse(pgconn.pgconn_ptr):
