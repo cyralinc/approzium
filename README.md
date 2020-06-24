@@ -15,9 +15,6 @@ To drop into a Bash shell into the development environment, run `make dev`. This
   - Make sure the access key and secret you configure can assume at least one role.
 - In one window, `$ docker-compose up`.
 - In another window, `$ make dev`
-- Edit the `client.py` file to contain the ARN of your assumable role. You can use any editor, but here's one way:
-  - `$ apt-get update`
-  - `$ apt-get install nano`
-  - `$ nano client.py` (and press CTRL+X to save and exit)
+- Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
 - To use our Python SDK to shoot a request at the authenticator, run
-  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 client.py`.
+  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/client.py`.
