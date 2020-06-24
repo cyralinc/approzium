@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/approzium/approzium/authenticator/credmgrs"
@@ -69,7 +70,9 @@ var (
 
 type Authenticator struct {
 	credMgr credmgrs.CredentialManager
-	counter int
+
+	counterMutex sync.RWMutex
+	counter      int
 }
 
 func NewAuthenticator() (*Authenticator, error) {
@@ -84,7 +87,9 @@ func NewAuthenticator() (*Authenticator, error) {
 
 func (a *Authenticator) run() {
 	for {
+		a.counterMutex.RLock()
 		log.Printf("authenticator running. %d requests received", a.counter)
+		a.counterMutex.RUnlock()
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -177,7 +182,9 @@ func toDatabaseARN(fullIAMArn string) (string, error) {
 }
 
 func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
+	a.counterMutex.Lock()
 	a.counter++
+	a.counterMutex.Unlock()
 
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
@@ -244,7 +251,9 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 }
 
 func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
+	a.counterMutex.Lock()
 	a.counter++
+	a.counterMutex.Unlock()
 
 	// Return early if we didn't get a valid auth message or salt.
 	authMsg := req.GetAuthenticationMsg()
