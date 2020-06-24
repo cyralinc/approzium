@@ -325,7 +325,10 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	cproof := computePGSHA256Cproof(saltedPass, authMsg)
+	cproof, err := computePGSHA256Cproof(saltedPass, authMsg)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	sproof := computePGSHA256Sproof(saltedPass, authMsg)
 
 	// Make sure the arn they claimed they had to get the creds was their actual arn.
@@ -378,27 +381,33 @@ func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]
 }
 
 // assumes a and b are of the same length
-func xorBytes(a, b []byte) []byte {
+func xorBytes(a, b []byte) ([]byte, error) {
+	if len(a) != len(b) {
+		return nil, fmt.Errorf("cannot xor slices of unequal lengths, received %d and %d", len(a), len(b))
+	}
 	buf := make([]byte, len(a))
 
 	for i := range a {
 		buf[i] = a[i] ^ b[i]
 	}
 
-	return buf
+	return buf, nil
 }
 
 // SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
-func computePGSHA256Cproof(spassword []byte, authMsg string) string {
+func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
 	mac := hmac.New(sha256.New, spassword)
 	mac.Write([]byte("Client Key"))
 	ckey := mac.Sum(nil)
 	ckeyHash := sha256.Sum256(ckey)
 	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
 	cproofHmac.Write([]byte(authMsg))
-	cproof := xorBytes(cproofHmac.Sum(nil), ckey)
+	cproof, err := xorBytes(cproofHmac.Sum(nil), ckey)
+	if err != nil {
+		return "", err
+	}
 	cproof64 := base64.StdEncoding.EncodeToString(cproof)
-	return cproof64
+	return cproof64, nil
 }
 
 func computePGSHA256Sproof(spassword []byte, authMsg string) string {
