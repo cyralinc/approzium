@@ -5,7 +5,12 @@ from pathlib import Path
 import approzium
 import grpc
 
-from .iam import obtain_signed_get_caller_identity
+from .iam import (
+    assume_role,
+    obtain_claimed_arn,
+    obtain_credentials,
+    obtain_signed_get_caller_identity,
+)
 
 sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
 import authenticator_pb2  # noqa: E402 isort:skip
@@ -19,7 +24,9 @@ class Authenticator(object):
 
 
 def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
-    signed_gci = obtain_signed_get_caller_identity(authenticator.iam_role)
+    response = assume_role(authenticator.iam_role)
+    credentials = obtain_credentials(response)
+    signed_gci = obtain_signed_get_caller_identity(credentials)
     channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
@@ -28,11 +35,15 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         if len(salt) != 4:
             raise Exception("salt not right size")
         request = authenticator_pb2.PGMD5HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
+            authtype=authenticator_pb2.AWS,
+            client_language=authenticator_pb2.PYTHON,
             dbhost=dbhost,
             dbuser=dbuser,
             dbport=dbport,
+            awsauth=authenticator_pb2.AWSAuth(
+                signed_get_caller_identity=signed_gci,
+                claimed_iam_arn=obtain_claimed_arn(response),
+            ),
             salt=salt,
         )
         response = stub.GetPGMD5Hash(request)
@@ -41,11 +52,15 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
         auth = auth_info
         auth._generate_auth_msg()
         request = authenticator_pb2.PGSHA256HashRequest(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=authenticator.iam_role,
+            authtype=authenticator_pb2.AWS,
+            client_language=authenticator_pb2.PYTHON,
             dbhost=dbhost,
             dbport=dbport,
             dbuser=dbuser,
+            awsauth=authenticator_pb2.AWSAuth(
+                signed_get_caller_identity=signed_gci,
+                claimed_iam_arn=obtain_claimed_arn(response),
+            ),
             salt=auth.password_salt,
             iterations=auth.password_iterations,
             authentication_msg=auth.authorization_message,

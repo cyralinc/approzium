@@ -13,15 +13,15 @@ class AuthenticatorStub(object):
             channel: A grpc.Channel.
         """
         self.GetPGMD5Hash = channel.unary_unary(
-            "/approzium.authenticator.protos.Authenticator/GetPGMD5Hash",
-            request_serializer=authenticator__pb2.PGMD5HashRequest.SerializeToString,
-            response_deserializer=authenticator__pb2.PGMD5Response.FromString,
-        )
+                '/approzium.authenticator.protos.Authenticator/GetPGMD5Hash',
+                request_serializer=authenticator__pb2.PGMD5HashRequest.SerializeToString,
+                response_deserializer=authenticator__pb2.PGMD5Response.FromString,
+                )
         self.GetPGSHA256Hash = channel.unary_unary(
-            "/approzium.authenticator.protos.Authenticator/GetPGSHA256Hash",
-            request_serializer=authenticator__pb2.PGSHA256HashRequest.SerializeToString,
-            response_deserializer=authenticator__pb2.PGSHA256Response.FromString,
-        )
+                '/approzium.authenticator.protos.Authenticator/GetPGSHA256Hash',
+                request_serializer=authenticator__pb2.PGSHA256HashRequest.SerializeToString,
+                response_deserializer=authenticator__pb2.PGSHA256Response.FromString,
+                )
 
 
 class AuthenticatorServicer(object):
@@ -30,89 +30,66 @@ class AuthenticatorServicer(object):
     def GetPGMD5Hash(self, request, context):
         """Missing associated documentation comment in .proto file"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def GetPGSHA256Hash(self, request, context):
         """Missing associated documentation comment in .proto file"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_AuthenticatorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "GetPGMD5Hash": grpc.unary_unary_rpc_method_handler(
-            servicer.GetPGMD5Hash,
-            request_deserializer=authenticator__pb2.PGMD5HashRequest.FromString,
-            response_serializer=authenticator__pb2.PGMD5Response.SerializeToString,
-        ),
-        "GetPGSHA256Hash": grpc.unary_unary_rpc_method_handler(
-            servicer.GetPGSHA256Hash,
-            request_deserializer=authenticator__pb2.PGSHA256HashRequest.FromString,
-            response_serializer=authenticator__pb2.PGSHA256Response.SerializeToString,
-        ),
+            'GetPGMD5Hash': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPGMD5Hash,
+                    request_deserializer=authenticator__pb2.PGMD5HashRequest.FromString,
+                    response_serializer=authenticator__pb2.PGMD5Response.SerializeToString,
+            ),
+            'GetPGSHA256Hash': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPGSHA256Hash,
+                    request_deserializer=authenticator__pb2.PGSHA256HashRequest.FromString,
+                    response_serializer=authenticator__pb2.PGSHA256Response.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "approzium.authenticator.protos.Authenticator", rpc_method_handlers
-    )
+            'approzium.authenticator.protos.Authenticator', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
-# This class is part of an EXPERIMENTAL API.
+ # This class is part of an EXPERIMENTAL API.
 class Authenticator(object):
     """Missing associated documentation comment in .proto file"""
 
     @staticmethod
-    def GetPGMD5Hash(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
-        return grpc.experimental.unary_unary(
-            request,
+    def GetPGMD5Hash(request,
             target,
-            "/approzium.authenticator.protos.Authenticator/GetPGMD5Hash",
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/approzium.authenticator.protos.Authenticator/GetPGMD5Hash',
             authenticator__pb2.PGMD5HashRequest.SerializeToString,
             authenticator__pb2.PGMD5Response.FromString,
-            options,
-            channel_credentials,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-        )
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetPGSHA256Hash(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
-        return grpc.experimental.unary_unary(
-            request,
+    def GetPGSHA256Hash(request,
             target,
-            "/approzium.authenticator.protos.Authenticator/GetPGSHA256Hash",
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/approzium.authenticator.protos.Authenticator/GetPGSHA256Hash',
             authenticator__pb2.PGSHA256HashRequest.SerializeToString,
             authenticator__pb2.PGSHA256Response.FromString,
-            options,
-            channel_credentials,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-        )
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)

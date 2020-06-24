@@ -1,13 +1,25 @@
 import boto3
 
 
-def obtain_signed_get_caller_identity(iam_role):
+def assume_role(iam_role):
     if iam_role is None:
         raise NotImplementedError("Automatic IAM ARN determination is not implemented")
     sts_client = boto3.client("sts")
-    credentials = sts_client.assume_role(
+    response = sts_client.assume_role(
         DurationSeconds=3600, RoleArn=iam_role, RoleSessionName="Service1",
-    )["Credentials"]
+    )
+    return response
+
+
+def obtain_credentials(response):
+    return response["Credentials"]
+
+
+def obtain_claimed_arn(response):
+    return response["AssumedRoleUser"]["Arn"]
+
+
+def obtain_signed_get_caller_identity(credentials):
     iam_session = boto3.Session(
         aws_access_key_id=credentials["AccessKeyId"],
         aws_secret_access_key=credentials["SecretAccessKey"],

@@ -36,7 +36,7 @@ func TestHcVaultCredMgr_Password(t *testing.T) {
 	if _, err := client.Logical().Write("approzium/localhost:5432", map[string]interface{}{
 		"dbuser1": map[string]interface{}{
 			"password": "asdfghjkl",
-			"iam_roles": []string{
+			"iam_arns": []string{
 				"arn:aws:iam::accountid:role/rolename1",
 				"arn:aws:iam::accountid:role/rolename2",
 			},
