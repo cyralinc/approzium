@@ -1,0 +1,32 @@
+---
+name: Overview
+route: /
+edit: false
+---
+
+# Approzium
+**Approzium** enables services to securely connect to databases without providing credentials.
+
+Here's how you might typically connect to your database.
+```python
+from psycopg2 import connect
+
+conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword dbname=mydb")
+```
+
+Here's what it would look like with Approzium. 😎
+```python
+from approzium import Authenticator
+from approzium.psycopg2 import connect
+
+auth = Authenticator('authenticator:1234')
+
+# Look ma, no password!
+conn = connect("host=1.2.3.4 user=user1 dbname=mydb", authenticator=auth)
+```
+
+You can get started with Approzium [here](/quickstart).
+
+Learn how it works by checking out the [architecture](/architecture).
+
+We hope you like it! 🤗
