@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
 	"os"
 	"reflect"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/google/gofuzz"
 	vault "github.com/hashicorp/vault/api"
 )
 
@@ -315,6 +317,34 @@ func TestNoRaces(t *testing.T) {
 			t.Fatal("over ten seconds elapsed")
 		default:
 		}
+	}
+}
+
+// TestFuzzAuthenticator simply fuzzes its two request-receiving
+// methods to ensure a panic isn't caused by random values. If
+// a panic is produced, the test will fail.
+func TestFuzzAuthenticator(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+
+	// This test generates a lot of error logs, so quiet them to
+	// avoid them drowning out other tests.
+	log.SetLevel(log.FatalLevel)
+
+	authenticator, err := NewAuthenticator()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fuzzer := fuzz.New()
+	for i := 0; i < 1000; i++ {
+		req1 := &pb.PGSHA256HashRequest{}
+		fuzzer.Fuzz(req1)
+		authenticator.GetPGSHA256Hash(nil, req1)
+
+		req2 := &pb.PGMD5HashRequest{}
+		fuzzer.Fuzz(req2)
+		authenticator.GetPGMD5Hash(nil, req2)
 	}
 }
 
