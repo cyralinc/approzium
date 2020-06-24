@@ -199,8 +199,8 @@ func TestToDatabaseARN(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result != "arn:aws:sts::account-id:assumed-role/role-name" {
-		t.Fatalf("expected %s but received %s", "arn:aws:sts::account-id:assumed-role/role-name/role-session-name", result)
+	if result != "arn:aws:iam::account-id:role/role-name" {
+		t.Fatalf("expected %s but received %s", "arn:aws:iam::account-id:role/role-name", result)
 	}
 
 	// Leave other arns alone.

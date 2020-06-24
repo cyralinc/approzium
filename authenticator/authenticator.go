@@ -154,6 +154,9 @@ func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLang
 	return executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
 }
 
+// toDatabaseARN either uses the original ARN to check the database
+// for a password, or if it's an assumed role ARN, converts it to a
+// role ARN before looking.
 func toDatabaseARN(fullIAMArn string) (string, error) {
 	parsedArn, err := arn.Parse(fullIAMArn)
 	if err != nil {
@@ -165,19 +168,12 @@ func toDatabaseARN(fullIAMArn string) (string, error) {
 		// database credentials.
 		return fullIAMArn, nil
 	}
-	// For assumed-role arns, they may have a session tag that we want to strip off
-	// for accessing database credentials.
+	// Convert assumed role arns to role arns.
 	fields := strings.Split(parsedArn.Resource, "/")
-	switch len(fields) {
-	case 2:
-		// No session tags are added, use it as-is.
-		return fullIAMArn, nil
-	case 3:
-		// Strip the session tag because they won't be included in the database.
-		return fmt.Sprintf("arn:%s:%s::%s:%s/%s", parsedArn.Partition, parsedArn.Service, parsedArn.AccountID, fields[0], fields[1]), nil
-	default:
-		return "", fmt.Errorf("unexpected resource format for %s", parsedArn.Resource)
+	if len(fields) < 2 || len(fields) > 3 {
+		return "", fmt.Errorf("unexpected assume role arn format: %s", fullIAMArn)
 	}
+	return fmt.Sprintf("arn:%s:iam::%s:role/%s", parsedArn.Partition, parsedArn.AccountID, fields[1]), nil
 }
 
 func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
