@@ -342,7 +342,7 @@ func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	creds, err := a.credMgr.Password(identity)
 	if err != nil {
-		msg := fmt.Errorf("password not found for identity %s", identity)
+		msg := fmt.Errorf("password not found for identity %s due to %s, using %s", identity, err, a.credMgr.Name())
 		log.Error(msg)
 		return "", msg
 	}

@@ -53,6 +53,10 @@ type localFileCredMgr struct {
 	creds map[DBKey]string
 }
 
+func (l *localFileCredMgr) Name() string {
+	return "local file (dev only)"
+}
+
 func (l *localFileCredMgr) Password(identity DBKey) (string, error) {
 	creds, ok := l.creds[identity]
 	if !ok {

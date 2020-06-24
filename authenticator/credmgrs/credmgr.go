@@ -19,6 +19,10 @@ type DBKey struct {
 }
 
 type CredentialManager interface {
+	// Name should provide a loggable and error-returnable identifying
+	// name for the credential manager.
+	Name() string
+
 	// Password should retrieve the password for a given identity.
 	// If the identity is not found, an error should be returned.
 	// IMPORTANT: While the identity given for the password should

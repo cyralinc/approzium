@@ -39,6 +39,10 @@ type hcVaultCredMgr struct {
 	vaultClient *vault.Client
 }
 
+func (h *hcVaultCredMgr) Name() string {
+	return "HashiCorp Vault"
+}
+
 func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
 	path := mountPath + "/" + identity.DBHost + ":" + identity.DBPort
 	secret, err := h.vaultClient.Logical().Read(path)
