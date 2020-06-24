@@ -1,7 +1,6 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
 	"reflect"
 	"strings"
@@ -15,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/google/gofuzz"
 	vault "github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
 
 const envVarTestRole = "TEST_IAM_ROLE"
