@@ -13,7 +13,7 @@ This guide will show you how to
 ## Deploying Authenticator
 Get the Authenticator binary [here](https://github.com/approzium/approzium/tree/develop/authenticator), then run it with the environment variables `VAULT_ADDR` and `VAULT_TOKEN` set.
 ```shell
-export VAULT_ADDR=localhost:8200
+export VAULT_ADDR=http://localhost:8200
 export VAULT_TOKEN=root
 ./authenticator
 ```
@@ -24,7 +24,7 @@ The Authenticator expects credentials for a single database user as a secret sto
 cat dbuser1-creds.json
 {
     "password": "asdfghjkl",
-    "iam_roles": [
+    "iam_arns": [
         "arn:aws:iam::accountid:role/rolename1",
         "arn:aws:iam::accountid:role/rolename2"
     ]
@@ -38,7 +38,7 @@ vault secrets enable -path=approzium -version=1 kv
 
 Put the secret at path `approzium/<DATABASE_HOST:DATABASE_PORT>` with your database user as the key.
 ```shell
-vault kv put approzium/1.2.3.4:5432 dbuser1=@dbuser1-creds.json
+vault write approzium/1.2.3.4:5432 dbuser1=@dbuser1-creds.json
 ```
 
 ## SDK Usage
