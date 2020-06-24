@@ -38,7 +38,7 @@ RUN pip3 install -e python
 # Build Authenticator Go Binary
 WORKDIR /usr/src/approzium/authenticator
 COPY authenticator/ .
-RUN mount=type=cache,target=$GOPATH/pkg/mod go build
+RUN --mount=type=cache,target=$GOPATH/pkg/mod go build
 
 FROM alpine:latest AS build
 WORKDIR /app/
