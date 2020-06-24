@@ -19,7 +19,7 @@ export VAULT_TOKEN=root
 ```
 
 ### Storing Credentials in Vault
-The Authenticator expects 
+The Authenticator expects credentials for a single database user as a secret stored against the database user as the key. The secret contains the database password and a set of IAM roles allowed to access the credentials in the following structure.
 ```shell
 cat dbuser1-creds.json
 {
@@ -47,6 +47,7 @@ Install the SDK
 pip install approzium
 ```
 
+Connect to your database as follows.
 ```python
 from approzium import Authenticator
 from approzium.psycopg2 import connect
