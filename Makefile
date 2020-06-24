@@ -53,6 +53,8 @@ enable-vault-path:
 seed-vault-host:  # call this with "make seed-vault-host HOST=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
 		vault write approzium/$(HOST):$(TEST_DBPORT) -
+	# Confirm secret was written
+	vault read approzium/$(HOST):$(TEST_DBPORT)
 seed-vault-all-hosts:
 	for HOST in $(TEST_DBHOSTS); do \
 		make seed-vault-host HOST=$$HOST; \

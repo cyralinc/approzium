@@ -437,7 +437,7 @@ func arnsMatch(claimedArn, actualArn string) (bool, error) {
 			fields := strings.Split(wrappedARN.Resource, "/")
 			// Assumed role resource strings look like "assumed-role/rolename/session",
 			// but they may not have session on the end.
-			if len(fields) < 2 {
+			if len(fields) < 2 || len(fields) > 3 {
 				return false, fmt.Errorf("received assumed role arn that doesn't match the expected format: %s", rawArn)
 			}
 			wrappedARN.RoleName = fields[1]
