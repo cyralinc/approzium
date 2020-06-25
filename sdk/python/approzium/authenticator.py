@@ -5,13 +5,13 @@ from pathlib import Path
 
 import grpc
 
+from . import _postgres
 from .iam import (
     assume_role,
     obtain_claimed_arn,
     obtain_credentials,
     obtain_signed_get_caller_identity,
 )
-from . import _postgres
 
 sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
 import authenticator_pb2  # noqa: E402 isort:skip
@@ -42,12 +42,14 @@ class AuthClient(object):
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # add authentication info
-        request.authtype=authenticator_pb2.AWS
-        request.client_language=authenticator_pb2.PYTHON
-        request.awsauth.CopyFrom(authenticator_pb2.AWSAuth(
-            signed_get_caller_identity=signed_gci,
-            claimed_iam_arn=obtain_claimed_arn(response),
-        ))
+        request.authtype = authenticator_pb2.AWS
+        request.client_language = authenticator_pb2.PYTHON
+        request.awsauth.CopyFrom(
+            authenticator_pb2.AWSAuth(
+                signed_get_caller_identity=signed_gci,
+                claimed_iam_arn=obtain_claimed_arn(response),
+            )
+        )
         response = getattr(stub, getmethodname)(request)
         # if no exception is raised, request was successful
         self.authenticated = True
