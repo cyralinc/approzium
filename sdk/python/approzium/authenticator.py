@@ -7,6 +7,7 @@ import grpc
 
 from .iam import (
     assume_role,
+    get_local_arn,
     obtain_claimed_arn,
     obtain_credentials,
     obtain_signed_get_caller_identity,
@@ -24,9 +25,15 @@ class Authenticator(object):
 
 
 def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
-    response = assume_role(authenticator.iam_role)
-    credentials = obtain_credentials(response)
-    signed_gci = obtain_signed_get_caller_identity(credentials)
+    if authenticator.iam_role is None:
+        claimed_arn = get_local_arn()
+        signed_gci = obtain_signed_get_caller_identity(None)
+    else:
+        response = assume_role(authenticator.iam_role)
+        credentials = obtain_credentials(response)
+        claimed_arn = obtain_claimed_arn(response)
+        signed_gci = obtain_signed_get_caller_identity(credentials)
+
     channel = grpc.insecure_channel(authenticator.address)
     stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
 
@@ -42,7 +49,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbport=dbport,
             awsauth=authenticator_pb2.AWSAuth(
                 signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=obtain_claimed_arn(response),
+                claimed_iam_arn=claimed_arn,
             ),
             salt=salt,
         )
@@ -59,7 +66,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbuser=dbuser,
             awsauth=authenticator_pb2.AWSAuth(
                 signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=obtain_claimed_arn(response),
+                claimed_iam_arn=claimed_arn,
             ),
             salt=auth.password_salt,
             iterations=auth.password_iterations,
