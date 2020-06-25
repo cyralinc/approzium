@@ -1,6 +1,6 @@
+import asyncio
 import asyncpg
 from ._asyncpg_connect import connect, new__connect_addr  # approzium's connect method
-from asyncpg import connect_utils
 from asyncpg.connection import Connection
 
 
