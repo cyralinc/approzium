@@ -20,7 +20,7 @@ def obtain_claimed_arn(response):
 def obtain_signed_get_caller_identity(credentials=None):
     if credentials is None:
         # Attempt to use local identity through the boto3 client.
-        sts_client = boto3.client('sts')
+        sts_client = boto3.client("sts")
     else:
         sts_session = boto3.Session(
             aws_access_key_id=credentials["AccessKeyId"],
@@ -33,6 +33,6 @@ def obtain_signed_get_caller_identity(credentials=None):
 
 
 def get_local_arn():
-    sts_client = boto3.client('sts')
+    sts_client = boto3.client("sts")
     response = sts_client.get_caller_identity()
     return response["Arn"]

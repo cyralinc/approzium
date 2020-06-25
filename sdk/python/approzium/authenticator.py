@@ -48,8 +48,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbuser=dbuser,
             dbport=dbport,
             awsauth=authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=claimed_arn,
+                signed_get_caller_identity=signed_gci, claimed_iam_arn=claimed_arn,
             ),
             salt=salt,
         )
@@ -65,8 +64,7 @@ def get_hash(dbhost, dbport, dbuser, auth_type, auth_info, authenticator):
             dbport=dbport,
             dbuser=dbuser,
             awsauth=authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=claimed_arn,
+                signed_get_caller_identity=signed_gci, claimed_iam_arn=claimed_arn,
             ),
             salt=auth.password_salt,
             iterations=auth.password_iterations,
