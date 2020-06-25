@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Approzium SDK'
+project = 'Approzium Python SDK'
 copyright = '2020, Cyral'
 author = 'Cyral'
 
