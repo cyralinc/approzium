@@ -1,9 +1,9 @@
 from os import environ
 from select import select
 
+import approzium
 import psycopg2
 import pytest
-import approzium
 from approzium.psycopg2 import connect
 from approzium.psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 
@@ -53,15 +53,7 @@ def test_connect(dbhost, sslmode, async_):
 @pytest.mark.parametrize("Pool", [ThreadedConnectionPool, SimpleConnectionPool])
 def test_pool(dbhost, sslmode, async_, Pool):
     approzium.default_auth_client = auth
-    conns = Pool(
-        1,
-        5,
-        "",
-        **connopts,
-        host=dbhost,
-        sslmode=sslmode,
-        async_=async_,
-    )
+    conns = Pool(1, 5, "", **connopts, host=dbhost, sslmode=sslmode, async_=async_,)
     conn = conns.getconn()
     if async_:
         wait(conn)
