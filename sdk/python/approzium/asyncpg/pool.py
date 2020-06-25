@@ -1,7 +1,9 @@
 import asyncio
+
 import asyncpg
-from ._asyncpg_connect import connect, new__connect_addr  # approzium's connect method
 from asyncpg.connection import Connection
+
+from ._asyncpg_connect import connect, new__connect_addr  # approzium's connect method
 
 
 class ApproziumPool(asyncpg.pool.Pool):
@@ -10,9 +12,8 @@ class ApproziumPool(asyncpg.pool.Pool):
             # First connection attempt on this pool.
             # 1) use our connect method instead of asyncpg's
             con = await connect(
-                *self._connect_args,
-                loop=self._loop,
-                **self._connect_kwargs)
+                *self._connect_args, loop=self._loop, **self._connect_kwargs
+            )
 
             self._working_addr = con._addr
             self._working_config = con._config
@@ -32,7 +33,8 @@ class ApproziumPool(asyncpg.pool.Pool):
                 timeout=self._working_params.connect_timeout,
                 config=self._working_config,
                 params=self._working_params,
-                connection_class=self._connection_class)
+                connection_class=self._connection_class,
+            )
 
         if self._init is not None:
             try:
@@ -53,21 +55,30 @@ class ApproziumPool(asyncpg.pool.Pool):
 
         return con
 
-def create_pool(dsn=None, *,
-                min_size=10,
-                max_size=10,
-                max_queries=50000,
-                max_inactive_connection_lifetime=300.0,
-                setup=None,
-                init=None,
-                loop=None,
-                authenticator=None,
-                **connect_kwargs):
+
+def create_pool(
+    dsn=None,
+    *,
+    min_size=10,
+    max_size=10,
+    max_queries=50000,
+    max_inactive_connection_lifetime=300.0,
+    setup=None,
+    init=None,
+    loop=None,
+    authenticator=None,
+    **connect_kwargs,
+):
     return ApproziumPool(
-            dsn,
-            connection_class=Connection,
-            min_size=min_size, max_size=max_size,
-            max_queries=max_queries, loop=loop, setup=setup, init=init,
-            max_inactive_connection_lifetime=max_inactive_connection_lifetime,
-            authenticator=authenticator,
-            **connect_kwargs)
+        dsn,
+        connection_class=Connection,
+        min_size=min_size,
+        max_size=max_size,
+        max_queries=max_queries,
+        loop=loop,
+        setup=setup,
+        init=init,
+        max_inactive_connection_lifetime=max_inactive_connection_lifetime,
+        authenticator=authenticator,
+        **connect_kwargs,
+    )

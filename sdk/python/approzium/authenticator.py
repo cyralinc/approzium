@@ -1,11 +1,11 @@
 # needed to be able to import protos code
 import sys
+from itertools import count
 from pathlib import Path
 
 import approzium
 import grpc
-from pathlib import Path
-from itertools import count
+
 from .iam import (
     assume_role,
     obtain_claimed_arn,
@@ -29,10 +29,10 @@ class AuthClient(object):
     @property
     def attribution_info(self):
         info = {}
-        info['authenticator_address'] = self.server_address
-        info['iam_role'] = self.iam_role
-        info['authenticated'] = self.authenticated
-        info['num_connections'] = self.n_conns
+        info["authenticator_address"] = self.server_address
+        info["iam_role"] = self.iam_role
+        info["authenticated"] = self.authenticated
+        info["num_connections"] = self.n_conns
         return info
 
     def _execute_request(self, request, getmethodname):
@@ -42,9 +42,9 @@ class AuthClient(object):
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # add authentication info
-        request.authtype=authenticator_pb2.AWS,
-        request.client_language=authenticator_pb2.PYTHON,
-        request.awsauth=authenticator_pb2.AWSAuth(
+        request.authtype = (authenticator_pb2.AWS,)
+        request.client_language = (authenticator_pb2.PYTHON,)
+        request.awsauth = authenticator_pb2.AWSAuth(
             signed_get_caller_identity=signed_gci,
             claimed_iam_arn=obtain_claimed_arn(response),
         )
@@ -60,12 +60,9 @@ class AuthClient(object):
             if len(salt) != 4:
                 raise Exception("salt not right size")
             request = authenticator_pb2.PGMD5HashRequest(
-                dbhost=dbhost,
-                dbuser=dbuser,
-                dbport=dbport,
-                salt=salt,
+                dbhost=dbhost, dbuser=dbuser, dbport=dbport, salt=salt,
             )
-            response = self._execute_request(request, 'GetPGMD5Hash')
+            response = self._execute_request(request, "GetPGMD5Hash")
             return response.hash
         elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
             auth = auth_info
@@ -78,7 +75,7 @@ class AuthClient(object):
                 iterations=auth.password_iterations,
                 authentication_msg=auth.authorization_message,
             )
-            response = self._execute_request(request, 'GetPGSHA256Hash')
+            response = self._execute_request(request, "GetPGSHA256Hash")
             client_final = auth.create_client_final_message(response.cproof)
             auth.server_signature = response.sproof
             return client_final, auth

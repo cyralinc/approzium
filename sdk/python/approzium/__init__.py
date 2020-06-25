@@ -1,6 +1,6 @@
 import logging
-from .authenticator import AuthClient
 
+from .authenticator import AuthClient
 
 default_auth_client = None
 logger = logging.getLogger(__name__)
