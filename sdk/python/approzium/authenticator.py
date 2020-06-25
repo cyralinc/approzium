@@ -65,8 +65,7 @@ class AuthClient(object):
         request.client_language = authenticator_pb2.PYTHON
         request.awsauth.CopyFrom(
             authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=self.signed_gci,
-                claimed_iam_arn=self.claimed_arn,
+                signed_get_caller_identity=self.signed_gci, claimed_iam_arn=self.claimed_arn,
             )
         )
         response = getattr(stub, getmethodname)(request)
