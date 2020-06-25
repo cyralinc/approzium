@@ -1,7 +1,6 @@
 # needed to be able to import protos code
 import sys
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from itertools import count
 from pathlib import Path
 
@@ -65,7 +64,8 @@ class AuthClient(object):
         request.client_language = authenticator_pb2.PYTHON
         request.awsauth.CopyFrom(
             authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=self.signed_gci, claimed_iam_arn=self.claimed_arn,
+                signed_get_caller_identity=self.signed_gci,
+                claimed_iam_arn=self.claimed_arn,
             )
         )
         response = getattr(stub, getmethodname)(request)
@@ -103,7 +103,7 @@ class AuthClient(object):
     # The presigned GetCallerIdentity string expires every 15 minuts, so refresh it
     # after 5 minutes just to be safe.
     def _update_gci_if_needed(self):
-        if datetime.utcnow() - self.signed_gci_last_updated < timedelta(minutes = 5):
+        if datetime.utcnow() - self.signed_gci_last_updated < timedelta(minutes=5):
             return
         if self.iam_role is None:
             self.signed_gci = obtain_signed_get_caller_identity(None)
