@@ -24,17 +24,13 @@ RUN apt-get install -y \
   libpq-dev \
   python3.7 \
   python3.7-dev \
-  python3-pip
-RUN pip3 install --upgrade pip
-RUN pip3 install pytest
-# Install protobuf compiler for Python
-RUN pip3 install grpcio-tools
-# Python package dependencies. Repeated here for faster cached build time
-RUN pip3 install psycopg2 boto3 grpcio
-WORKDIR /usr/src/approzium/sdk
-COPY sdk/ .
-# Install Python SDK in editable mode
-RUN pip3 install -e python
+  python3-pip \
+  python3-venv
+RUN pip3 install poetry tox
+WORKDIR /usr/src/approzium/sdk/python
+COPY sdk/python .
+RUN poetry run pip install -U pip setuptools
+RUN poetry install
 # Build Authenticator Go Binary
 WORKDIR /usr/src/approzium/authenticator
 COPY authenticator/ .

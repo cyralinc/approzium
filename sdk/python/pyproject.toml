@@ -1,3 +1,24 @@
+[build-system]
+requires = ["poetry>=1.0.9"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "approzium"
+version = "0.1.1"
+description = "Approzium SDK provides Approzium database authentiation for Python"
+authors = ["Cyral <us@cyral.org>"]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+boto3 = "^1.14.10"
+grpcio = "^1.30.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.3"
+psycopg2 = "^2.8.5"
+asyncpg = "^0.20.1"
+grpcio-tools = "^1.30.0"
 [tool.black]
 target-version = ['py37']
 exclude = '''
