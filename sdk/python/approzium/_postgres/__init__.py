@@ -5,7 +5,6 @@ libraries and the Postgres protocol.
 import logging
 import struct
 
-from ..authenticator import get_hash
 from ..misc import read_int32_from_bytes
 from .scram import SCRAMAuthentication
 
@@ -70,13 +69,12 @@ class PGAuthClient(object):
             raise Exception("Authentication message not received")
         auth_type, self.auth_info = parse_auth_msg(msg)
         if auth_type == AUTH_REQ_MD5:
-            hash = get_hash(
+            hash = self.authenticator._get_pg2_hash(
                 self.dbhost,
                 self.dbport,
                 self.dbuser,
                 AUTH_REQ_MD5,
                 self.auth_info["salt"],
-                self.authenticator,
             )
             msg = construct_msg(b"p", b"md5" + hash.encode("ascii") + b"\0")
             self.write_bytes(msg)
@@ -97,13 +95,12 @@ class PGAuthClient(object):
         # the part that is relevant is the part that starts with r=
         scram_state = self.auth_info["scram"]
         scram_state.parse_server_first_message(server_first[4:])
-        client_final = get_hash(
+        client_final = self.authenticator._get_pg2_hash(
             self.dbhost,
             self.dbport,
             self.dbuser,
             AUTH_REQ_SASL,
             self.auth_info["scram"],
-            self.authenticator,
         )[0]
         msg = construct_msg(b"p", client_final)
         self.write_bytes(msg)
