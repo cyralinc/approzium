@@ -1,11 +1,11 @@
 from os import environ
 
 import pytest
-from approzium import Authenticator
+from approzium import AuthClient
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = Authenticator("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
+auth = AuthClient("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
 # use Psycopg2 defined test environment variables
 connopts = {
     "user": environ["PSYCOPG2_TESTDB_USER"],

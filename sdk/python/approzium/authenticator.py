@@ -2,7 +2,6 @@
 import sys
 from pathlib import Path
 
-import approzium
 import grpc
 from pathlib import Path
 from itertools import count
@@ -12,6 +11,7 @@ from .iam import (
     obtain_credentials,
     obtain_signed_get_caller_identity,
 )
+from . import _postgres
 
 sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
 import authenticator_pb2  # noqa: E402 isort:skip
@@ -42,12 +42,12 @@ class AuthClient(object):
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # add authentication info
-        request.authtype=authenticator_pb2.AWS,
-        request.client_language=authenticator_pb2.PYTHON,
-        request.awsauth=authenticator_pb2.AWSAuth(
+        request.authtype=authenticator_pb2.AWS
+        request.client_language=authenticator_pb2.PYTHON
+        request.awsauth.CopyFrom(authenticator_pb2.AWSAuth(
             signed_get_caller_identity=signed_gci,
             claimed_iam_arn=obtain_claimed_arn(response),
-        )
+        ))
         response = getattr(stub, getmethodname)(request)
         # if no exception is raised, request was successful
         self.authenticated = True
@@ -55,7 +55,7 @@ class AuthClient(object):
         return response
 
     def _get_pg2_hash(self, dbhost, dbport, dbuser, auth_type, auth_info):
-        if auth_type == approzium.psycopg2.AUTH_REQ_MD5:
+        if auth_type == _postgres.AUTH_REQ_MD5:
             salt = auth_info
             if len(salt) != 4:
                 raise Exception("salt not right size")
@@ -67,7 +67,7 @@ class AuthClient(object):
             )
             response = self._execute_request(request, 'GetPGMD5Hash')
             return response.hash
-        elif auth_type == approzium.psycopg2.AUTH_REQ_SASL:
+        elif auth_type == _postgres.AUTH_REQ_SASL:
             auth = auth_info
             auth._generate_auth_msg()
             request = authenticator_pb2.PGSHA256HashRequest(
