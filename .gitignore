@@ -1,3 +1,5 @@
+# Sphinx built documentation
+sdk/python/docs/build/
 # executables
 authenticator/authenticator
 main
