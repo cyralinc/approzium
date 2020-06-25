@@ -1,15 +1,21 @@
+# needed to be able to import protos code
+import sys
+from pathlib import Path
+
 import approzium
 import grpc
 from pathlib import Path
 from itertools import count
-from .iam import obtain_signed_get_caller_identity
+from .iam import (
+    assume_role,
+    obtain_claimed_arn,
+    obtain_credentials,
+    obtain_signed_get_caller_identity,
+)
 
-# needed to be able to import protos code
-import sys
-
-sys.path.append(str(Path(__file__).parent / "protos"))
-import authenticator_pb2_grpc  # noqa: E402
-import authenticator_pb2  # noqa: E402
+sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
+import authenticator_pb2  # noqa: E402 isort:skip
+import authenticator_pb2_grpc  # noqa: E402 isort:skip
 
 
 class AuthClient(object):
@@ -30,11 +36,18 @@ class AuthClient(object):
         return info
 
     def _execute_request(self, request, getmethodname):
-        signed_gci = obtain_signed_get_caller_identity(self.iam_role)
+        response = assume_role(self.iam_role)
+        credentials = obtain_credentials(response)
+        signed_gci = obtain_signed_get_caller_identity(credentials)
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
-        request.signed_get_caller_identity = signed_gci
-        request.claimed_iam_arn = self.iam_role
+        # add authentication info
+        request.authtype=authenticator_pb2.AWS,
+        request.client_language=authenticator_pb2.PYTHON,
+        request.awsauth=authenticator_pb2.AWSAuth(
+            signed_get_caller_identity=signed_gci,
+            claimed_iam_arn=obtain_claimed_arn(response),
+        )
         response = getattr(stub, getmethodname)(request)
         # if no exception is raised, request was successful
         self.authenticated = True

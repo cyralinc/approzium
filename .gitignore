@@ -198,7 +198,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-authenticator/secrets.yaml
 
 # Vendored libraries
 vendor/
+
+# Test resources
+.srl

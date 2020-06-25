@@ -1,0 +1,36 @@
+{
+  "name": "approzium-docs",
+  "private": true,
+  "description": "Documentation for the Approzium project",
+  "version": "2.0.0-rc.41",
+  "keywords": [
+    "approzium",
+    "documentation",
+    "help",
+    "usage",
+    "docs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/approzium/approzium.git"
+  },
+  "scripts": {
+    "dev": "gatsby develop",
+    "build": "gatsby build",
+    "serve": "gatsby serve",
+    "deploy": "gatsby build && gh-pages -d public"
+  },
+  "dependencies": {
+    "docz": "^2.0.0-rc.76",
+    "gatsby": "^2.23.3",
+    "gatsby-plugin-offline": "^2.2.7",
+    "gatsby-plugin-sharp": "^2.6.11",
+    "gatsby-theme-docz": "latest",
+    "gatsby-transformer-sharp": "^2.5.5",
+    "gh-pages": "^3.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-helmet-async": "^1.0.4"
+  }
+}

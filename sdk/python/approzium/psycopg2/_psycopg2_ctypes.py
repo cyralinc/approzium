@@ -1,20 +1,21 @@
+import logging
+import select
+import struct
+import warnings
 from ctypes import (
     CDLL,
+    c_char_p,
+    c_int,
+    c_void_p,
     cdll,
     create_string_buffer,
-    string_at,
     memmove,
-    c_void_p,
-    c_int,
-    c_char_p,
+    string_at,
 )
 from ctypes.util import find_library
-import struct
-import logging
 from sys import getsizeof
-import warnings
-from .socketfromfd import fromfd
 
+from ..socketfromfd import fromfd
 
 logger = logging.getLogger(__name__)
 
@@ -104,19 +105,17 @@ def read_msg(pgconn):
                 sock = fromfd(fd)
                 return sock.recv(n)
 
+    select.select([pgconn.fileno()], [], [])
     msg_type = read_bytes(1)
-    msg_size = struct.unpack("!i", read_bytes(4))[0]
+    msg_size_b = read_bytes(4)
+    msg_size = struct.unpack("!i", msg_size_b)[0]
     msg_content = read_bytes(msg_size - 4)
     logger.debug(f"read: {msg_type} {msg_content}")
-    return msg_type, msg_content
+    return msg_type + msg_size_b + msg_content
 
 
-def write_msg(pgconn, msg_header, msg):
-    msg = msg_header + struct.pack("!i", len(msg) + 4) + msg
-    write_to_conn(pgconn, msg)
-
-
-def write_to_conn(pgconn, msg):
+def write_msg(pgconn, msg):
+    select.select([], [pgconn.fileno()], [])
     if libpq_PQsslInUse(pgconn.pgconn_ptr):
         ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
         c_buffer = create_string_buffer(msg, len(msg))

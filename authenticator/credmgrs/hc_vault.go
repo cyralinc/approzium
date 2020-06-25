@@ -39,11 +39,21 @@ type hcVaultCredMgr struct {
 	vaultClient *vault.Client
 }
 
+func (h *hcVaultCredMgr) Name() string {
+	return "HashiCorp Vault"
+}
+
 func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
 	path := mountPath + "/" + identity.DBHost + ":" + identity.DBPort
 	secret, err := h.vaultClient.Logical().Read(path)
 	if err != nil {
 		return "", err
+	}
+	if secret == nil {
+		return "", fmt.Errorf("nothing exists at this Vault path")
+	}
+	if secret.Data == nil {
+		return "", fmt.Errorf("no response body data returned from Vault")
 	}
 
 	// Please see tests for examples of the kind of secret data we'd expect
@@ -55,21 +65,21 @@ func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
 	}
 
 	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
-	iamRolesRaw, ok := userDataMap["iam_roles"]
+	iamArnsRaw, ok := userDataMap["iam_arns"]
 	if !ok {
-		return "", fmt.Errorf("iam_roles not found in %s", userDataMap)
+		return "", fmt.Errorf("iam_arns not found in %s", userDataMap)
 	}
-	iamRoles, ok := iamRolesRaw.([]interface{})
+	iamArns, ok := iamArnsRaw.([]interface{})
 	if !ok {
-		return "", fmt.Errorf("could not convert %s to array, type is %T", iamRolesRaw, iamRolesRaw)
+		return "", fmt.Errorf("could not convert %s to array, type is %T", iamArnsRaw, iamArnsRaw)
 	}
 	authorized := false
-	for _, iamRoleRaw := range iamRoles {
-		iamRole, ok := iamRoleRaw.(string)
+	for _, iamArnRaw := range iamArns {
+		iamArn, ok := iamArnRaw.(string)
 		if !ok {
-			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamRoleRaw, iamRoleRaw)
+			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamArnRaw, iamArnRaw)
 		}
-		if iamRole == identity.IAMArn {
+		if iamArn == identity.IAMArn {
 			authorized = true
 			break
 		}

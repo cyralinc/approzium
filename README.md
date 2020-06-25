@@ -1,5 +1,13 @@
 # approzium
-credential-less database authentication for services
+Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
+identity is provided through the platform on which you're running.
+
+We currently support AWS for identity, and have a Python SDK for Postres. This project is under active development, please
+do stay tuned for more identity platforms, databases, and SDK languages.
+
+## Docs
+
+See https://approzium.org/ for a Quick Start, or elaboration on the architecture and API.
 
 ## Developing
 
@@ -15,9 +23,10 @@ To drop into a Bash shell into the development environment, run `make dev`. This
   - Make sure the access key and secret you configure can assume at least one role.
 - In one window, `$ docker-compose up`.
 - In another window, `$ make dev`
-- Edit the `client.py` file to contain the ARN of your assumable role. You can use any editor, but here's one way:
-  - `$ apt-get update`
-  - `$ apt-get install nano`
-  - `$ nano client.py` (and press CTRL+X to save and exit)
+- Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
 - To use our Python SDK to shoot a request at the authenticator, run
-  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 client.py`.
+  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/client.py`.
+  
+## Credits
+
+This project is brought to you by [Cyral](https://www.cyral.com/), who wishes to give back to the Open Source community.
