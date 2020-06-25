@@ -6,43 +6,10 @@ edit: false
 
 # Python SDK
 
-## Authenticator Client
-_class_ **`authenticator`**  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The `authenticator` class is used to interact with an [Authenticator](link-to-authenticator-definition) service.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**`__init__`**(self, address, iam\_role=_None_)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Create a new `authenticator` object connected to the Authenticator service at the given address `address`.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**`address`:** address (`host:port`) at which an Authenticator service is listening  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**`iam_role`:** if set, assume this IAM role
-```python
-from approzium import Authenticator
+## Quick Start
 
-auth = Authenticator('authenticator:1234') 
-# this authenticator object can be used later in the connect() method
-```
-**`set_default_authenticator`**(new_authenticator)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the default authenticator client to be used when calling `connect()`.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**`new_authenticator`:** authenticator to set as default
-## psycopg2
-`approzium.psycopg2.connect`(dsn=_None_, connection\_factory=_None_, cursor\_factory=_None_, async=_False_, authenticator=_None_, _**kwargs_)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method takes the same arguments as [`psycopg2.connect`](https://www.psycopg.org/docs/module.html#psycopg2.connect) in addition to the `authenticator` argument.
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**`authenticator`:** if set, authenticator client used for authentication, otherwise the default authenticator is used
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if neither are set, an exception is raised.
+This guide gets you started with Approzium in Python with a simple working example.
 
+## API
 
-### Example
-```python
-# client.py
-
-from approzium import Authenticator
-from approzium.psycopg2 import connect
-
-# create an Authenticator client
-auth = Authenticator('authenticator:1234')
-
-# connect using Approzium's connect method
-conn = connect("", authenticator=auth)
-
-# use the connection cas you typically would. very cool!
-cur = conn.cursor()
-cur.execute('SELECT 1')
-```
+You can find full Approzium Python SDK API documentation [here](api/python/)

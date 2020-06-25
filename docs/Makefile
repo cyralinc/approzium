@@ -8,3 +8,10 @@ website-build:
 	gatsby clean
 	gatsby build
 	gatsby serve
+
+python-docs:
+	# ensure sphinx
+	pip3 install sphinx
+	make -C ../sdk/python/docs/ html
+	mkdir -p static/api
+	cp -r ../sdk/python/docs/build/html static/api/python
