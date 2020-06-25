@@ -1,12 +1,13 @@
 import logging
 
 import asyncpg
-from asyncpg.protocol import Protocol
 from asyncpg.connect_utils import _ConnectionParameters
+from asyncpg.protocol import Protocol
 
 from .._postgres import PGAuthClient, construct_msg, parse_msg
 
 logger = logging.getLogger(__name__)
+
 
 def appz_authenticate(self, data):
     # This method is used to override the method
@@ -14,7 +15,7 @@ def appz_authenticate(self, data):
     # Approzium connection sequence. If the protocol instance is already
     # authenticated, this method reverts to the original `data_received` method
 
-    context = self.password['approzium_context']
+    context = self.password["approzium_context"]
     if context["authclient"] is None:
         # happens only once per connection
         context["authclient"] = PGAuthClient(
@@ -44,15 +45,15 @@ def new_connection_made(self, transport):
     # `self` is a `asyncpg.protocol.Protocol` instance.
 
     # checks if this is an approzium connection
-    if isinstance(self.password, dict) and \
-            'approzium_context' in self.password:
-        # store transport because otherwise it is a private variable because of 
+    if isinstance(self.password, dict) and "approzium_context" in self.password:
+        # store transport because otherwise it is a private variable because of
         # Cython
-        self.password['approzium_context']['transport'] = transport
+        self.password["approzium_context"]["transport"] = transport
 
         # override the protocol's `data_received` method
         def new_data_received(data):
             appz_authenticate(self, data)
+
         self.data_received = new_data_received
     return original_connection_made(self, transport)
 
@@ -62,22 +63,21 @@ Protocol.connection_made = new_connection_made
 
 
 def new__connect_addr(*args, **kwargs):
-    connection_class = kwargs['connection_class']
+    connection_class = kwargs["connection_class"]
     if connection_class.__name__ == "ApproziumConnection":
-        host, port = kwargs['addr']
+        host, port = kwargs["addr"]
         approzium_context = {
-            'authenticator': connection_class.authenticator,
-            "transport": None, # this is determined later by `connection_made`
+            "authenticator": connection_class.authenticator,
+            "transport": None,  # this is determined later by `connection_made`
             "authclient": None,
             "host": host,
-            "port": str(port)
+            "port": str(port),
         }
         # trick: put context in password field, discarding its passed value
-        conn_params_dict = kwargs['params']._asdict()
-        conn_params_dict['password'] = {'approzium_context':
-                                               approzium_context}
+        conn_params_dict = kwargs["params"]._asdict()
+        conn_params_dict["password"] = {"approzium_context": approzium_context}
         new_conn_params = _ConnectionParameters(**conn_params_dict)
-        kwargs['params'] = new_conn_params
+        kwargs["params"] = new_conn_params
     return original__connect_addr(*args, **kwargs)
 
 
