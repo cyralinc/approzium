@@ -21,8 +21,9 @@ To drop into a Bash shell into the development environment, run `make dev`. This
 - Ensure you have the latest authenticator binary: `$ cd authenticator && GOOS=linux GOARCH=amd64 go build && cd ..`.
 - In your local environment, run `$ aws configure` and add an access key and secret.
   - Make sure the access key and secret you configure can assume at least one role.
+- Run `$ make dc-build`.
 - In one window, `$ docker-compose up`.
-- In another window, `$ make dev`
+- In another window, `$ make dev`.
 - Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
 - To use our Python SDK to shoot a request at the authenticator, run
   `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/examples/pg2_client.py`.

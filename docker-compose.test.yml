@@ -11,6 +11,7 @@ services:
         working_dir: /usr/src/approzium/
         command: make run-testsuite
         environment:
+            - APPROZIUM_HOST=0.0.0.0
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
             - AWS_ACCESS_KEY_ID

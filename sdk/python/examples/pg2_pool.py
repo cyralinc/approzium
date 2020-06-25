@@ -3,7 +3,7 @@ from os import environ
 from approzium import Authenticator
 from approzium.psycopg2.pool import ThreadedConnectionPool
 
-auth = Authenticator("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
+auth = Authenticator("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
 conns = ThreadedConnectionPool(1, 5, "", authenticator=auth)
 conn = conns.getconn()
 print("Connection Established")
