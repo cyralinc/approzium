@@ -1,5 +1,4 @@
 import boto3
-import urllib.request
 
 
 def assume_role(iam_role):
