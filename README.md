@@ -25,7 +25,7 @@ To drop into a Bash shell into the development environment, run `make dev`. This
 - In another window, `$ make dev`
 - Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
 - To use our Python SDK to shoot a request at the authenticator, run
-  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/client.py`.
+  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/examples/pg2_client.py`.
   
 ## Credits
 

@@ -1,5 +1,6 @@
 # needed to be able to import protos code
 import sys
+from datetime import datetime, timedelta
 from itertools import count
 from pathlib import Path
 
@@ -8,6 +9,7 @@ import grpc
 from . import _postgres
 from .iam import (
     assume_role,
+    get_local_arn,
     obtain_claimed_arn,
     obtain_credentials,
     obtain_signed_get_caller_identity,
@@ -21,10 +23,26 @@ import authenticator_pb2_grpc  # noqa: E402 isort:skip
 class AuthClient(object):
     def __init__(self, server_address, iam_role=None):
         self.server_address = server_address
-        self.iam_role = iam_role
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
+        self.iam_role = iam_role
+
+        # Parse the claimed ARN once because it'll never change.
+        # Parse the signed_gci at startup, and then we'll update
+        # it every 5 minutes because it expires every 15.
+        if iam_role is None:
+            claimed_arn = get_local_arn()
+            signed_gci = obtain_signed_get_caller_identity(None)
+        else:
+            response = assume_role(iam_role)
+            credentials = obtain_credentials(response)
+            claimed_arn = obtain_claimed_arn(response)
+            signed_gci = obtain_signed_get_caller_identity(credentials)
+
+        self.claimed_arn = claimed_arn
+        self.signed_gci = signed_gci
+        self.signed_gci_last_updated = datetime.utcnow()
 
     @property
     def attribution_info(self):
@@ -36,9 +54,9 @@ class AuthClient(object):
         return info
 
     def _execute_request(self, request, getmethodname):
-        response = assume_role(self.iam_role)
-        credentials = obtain_credentials(response)
-        signed_gci = obtain_signed_get_caller_identity(credentials)
+        # The presigned GetCallerIdentity call expires every 15 minutes.
+        self._update_gci_if_needed()
+
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # add authentication info
@@ -46,8 +64,8 @@ class AuthClient(object):
         request.client_language = authenticator_pb2.PYTHON
         request.awsauth.CopyFrom(
             authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=obtain_claimed_arn(response),
+                signed_get_caller_identity=self.signed_gci,
+                claimed_iam_arn=self.claimed_arn,
             )
         )
         response = getattr(stub, getmethodname)(request)
@@ -81,3 +99,17 @@ class AuthClient(object):
             client_final = auth.create_client_final_message(response.cproof)
             auth.server_signature = response.sproof
             return client_final, auth
+
+    # The presigned GetCallerIdentity string expires every 15 minuts, so refresh it
+    # after 5 minutes just to be safe.
+    def _update_gci_if_needed(self):
+        if datetime.utcnow() - self.signed_gci_last_updated < timedelta(minutes=5):
+            return
+        if self.iam_role is None:
+            self.signed_gci = obtain_signed_get_caller_identity(None)
+            self.signed_gci_last_updated = datetime.utcnow()
+        else:
+            response = assume_role(self.iam_role)
+            credentials = obtain_credentials(response)
+            self.signed_gci = obtain_signed_get_caller_identity(credentials)
+            self.signed_gci_last_updated = datetime.utcnow()
