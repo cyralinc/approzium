@@ -1,0 +1,27 @@
+---
+name: Roadmap
+edit: false
+---
+
+# Roadmap
+
+## Integrations
+- Secrets Engines
+  - AWS Secrets Manager
+  - Kubernetes Secrets
+- Databases
+  - PG SDKs
+    - [lib/pq](https://godoc.org/github.com/lib/pq) (Go)
+    - [asyncpg](https://magicstack.github.io/asyncpg/current/) (Python) **P1**
+    - [JDBC](https://jdbc.postgresql.org/) (Java)
+  - MySQL SDKs
+    - python **P1**
+- SDK Features  
+  - tracing **P0**
+    - OpenTelemetry (OpenTracing) 
+
+## Authenticator
+- fluentd/filebeat to push connection request logs to Elastic/Datadog/SIEM **P0**
+- publish OpenTelemetry (OpenCensus) metrics **P0**
+  - connection counter (tags: userID, ip)
+- high availability deployment

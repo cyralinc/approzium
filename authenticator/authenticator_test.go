@@ -12,7 +12,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/google/gofuzz"
 	vault "github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
 
 const envVarTestRole = "TEST_IAM_ROLE"
@@ -214,25 +216,37 @@ func TestToDatabaseARN(t *testing.T) {
 }
 
 func TestXorBytes(t *testing.T) {
-	result := xorBytes([]byte{0}, []byte{0})
+	result, err := xorBytes([]byte{0}, []byte{0})
+	if err != nil {
+		t.Fatal(err)
+	}
 	expected := []byte{0}
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("expected %#v, but received %#v", expected, result)
 	}
 
-	result = xorBytes([]byte{1}, []byte{1})
+	result, err = xorBytes([]byte{1}, []byte{1})
+	if err != nil {
+		t.Fatal(err)
+	}
 	expected = []byte{0}
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("expected %#v, but received %#v", expected, result)
 	}
 
-	result = xorBytes([]byte{0, 1, 1}, []byte{0, 1, 1})
+	result, err = xorBytes([]byte{0, 1, 1}, []byte{0, 1, 1})
+	if err != nil {
+		t.Fatal(err)
+	}
 	expected = []byte{0, 0, 0}
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("expected %#v, but received %#v", expected, result)
 	}
 
-	result = xorBytes([]byte{1, 1, 1}, []byte{0, 0, 0})
+	result, err = xorBytes([]byte{1, 1, 1}, []byte{0, 0, 0})
+	if err != nil {
+		t.Fatal(err)
+	}
 	expected = []byte{1, 1, 1}
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("expected %#v, but received %#v", expected, result)
@@ -315,6 +329,48 @@ func TestNoRaces(t *testing.T) {
 			t.Fatal("over ten seconds elapsed")
 		default:
 		}
+	}
+}
+
+// TestFuzzAuthenticator simply fuzzes its two request-receiving
+// methods to ensure a panic isn't caused by random values. If
+// a panic is produced, the test will fail.
+func TestFuzzAuthenticator(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+
+	// This test generates a lot of error logs, so quiet them to
+	// avoid them drowning out other tests.
+	log.SetLevel(log.FatalLevel)
+
+	authenticator, err := NewAuthenticator()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fuzzer := fuzz.New()
+	for i := 0; i < 1000; i++ {
+		req1 := &pb.PGSHA256HashRequest{}
+		fuzzer.Fuzz(req1)
+		authenticator.GetPGSHA256Hash(nil, req1)
+
+		req2 := &pb.PGMD5HashRequest{}
+		fuzzer.Fuzz(req2)
+		authenticator.GetPGMD5Hash(nil, req2)
+	}
+}
+
+func TestFuzzXorBytes(t *testing.T) {
+	fuzzer := fuzz.New()
+	for i := 0; i < 1000; i++ {
+
+		var a []byte
+		fuzzer.Fuzz(&a)
+
+		var b []byte
+		fuzzer.Fuzz(&b)
+
+		xorBytes(a, b)
 	}
 }
 
