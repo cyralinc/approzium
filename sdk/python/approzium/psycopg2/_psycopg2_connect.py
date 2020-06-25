@@ -94,7 +94,7 @@ def connect(
     if kwargs.get("async_", False):
         is_sync = False
     if authenticator is None:
-        authenticator = approzium.default_authenticator
+        authenticator = approzium.default_auth_client
     if authenticator is None:
         raise Exception("Authenticator not specified")
     # construct our approzium factory class on top of given connection factory class

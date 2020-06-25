@@ -1,5 +1,6 @@
 import logging
 
+import approzium
 import asyncpg
 from asyncpg.connect_utils import _ConnectionParameters
 from asyncpg.protocol import Protocol
@@ -97,6 +98,8 @@ def construct_approzium_connection(authenticator):
 
 
 async def connect(*args, authenticator=None, **kwargs):
+    if authenticator is None:
+        authenticator = approzium.default_auth_client
     conn = await asyncpg.connect(
         *args, **kwargs, connection_class=construct_approzium_connection(authenticator)
     )
