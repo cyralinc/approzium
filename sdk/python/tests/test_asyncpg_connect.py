@@ -1,11 +1,11 @@
 from os import environ
 
 import pytest
-from approzium import AuthClient
+import approzium
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = AuthClient("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
+auth = approzium.AuthClient("authenticator:1234", iam_role=environ.get("TEST_IAM_ROLE"))
 # use Psycopg2 defined test environment variables
 connopts = {
     "user": environ["PSYCOPG2_TESTDB_USER"],
@@ -28,8 +28,9 @@ async def test_connect(host, sslmode):
 @pytest.mark.parametrize("sslmode", ["disable", "require"])
 @pytest.mark.asyncio
 async def test_pool(host, sslmode):
+    approzium.default_auth_client = auth
     # set SSL mode using env variable because there is no better way
     environ["PGSSLMODE"] = sslmode
-    pool = await create_pool(**connopts, host=host, authenticator=auth)
+    pool = await create_pool(**connopts, host=host)
     async with pool.acquire() as conn:
         await conn.fetch("""SELECT 1""")
