@@ -26,7 +26,7 @@ RUN apt-get install -y \
   python3.7-dev \
   python3-pip
 RUN pip3 install --upgrade pip
-RUN pip3 install pytest
+RUN pip3 install pytest pytest-parallel
 # Install protobuf compiler for Python
 RUN pip3 install grpcio-tools
 # Python package dependencies. Repeated here for faster cached build time

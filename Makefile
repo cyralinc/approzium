@@ -64,7 +64,7 @@ run-gotests:
 	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
 
 run-pythontests: enable-vault-path seed-vault-all-hosts
-	cd sdk/python && pytest
+	cd sdk/python && pytest --workers auto
 
 run-pg2tests: enable-vault-path seed-vault-all-hosts
 	for HOST in $(TEST_DBHOSTS); do \
