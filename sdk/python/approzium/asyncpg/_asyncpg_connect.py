@@ -1,7 +1,7 @@
 import logging
 
-import asyncpg
 import approzium
+import asyncpg
 from asyncpg.connect_utils import _ConnectionParameters
 from asyncpg.protocol import Protocol
 
