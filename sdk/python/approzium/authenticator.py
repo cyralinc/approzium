@@ -36,7 +36,6 @@ class AuthClient(object):
         info["num_connections"] = self.n_conns
         return info
 
-
     def _execute_request(self, request, getmethodname):
         if self.iam_role is None:
             claimed_arn = get_local_arn()
@@ -54,8 +53,7 @@ class AuthClient(object):
         request.client_language = authenticator_pb2.PYTHON
         request.awsauth.CopyFrom(
             authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=signed_gci,
-                claimed_iam_arn=claimed_arn,
+                signed_get_caller_identity=signed_gci, claimed_iam_arn=claimed_arn,
             )
         )
         response = getattr(stub, getmethodname)(request)
