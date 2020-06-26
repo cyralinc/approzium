@@ -14,7 +14,7 @@ python-docs:
 	# ensure sphinx
 	pip3 install poetry
 	cd ../sdk/python/ && poetry install || true
-	cd ../sdk/python/ && poetry install psycopg-binary
+	cd ../sdk/python/ && poetry add psycopg-binary
 	make -C ../sdk/python/docs/ html
 	mkdir -p static/api
 	cp -r ../sdk/python/docs/build/html static/api/python
