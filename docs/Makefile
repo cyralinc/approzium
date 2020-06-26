@@ -9,7 +9,9 @@ website-build:
 	gatsby build
 	gatsby serve
 
+# this is meant to run on the Netlify build env
 python-docs:
+	source /opt/buildhome/python3.7/bin/activate
 	# ensure sphinx
 	pip3 install sphinx
 	make -C ../sdk/python/docs/ html
