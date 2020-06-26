@@ -88,7 +88,7 @@ func New() (*Authenticator, error) {
 // LogRequestCount asynchronously begins an optional ongoing log of the number of
 // requests that have been received.
 func (a *Authenticator) LogRequestCount() {
-	go func(){
+	go func() {
 		for {
 			a.counterMutex.RLock()
 			log.Printf("authenticator running. %d requests received", a.counter)
