@@ -12,10 +12,9 @@ website-build:
 # this is meant to run on the Netlify build env
 python-docs:
 	# ensure sphinx
-	pip3 install sphinx
-	# other optional dependencies, because autodoc needs to import whole library
-	pip3 install psycopg2-binary asyncpg
-	cd ../sdk/python/ && pip3 install -e .
+	pip3 install poetry
+	cd ../sdk/python/ && poetry install psycopg-binary asyncpg sphinx
+	cd ../sdk/python/ && poetry install
 	make -C ../sdk/python/docs/ html
 	mkdir -p static/api
 	cp -r ../sdk/python/docs/build/html static/api/python
