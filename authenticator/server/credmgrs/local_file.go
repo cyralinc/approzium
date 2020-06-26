@@ -1,14 +1,15 @@
 package credmgrs
 
 import (
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
-const envVarTestRole = "TEST_IAM_ROLE"
+const secretsFileLocation = "testing/secrets.yaml"
 
 // newLocalFileCreds is for dev purposes: read credentials from a local file.
 func newLocalFileCreds() (CredentialManager, error) {
@@ -21,27 +22,19 @@ func newLocalFileCreds() (CredentialManager, error) {
 		IamArn   string `yaml:"iam_arn"`
 	}
 	var devCreds secrets
-	yamlFile, err := ioutil.ReadFile("testing/secrets.yaml")
+	yamlFile, err := ioutil.ReadFile(secretsFileLocation)
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(yamlFile, &devCreds)
-	if err != nil {
+	if err = yaml.Unmarshal(yamlFile, &devCreds); err != nil {
 		return nil, err
 	}
 	for _, cred := range devCreds {
-		iamArn := cred.IamArn
-		if strings.HasPrefix(cred.IamArn, "$") {
-			// It's an env var, parse it.
-			iamArn = strings.ReplaceAll(iamArn, "${", "")
-			iamArn = strings.ReplaceAll(iamArn, "}", "")
-			iamArn = os.Getenv(iamArn)
-		}
 		key := DBKey{
-			IAMArn: iamArn,
-			DBHost: cred.Dbhost,
-			DBPort: cred.Dbport,
-			DBUser: cred.Dbuser,
+			IAMArn: replaceEnvVars(cred.IamArn),
+			DBHost: replaceEnvVars(cred.Dbhost),
+			DBPort: replaceEnvVars(cred.Dbport),
+			DBUser: replaceEnvVars(cred.Dbuser),
 		}
 		creds[key] = cred.Password
 		log.Debugf("added dev credential for host %s", cred.Dbhost)
@@ -63,4 +56,17 @@ func (l *localFileCredMgr) Password(identity DBKey) (string, error) {
 		return "", ErrNotFound
 	}
 	return creds, nil
+}
+
+// replaceEnvVars takes fields that are formatted like ${FOO}, strips
+// the $ and brackets, and replaces the env var with its environmental
+// value
+func replaceEnvVars(field string) string {
+	if !strings.HasPrefix(field, "$") {
+		// It's not an env var.
+		return field
+	}
+	field = strings.ReplaceAll(field, "${", "")
+	field = strings.ReplaceAll(field, "}", "")
+	return os.Getenv(field)
 }

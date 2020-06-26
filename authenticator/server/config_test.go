@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"os"
@@ -9,7 +9,7 @@ func TestParseConfig(t *testing.T) {
 	os.Unsetenv("APPROZIUM_HOST")
 	os.Unsetenv("APPROZIUM_PORT")
 	os.Unsetenv("APPROZIUM_LOG_LEVEL")
-	config, err := parseConfig()
+	config, err := ParseConfig()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +26,7 @@ func TestParseConfig(t *testing.T) {
 	os.Setenv("APPROZIUM_HOST", "0.0.0.0")
 	os.Setenv("APPROZIUM_PORT", "6001")
 	os.Setenv("APPROZIUM_LOG_LEVEL", "debug")
-	config, err = parseConfig()
+	config, err = ParseConfig()
 	if err != nil {
 		t.Fatal(err)
 	}

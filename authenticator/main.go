@@ -5,38 +5,14 @@ import (
 	"net"
 	"strings"
 
-	pb "github.com/approzium/approzium/authenticator/protos"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/approzium/approzium/authenticator/server"
+	pb "github.com/approzium/approzium/authenticator/server/protos"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
-// Config is an object for storing configuration variables set through
-// Approzium's environment. Supports:
-// 		- APPROZIUM_HOST: Defaults to 127.0.0.1.
-//		- APPROZIUM_PORT: Defaults to 6000.
-//		- APPROZIUM_LOG_LEVEL: Defaults to info. Valid values are:
-//			- trace
-//			- debug
-//			- info
-//			- warn
-//			- error
-//			- fatal
-//			- panic
-//
-// For those using Vault for storage, Approzium will read Vault's address
-// and the Vault token it should use through Vault's normal environment
-// variables described here:
-// https://www.vaultproject.io/docs/commands#environment-variables.
-// At a minimum, VAULT_ADDR and VAULT_TOKEN must be set.
-type Config struct {
-	Host     string `default:"127.0.0.1"`
-	Port     int    `default:"6000"`
-	LogLevel string `envconfig:"log_level" default:"info"`
-}
-
 func main() {
-	config, err := parseConfig()
+	config, err := server.ParseConfig()
 	if err != nil {
 		log.Panicf("couldn't parse config: %s", err)
 	}
@@ -52,7 +28,7 @@ func main() {
 		PadLevelText:           true,
 	})
 
-	authenticator, err := NewAuthenticator()
+	svr, err := server.New()
 	if err != nil {
 		log.Panicf("failed to create authenticator: %s", err)
 	}
@@ -64,21 +40,11 @@ func main() {
 	}
 	log.Infof("authenticator listening for requests on %s\n", serviceAddress)
 
-	go authenticator.run()
+	svr.LogRequestCount()
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterAuthenticatorServer(grpcServer, authenticator)
+	pb.RegisterAuthenticatorServer(grpcServer, svr)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Panicf("failed to listen on %s", serviceAddress)
 	}
-}
-
-// parseConfig returns the parsed config. A pointer is not returned
-// because after first parse, the config is immutable.
-func parseConfig() (Config, error) {
-	var config Config
-	if err := envconfig.Process("approzium", &config); err != nil {
-		return Config{}, err
-	}
-	return config, nil
 }

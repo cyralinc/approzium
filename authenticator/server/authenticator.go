@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -17,8 +17,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/approzium/approzium/authenticator/credmgrs"
-	pb "github.com/approzium/approzium/authenticator/protos"
+	"github.com/approzium/approzium/authenticator/server/credmgrs"
+	pb "github.com/approzium/approzium/authenticator/server/protos"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/pbkdf2"
@@ -71,11 +71,14 @@ var (
 type Authenticator struct {
 	credMgr credmgrs.CredentialManager
 
-	counterMutex sync.RWMutex
-	counter      int
+	// Please increment the request counter via incrementRequestCount.
+	// When reading the request count, please RLock before, and RUnlock
+	// afterwards.
+	requestCountMu sync.RWMutex
+	requestCount   int
 }
 
-func NewAuthenticator() (*Authenticator, error) {
+func New() (*Authenticator, error) {
 	credMgr, err := credmgrs.RetrieveConfigured()
 	if err != nil {
 		return nil, err
@@ -85,106 +88,21 @@ func NewAuthenticator() (*Authenticator, error) {
 	}, nil
 }
 
-func (a *Authenticator) run() {
-	for {
-		a.counterMutex.RLock()
-		log.Printf("authenticator running. %d requests received", a.counter)
-		a.counterMutex.RUnlock()
-		time.Sleep(10 * time.Second)
-	}
-}
-
-func executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
-	var resp *http.Response
-	var err error
-	switch clientLanguage {
-	case pb.ClientLanguage_GO:
-		resp, err = http.Get(signedGetCallerIdentity)
-	case pb.ClientLanguage_PYTHON:
-		resp, err = http.Post(signedGetCallerIdentity, "", nil)
-	case pb.ClientLanguage_LANGUAGE_NOT_PROVIDED:
-		return "", fmt.Errorf("client language must be provided for AWS authentication")
-	default:
-		return "", fmt.Errorf("unsupported SDK type of %d", clientLanguage)
-	}
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	respBody, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("received unexpected get caller identity response %d: %s", resp.StatusCode, respBody)
-	}
-
-	type GetCallerIdentityResponse struct {
-		IamArn string `xml:"GetCallerIdentityResult>Arn"`
-	}
-	response := GetCallerIdentityResponse{}
-	err = xml.Unmarshal(respBody, &response)
-	if err != nil {
-		return "", err
-	}
-	return response.IamArn, nil
-}
-
-// getAwsIdentity takes a signed get caller identity string and executes
-// the request to the given AWS STS endpoint. It returns the caller's
-// full IAM arn.
-func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
-	u, err := url.Parse(signedGetCallerIdentity)
-	if err != nil {
-		return "", err
-	}
-
-	// Ensure the STS endpoint we'll be using is an AWS endpoint, and it's not
-	// just some random server set up to mimic valid AWS STS responses.
-	isValidSTSEndpoint := false
-	for _, validSTSEndpoint := range validSTSEndpoints {
-		if u.Host == validSTSEndpoint {
-			isValidSTSEndpoint = true
-			break
+// LogRequestCount asynchronously begins an optional ongoing log of the number of
+// requests that have been received.
+func (a *Authenticator) LogRequestCount() {
+	go func() {
+		for {
+			a.requestCountMu.RLock()
+			log.Printf("authenticator running. %d requests received", a.requestCount)
+			a.requestCountMu.RUnlock()
+			time.Sleep(10 * time.Second)
 		}
-	}
-	if !isValidSTSEndpoint {
-		return "", fmt.Errorf("%s is not a valid STS endpoint", u.Host)
-	}
-
-	// Ensure the call getting executed is actually the GetCallerIdentity call,
-	// and not some other call that happens to return the expected XML fields.
-	query := u.Query()
-	if query.Get("Action") != "GetCallerIdentity" {
-		return "", fmt.Errorf("invalid action for GetCallerIdentity: %s", query.Get("Action"))
-	}
-	return executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
+	}()
 }
 
-// toDatabaseARN either uses the original ARN to check the database
-// for a password, or if it's an assumed role ARN, converts it to a
-// role ARN before looking.
-func toDatabaseARN(fullIAMArn string) (string, error) {
-	parsedArn, err := arn.Parse(fullIAMArn)
-	if err != nil {
-		return "", err
-	}
-	log.Debugf("received login attempt from %+v", parsedArn)
-	if !strings.HasPrefix(parsedArn.Resource, "assumed-role") {
-		// This is a regular arn, so we should return it as-is for use in accessing
-		// database credentials.
-		return fullIAMArn, nil
-	}
-	// Convert assumed role arns to role arns.
-	fields := strings.Split(parsedArn.Resource, "/")
-	if len(fields) < 2 || len(fields) > 3 {
-		return "", fmt.Errorf("unexpected assume role arn format: %s", fullIAMArn)
-	}
-	return fmt.Sprintf("arn:%s:iam::%s:role/%s", parsedArn.Partition, parsedArn.AccountID, fields[1]), nil
-}
-
-func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
-	a.counterMutex.Lock()
-	a.counter++
-	a.counterMutex.Unlock()
+func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
+	a.incrementRequestCount()
 
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
@@ -254,10 +172,8 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	return &pb.PGMD5Response{Hash: hash}, nil
 }
 
-func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
-	a.counterMutex.Lock()
-	a.counter++
-	a.counterMutex.Unlock()
+func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
+	a.incrementRequestCount()
 
 	// Return early if we didn't get a valid auth message or salt.
 	authMsg := req.GetAuthenticationMsg()
@@ -361,76 +277,10 @@ func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	return creds, nil
 }
 
-func computeMD5(s string, salt []byte) (string, error) {
-	hasher := md5.New()
-	if _, err := io.WriteString(hasher, s); err != nil {
-		return "", err
-	}
-	hasher.Write(salt)
-	hashedBytes := hasher.Sum(nil)
-	return hex.EncodeToString(hashedBytes), nil
-}
-
-func computePGMD5Hash(user, password string, salt []byte) (string, error) {
-	firstHash, err := computeMD5(password, []byte(user))
-	if err != nil {
-		return "", err
-	}
-	secondHash, err := computeMD5(firstHash, salt)
-	if err != nil {
-		return "", err
-	}
-	return secondHash, nil
-}
-
-func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]byte, error) {
-	s, err := base64.StdEncoding.DecodeString(salt)
-	if err != nil {
-		return nil, fmt.Errorf("Bad salt %s", err)
-	}
-	dk := pbkdf2.Key([]byte(password), s, iterations, 32, sha256.New)
-	return dk, nil
-}
-
-// assumes a and b are of the same length
-func xorBytes(a, b []byte) ([]byte, error) {
-	if len(a) != len(b) {
-		return nil, fmt.Errorf("cannot xor slices of unequal lengths, received %d and %d", len(a), len(b))
-	}
-	buf := make([]byte, len(a))
-
-	for i := range a {
-		buf[i] = a[i] ^ b[i]
-	}
-
-	return buf, nil
-}
-
-// SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
-func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
-	mac := hmac.New(sha256.New, spassword)
-	mac.Write([]byte("Client Key"))
-	ckey := mac.Sum(nil)
-	ckeyHash := sha256.Sum256(ckey)
-	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
-	cproofHmac.Write([]byte(authMsg))
-	cproof, err := xorBytes(cproofHmac.Sum(nil), ckey)
-	if err != nil {
-		return "", err
-	}
-	cproof64 := base64.StdEncoding.EncodeToString(cproof)
-	return cproof64, nil
-}
-
-func computePGSHA256Sproof(spassword []byte, authMsg string) string {
-	mac := hmac.New(sha256.New, spassword)
-	mac.Write([]byte("Server Key"))
-	skey := mac.Sum(nil)
-	sproofHmac := hmac.New(sha256.New, skey)
-	sproofHmac.Write([]byte(authMsg))
-	sproof := sproofHmac.Sum(nil)
-	sproof64 := base64.StdEncoding.EncodeToString(sproof)
-	return sproof64
+func (a *Authenticator) incrementRequestCount() {
+	a.requestCountMu.Lock()
+	a.requestCount++
+	a.requestCountMu.Unlock()
 }
 
 // arnsMatch compares a claimed arn that the caller states they'll
@@ -507,4 +357,162 @@ func arnsMatch(claimedArn, actualArn string) (bool, error) {
 		return false, fmt.Errorf("role names don't match, claimed arn %s, actual arn %s", claimedArn, actualArn)
 	}
 	return true, nil
+}
+
+// getAwsIdentity takes a signed get caller identity string and executes
+// the request to the given AWS STS endpoint. It returns the caller's
+// full IAM arn.
+func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
+	u, err := url.Parse(signedGetCallerIdentity)
+	if err != nil {
+		return "", err
+	}
+
+	// Ensure the STS endpoint we'll be using is an AWS endpoint, and it's not
+	// just some random server set up to mimic valid AWS STS responses.
+	isValidSTSEndpoint := false
+	for _, validSTSEndpoint := range validSTSEndpoints {
+		if u.Host == validSTSEndpoint {
+			isValidSTSEndpoint = true
+			break
+		}
+	}
+	if !isValidSTSEndpoint {
+		return "", fmt.Errorf("%s is not a valid STS endpoint", u.Host)
+	}
+
+	// Ensure the call getting executed is actually the GetCallerIdentity call,
+	// and not some other call that happens to return the expected XML fields.
+	query := u.Query()
+	if query.Get("Action") != "GetCallerIdentity" {
+		return "", fmt.Errorf("invalid action for GetCallerIdentity: %s", query.Get("Action"))
+	}
+	return executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
+}
+
+func executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
+	var resp *http.Response
+	var err error
+	switch clientLanguage {
+	case pb.ClientLanguage_GO:
+		resp, err = http.Get(signedGetCallerIdentity)
+	case pb.ClientLanguage_PYTHON:
+		resp, err = http.Post(signedGetCallerIdentity, "", nil)
+	case pb.ClientLanguage_LANGUAGE_NOT_PROVIDED:
+		return "", fmt.Errorf("client language must be provided for AWS authentication")
+	default:
+		return "", fmt.Errorf("unsupported SDK type of %d", clientLanguage)
+	}
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("received unexpected get caller identity response %d: %s", resp.StatusCode, respBody)
+	}
+
+	type GetCallerIdentityResponse struct {
+		IamArn string `xml:"GetCallerIdentityResult>Arn"`
+	}
+	response := GetCallerIdentityResponse{}
+	if err = xml.Unmarshal(respBody, &response); err != nil {
+		return "", err
+	}
+	return response.IamArn, nil
+}
+
+// toDatabaseARN either uses the original ARN to check the database
+// for a password, or if it's an assumed role ARN, converts it to a
+// role ARN before looking.
+func toDatabaseARN(fullIAMArn string) (string, error) {
+	parsedArn, err := arn.Parse(fullIAMArn)
+	if err != nil {
+		return "", err
+	}
+	log.Debugf("received login attempt from %+v", parsedArn)
+	if !strings.HasPrefix(parsedArn.Resource, "assumed-role") {
+		// This is a regular arn, so we should return it as-is for use in accessing
+		// database credentials.
+		return fullIAMArn, nil
+	}
+	// Convert assumed role arns to role arns.
+	fields := strings.Split(parsedArn.Resource, "/")
+	if len(fields) < 2 || len(fields) > 3 {
+		return "", fmt.Errorf("unexpected assume role arn format: %s", fullIAMArn)
+	}
+	return fmt.Sprintf("arn:%s:iam::%s:role/%s", parsedArn.Partition, parsedArn.AccountID, fields[1]), nil
+}
+
+func computeMD5(s string, salt []byte) (string, error) {
+	hasher := md5.New()
+	if _, err := io.WriteString(hasher, s); err != nil {
+		return "", err
+	}
+	hasher.Write(salt)
+	hashedBytes := hasher.Sum(nil)
+	return hex.EncodeToString(hashedBytes), nil
+}
+
+func computePGMD5Hash(user, password string, salt []byte) (string, error) {
+	firstHash, err := computeMD5(password, []byte(user))
+	if err != nil {
+		return "", err
+	}
+	secondHash, err := computeMD5(firstHash, salt)
+	if err != nil {
+		return "", err
+	}
+	return secondHash, nil
+}
+
+func computePGSHA256SaltedPass(password string, salt string, iterations int) ([]byte, error) {
+	s, err := base64.StdEncoding.DecodeString(salt)
+	if err != nil {
+		return nil, fmt.Errorf("Bad salt %s", err)
+	}
+	dk := pbkdf2.Key([]byte(password), s, iterations, 32, sha256.New)
+	return dk, nil
+}
+
+// assumes a and b are of the same length
+func xorBytes(a, b []byte) ([]byte, error) {
+	if len(a) != len(b) {
+		return nil, fmt.Errorf("cannot xor slices of unequal lengths, received %d and %d", len(a), len(b))
+	}
+	buf := make([]byte, len(a))
+
+	for i := range a {
+		buf[i] = a[i] ^ b[i]
+	}
+
+	return buf, nil
+}
+
+// SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
+func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
+	mac := hmac.New(sha256.New, spassword)
+	mac.Write([]byte("Client Key"))
+	ckey := mac.Sum(nil)
+	ckeyHash := sha256.Sum256(ckey)
+	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
+	cproofHmac.Write([]byte(authMsg))
+	cproof, err := xorBytes(cproofHmac.Sum(nil), ckey)
+	if err != nil {
+		return "", err
+	}
+	cproof64 := base64.StdEncoding.EncodeToString(cproof)
+	return cproof64, nil
+}
+
+func computePGSHA256Sproof(spassword []byte, authMsg string) string {
+	mac := hmac.New(sha256.New, spassword)
+	mac.Write([]byte("Server Key"))
+	skey := mac.Sum(nil)
+	sproofHmac := hmac.New(sha256.New, skey)
+	sproofHmac.Write([]byte(authMsg))
+	sproof := sproofHmac.Sum(nil)
+	sproof64 := base64.StdEncoding.EncodeToString(sproof)
+	return sproof64
 }

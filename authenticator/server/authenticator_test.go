@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	pb "github.com/approzium/approzium/authenticator/protos"
+	pb "github.com/approzium/approzium/authenticator/server/protos"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -32,7 +32,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := NewAuthenticator()
+	authenticator, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := NewAuthenticator()
+	authenticator, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -268,11 +268,11 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := NewAuthenticator()
+	authenticator, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
-	go authenticator.run()
+	authenticator.LogRequestCount()
 
 	// Try to create a race.
 	start := make(chan interface{})
@@ -343,7 +343,7 @@ func TestFuzzAuthenticator(t *testing.T) {
 	// avoid them drowning out other tests.
 	log.SetLevel(log.FatalLevel)
 
-	authenticator, err := NewAuthenticator()
+	authenticator, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
