@@ -13,7 +13,7 @@ website-build:
 python-docs:
 	# ensure sphinx
 	pip3 install poetry
-	cd ../sdk/python/ && poetry install psycopg-binary asyncpg sphinx
+	apt-get install libpq-dev
 	cd ../sdk/python/ && poetry install
 	make -C ../sdk/python/docs/ html
 	mkdir -p static/api
