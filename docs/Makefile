@@ -13,7 +13,7 @@ website-build:
 python-docs:
 	# ensure sphinx
 	pip3 install poetry
-	apt-get install libpq-dev
+	sudo apt-get install libpq-dev
 	cd ../sdk/python/ && poetry install
 	make -C ../sdk/python/docs/ html
 	mkdir -p static/api
