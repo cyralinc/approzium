@@ -98,7 +98,7 @@ func (a *Authenticator) LogRequestCount() {
 	}()
 }
 
-func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
+func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	a.counterMutex.Lock()
 	a.counter++
 	a.counterMutex.Unlock()
@@ -171,7 +171,7 @@ func (a *Authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	return &pb.PGMD5Response{Hash: hash}, nil
 }
 
-func (a *Authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
+func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
 	a.counterMutex.Lock()
 	a.counter++
 	a.counterMutex.Unlock()
