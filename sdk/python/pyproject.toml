@@ -12,6 +12,7 @@ authors = ["Cyral <us@cyral.org>"]
 python = "^3.5"
 boto3 = "^1.14.10"
 grpcio = "^1.30.0"
+pytest-parallel = "^0.1.0"
 
 
 [tool.poetry.dev-dependencies]
