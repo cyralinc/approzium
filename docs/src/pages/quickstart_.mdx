@@ -31,6 +31,9 @@ cat dbuser1-creds.json
 }
 ```
 
+For database access to be granted to a caller, the caller's exact `iam_arn` must be listed, _unless_ the caller has assumed a role.
+For assumed roles, either the role ARN or the assumed role ARN may be used to grant access.
+
 Enable Vault KV Version 1 (see [Vault documentation](https://www.vaultproject.io/docs/secrets/kv/kv-v1) for more information).
 ```shell
 vault secrets enable -path=approzium -version=1 kv
