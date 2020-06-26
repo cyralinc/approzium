@@ -12,8 +12,8 @@ website-build:
 # this is meant to run on the Netlify build env
 python-docs:
 	pip3 install poetry
-	(cd ../sdk/python/ && rm poetry.lock) || true
-	(cd ../sdk/python && poetry remove psycopg2) || true
+	(cd ../sdk/python/ && sed '/psycopg2/d' pyproject.toml > pyproject.toml ) || true
+	(cd ../sdk/python/ && rm poetry.lock ) || true
 	(cd ../sdk/python/ && poetry install) || true
 	(cd ../sdk/python/ && poetry add psycopg2-binary sphinx) || true
 	cd ../sdk/python/ && poetry run make -C docs/ html
