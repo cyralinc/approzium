@@ -13,7 +13,7 @@ website-build:
 python-docs:
 	# ensure sphinx
 	pip3 install poetry
-	ignore := $(cd ../sdk/python/ && poetry install)
+	cd ../sdk/python/ && poetry install || true
 	cd ../sdk/python/ && poetry install psycopg-binary
 	make -C ../sdk/python/docs/ html
 	mkdir -p static/api
