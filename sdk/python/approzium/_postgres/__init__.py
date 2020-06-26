@@ -5,7 +5,7 @@ libraries and the Postgres protocol.
 import logging
 import struct
 
-from ..misc import read_int32_from_bytes
+from .._misc import read_int32_from_bytes
 from .scram import SCRAMAuthentication
 
 logger = logging.getLogger(__name__)

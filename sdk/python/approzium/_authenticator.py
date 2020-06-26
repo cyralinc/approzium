@@ -6,14 +6,14 @@ from pathlib import Path
 import grpc
 
 from . import _postgres
-from .iam import (
+from ._iam import (
     assume_role,
     obtain_claimed_arn,
     obtain_credentials,
     obtain_signed_get_caller_identity,
 )
 
-sys.path.append(str(Path(__file__).parent / "protos"))  # isort:skip
+sys.path.append(str(Path(__file__).parent / "_protos"))  # isort:skip
 import authenticator_pb2  # noqa: E402 isort:skip
 import authenticator_pb2_grpc  # noqa: E402 isort:skip
 

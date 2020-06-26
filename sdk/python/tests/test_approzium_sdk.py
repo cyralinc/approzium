@@ -1,4 +1,4 @@
-from approzium.misc import read_int32_from_bytes
+from approzium._misc import read_int32_from_bytes
 
 
 def test_readint32():

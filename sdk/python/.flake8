@@ -6,7 +6,7 @@ exclude =
     build,
     dist,
     tests/pg2_testsuite/
-    approzium/protos/
+    approzium/_protos/
     setup.py
 extend-ignore =
     E203
