@@ -71,8 +71,11 @@ var (
 type Authenticator struct {
 	credMgr credmgrs.CredentialManager
 
-	counterMutex sync.RWMutex
-	counter      int
+	// Please increment the request counter via incrementRequestCount.
+	// When reading the request count, please RLock before, and RUnlock
+	// afterwards.
+	requestCountMu sync.RWMutex
+	requestCount   int
 }
 
 func New() (*Authenticator, error) {
@@ -90,18 +93,16 @@ func New() (*Authenticator, error) {
 func (a *Authenticator) LogRequestCount() {
 	go func() {
 		for {
-			a.counterMutex.RLock()
-			log.Printf("authenticator running. %d requests received", a.counter)
-			a.counterMutex.RUnlock()
+			a.requestCountMu.RLock()
+			log.Printf("authenticator running. %d requests received", a.requestCount)
+			a.requestCountMu.RUnlock()
 			time.Sleep(10 * time.Second)
 		}
 	}()
 }
 
 func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
-	a.counterMutex.Lock()
-	a.counter++
-	a.counterMutex.Unlock()
+	a.incrementRequestCount()
 
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
@@ -172,9 +173,7 @@ func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest
 }
 
 func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
-	a.counterMutex.Lock()
-	a.counter++
-	a.counterMutex.Unlock()
+	a.incrementRequestCount()
 
 	// Return early if we didn't get a valid auth message or salt.
 	authMsg := req.GetAuthenticationMsg()
@@ -276,6 +275,12 @@ func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 		return "", msg
 	}
 	return creds, nil
+}
+
+func (a *Authenticator) incrementRequestCount() {
+	a.requestCountMu.Lock()
+	a.requestCount++
+	a.requestCountMu.Unlock()
 }
 
 // arnsMatch compares a claimed arn that the caller states they'll
