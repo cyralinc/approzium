@@ -1,3 +1,7 @@
+# Sphinx built documentation
+sdk/python/docs/build/
+# Automatically built documentation is below to the path below before serving.
+docs/static/api/
 # executables
 authenticator/authenticator
 main
