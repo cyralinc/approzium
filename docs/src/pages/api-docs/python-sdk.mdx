@@ -16,7 +16,7 @@ _class_ **`authenticator`**
 ```python
 from approzium import Authenticator
 
-auth = Authenticator('authenticator:1234') 
+auth = Authenticator('authenticator:6000')
 # this authenticator object can be used later in the connect() method
 ```
 **`set_default_authenticator`**(new_authenticator)  
@@ -37,7 +37,7 @@ from approzium import Authenticator
 from approzium.psycopg2 import connect
 
 # create an Authenticator client
-auth = Authenticator('authenticator:1234')
+auth = Authenticator('authenticator:6000')
 
 # connect using Approzium's connect method
 conn = connect("", authenticator=auth)
