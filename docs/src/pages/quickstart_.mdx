@@ -55,21 +55,21 @@ vault write approzium/1.2.3.4:5432 @dbuser1-creds.json
 ## SDK Usage
 Install the SDK in your client.
 ```shell
-pip install approzium
+pip3 install approzium
 ```
 
 Connect to your database as follows.
 ```python
-from approzium import Authenticator
+from approzium import AuthClient
 from approzium.psycopg2 import connect
 
 # create an Authenticator client
-auth = Authenticator('authenticator:6000')
+auth = AuthClient('authenticator:6000')
 
 # connect using Approzium's connect method without providing a password
 conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydb", authenticator=auth)
 
-# use the connection cas you typically would. very cool!
+# use the connection as you typically would. very cool!
 cur = conn.cursor()
 cur.execute('SELECT 1')
 ```
