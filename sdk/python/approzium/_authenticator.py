@@ -21,6 +21,20 @@ import authenticator_pb2_grpc  # noqa: E402 isort:skip
 
 
 class AuthClient(object):
+    """This class represents a connection to an Approzium authenticator
+    service. Instances of this class can be used as arguments to database
+    drivers connect method to use for authentication.
+
+    :param server_address: address (host:port) at which an authenticator
+        service is listening.
+
+    :type server_address: str
+    :param iam_role: if an IAM role Amazon resource number (ARN) is provided,
+        it will be assumed and its identity will be used for authentication.
+        Otherwise, the default ``boto3`` session will be used as the identity.
+    :type iam_role: str, optional
+    """
+
     def __init__(self, server_address, iam_role=None):
         self.server_address = server_address
         self.authenticated = False
@@ -46,6 +60,19 @@ class AuthClient(object):
 
     @property
     def attribution_info(self):
+        """Provides a dictionary containing information about the current state
+        of the AuthClient. Useful for logging.
+
+        :rtype: dict
+
+        **Return Structure**:
+            * *authenticator_address* (*str*): address of authenticator service used
+            * *iam_role* (*str*): IAM Amazon resource number (ARN) used as identity
+            * *authenticated* (*bool*): whether the AuthClient was verified by the
+                                        authenticator service.
+            * *num_connections* (*int*): number of connections made through this
+                                         AuthClient
+        """
         info = {}
         info["authenticator_address"] = self.server_address
         info["iam_role"] = self.iam_role
