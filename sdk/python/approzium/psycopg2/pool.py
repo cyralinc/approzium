@@ -17,7 +17,18 @@ class _AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):
 
 
 class SimpleConnectionPool(_AbstractConnectionPool, psycopg2.pool.SimpleConnectionPool):
-    """A Psycopg2 pool that can't be shared across different threads."""
+    """A Psycopg2 pool that can't be shared across different threads.
+
+    Example:
+
+    .. code-block:: python
+
+        >>> import approzium
+        >>> from approzium.psycopg2.pool import SimpleConnectionPool
+        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> pool = SimpleConnectionPool("host=DB.com dbname=mydb", authenticator=auth)
+        >>> conn = poll.getconn()
+    """
     pass
 
 
