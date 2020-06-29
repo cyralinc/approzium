@@ -66,9 +66,11 @@ class AuthClient(object):
 
         **Return Structure**:
             * *authenticator_address* (*str*): address of authenticator service used
-            * *iam_role* (*str*): IAM Amazon resource number (ARN) being used as identity
-            * *authenticated* (*bool*): whether the AuthClient was verified by the authenticator service.
-            * *num_connections* (*int*): the number of connections made through this AuthClient
+            * *iam_role* (*str*): IAM Amazon resource number (ARN) used as identity
+            * *authenticated* (*bool*): whether the AuthClient was verified by the
+                                        authenticator service.
+            * *num_connections* (*int*): number of connections made through this
+                                         AuthClient
         """
         info = {}
         info["authenticator_address"] = self.server_address
