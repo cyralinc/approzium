@@ -29,6 +29,7 @@ class SimpleConnectionPool(_AbstractConnectionPool, psycopg2.pool.SimpleConnecti
         >>> pool = SimpleConnectionPool("host=DB.com dbname=mydb", authenticator=auth)
         >>> conn = poll.getconn()
     """
+
     pass
 
 
@@ -36,4 +37,5 @@ class ThreadedConnectionPool(
     _AbstractConnectionPool, psycopg2.pool.ThreadedConnectionPool
 ):
     """A Psycopg2 pool that works with the threading module"""
+
     pass

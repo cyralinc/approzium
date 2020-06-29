@@ -82,9 +82,7 @@ def construct_approzium_conn(is_sync, authenticator):
     return ApproziumConn
 
 
-def connect(
-    dsn=None, cursor_factory=None, authenticator=None, **kwargs
-):
+def connect(dsn=None, cursor_factory=None, authenticator=None, **kwargs):
     """Creates a Psycopg2 connection through Approzium authentication. Takes
     the same arguments as ``psycopg2.connect``, in addition to the
     authenticator argument.

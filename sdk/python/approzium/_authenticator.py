@@ -34,6 +34,7 @@ class AuthClient(object):
         Otherwise, the default ``boto3`` session will be used as the identity.
     :type iam_role: str, optional
     """
+
     def __init__(self, server_address, iam_role=None):
         self.server_address = server_address
         self.authenticated = False
