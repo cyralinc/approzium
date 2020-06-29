@@ -74,6 +74,20 @@ def create_pool(
     `authenticator` argument
 
     :return: An instance of :class:`~approziu.asyncpg.pool._ApproziumPool`.
+
+    Example:
+
+    .. code-block:: python
+
+        >>> import approzium
+        >>> from approzium.asyncpg import create_pool
+        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> pool = await create_pool(user='postgres', authenticator=auth)
+        >>> con = await pool.acquire()
+        >>> try:
+        ...     await con.fetch('SELECT 1')
+        ... finally:
+        ...     await pool.release(con)
     """
     return _ApproziumPool(
         dsn,

@@ -107,6 +107,21 @@ async def connect(*args, authenticator=None, **kwargs):
     :type authenticator: approzium.AuthClient, optional
     :raises: TypeError, if no AuthClient is given and no default one is set.
     :rtype: ``asyncpg.Connection``
+
+    Example:
+
+    .. code-block:: python
+
+        >>> import approzium
+        >>> import asyncio
+        >>> from approzium.asyncpg import connect
+        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> async def run():
+        ...     con = await connect(user='postgres', authenticator=auth)
+        ...     # use the connection just like any other Asyncpg connection
+        ...     types = await con.fetch('SELECT * FROM pg_type')
+        ...     print(types)
+        >>> asyncio.get_event_loop().run_until_complete(run())
     """
     if authenticator is None:
         authenticator = approzium.default_auth_client
