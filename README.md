@@ -2,7 +2,7 @@
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
 identity is provided through the platform on which you're running.
 
-We currently support AWS for identity, and have a Python SDK for Postres. This project is under active development, please
+We currently support AWS for identity, and have a Python SDK for Postgres drivers. This project is under active development, please
 do stay tuned for more identity platforms, databases, and SDK languages.
 
 ## Docs
@@ -27,7 +27,7 @@ To drop into a Bash shell into the development environment, run `make dev`. This
 - Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
 - To use our Python SDK to shoot a request at the authenticator, run
   `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/examples/pg2_client.py`.
-  
+
 ## Credits
 
 This project is brought to you by [Cyral](https://www.cyral.com/), who wishes to give back to the Open Source community.
