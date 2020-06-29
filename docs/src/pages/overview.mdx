@@ -17,10 +17,10 @@ conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword dbname=mydb"
 
 Here's what it would look like with Approzium. 😎
 ```python
-from approzium import Authenticator
+from approzium import AuthClient
 from approzium.psycopg2 import connect
 
-auth = Authenticator('authenticator:6000')
+auth = AuthClient('authenticator:6000')
 
 # Look ma, no password!
 conn = connect("host=1.2.3.4 user=user1 dbname=mydb", authenticator=auth)
