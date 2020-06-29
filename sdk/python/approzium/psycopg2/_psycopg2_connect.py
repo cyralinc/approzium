@@ -32,11 +32,8 @@ def wait(pgconn):
             raise psycopg2.OperationalError("poll() returned %s" % state)
 
 
-def construct_approzium_conn(base, is_sync, authenticator):
-    if not base:
-        base = psycopg2.extensions.connection
-
-    class ApproziumConn(base):
+def construct_approzium_conn(is_sync, authenticator):
+    class ApproziumConn(psycopg2.extensions.connection):
         CONNECTION_AWAITING_RESPONSE = 4
 
         def __init__(self, *args, **kwargs):
@@ -86,8 +83,28 @@ def construct_approzium_conn(base, is_sync, authenticator):
 
 
 def connect(
-    dsn=None, connection_factory=None, cursor_factory=None, authenticator=None, **kwargs
+    dsn=None, cursor_factory=None, authenticator=None, **kwargs
 ):
+    """Creates a Psycopg2 connection through Approzium authentication. Takes
+    the same arguments as ``psycopg2.connect``, in addition to the
+    authenticator argument.
+
+    :param authenticator: AuthClient instance to be used for authentication. If
+        not provided, the default AuthClient, if set, is used.
+    :type authenticator: approzium.AuthClient, optional
+    :raises: TypeError, if no AuthClient is given and no default one is set.
+    :rtype: ``psycopg2.Connection``
+
+    Example:
+
+    .. code-block:: python
+
+        >>> import approzium
+        >>> from approzium.psycopg2 import connect
+        >>> auth = approzium.AuthClient("authenticator:6000")
+        >>> conn = connect("host=DB.com dbname=mydb", authenticator=auth)  # no password!
+        >>> # use the connection just like any other Psycopg2 connection
+    """
     is_sync = True
     if kwargs.get("async", False):
         is_sync = False
@@ -96,7 +113,6 @@ def connect(
     if authenticator is None:
         authenticator = approzium.default_auth_client
     if authenticator is None:
-        raise Exception("Authenticator not specified")
-    # construct our approzium factory class on top of given connection factory class
-    factory = construct_approzium_conn(connection_factory, is_sync, authenticator)
+        raise TypeError("Auth client not specified and not default auth client is set")
+    factory = construct_approzium_conn(is_sync, authenticator)
     return pgconnect(dsn, factory, cursor_factory, **kwargs)

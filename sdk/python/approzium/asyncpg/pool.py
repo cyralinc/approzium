@@ -6,7 +6,7 @@ from asyncpg.connection import Connection
 from ._asyncpg_connect import connect, new__connect_addr  # approzium's connect method
 
 
-class ApproziumPool(asyncpg.pool.Pool):
+class _ApproziumPool(asyncpg.pool.Pool):
     async def _get_new_connection(self):
         if self._working_addr is None:
             # First connection attempt on this pool.
@@ -69,7 +69,13 @@ def create_pool(
     authenticator=None,
     **connect_kwargs,
 ):
-    return ApproziumPool(
+    """Create an Asyncpg connection pool through Approzium authentication.
+    Takes same arguments as ``asyncpg.create_pool`` in addition to the
+    `authenticator` argument
+
+    :return: An instance of :class:`~approziu.asyncpg.pool._ApproziumPool`.
+    """
+    return _ApproziumPool(
         dsn,
         connection_class=Connection,
         min_size=min_size,

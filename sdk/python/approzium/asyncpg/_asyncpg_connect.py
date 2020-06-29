@@ -98,6 +98,16 @@ def construct_approzium_connection(authenticator):
 
 
 async def connect(*args, authenticator=None, **kwargs):
+    """Creates a Asyncpg connection through Approzium authentication. Takes
+    the same arguments as ``asyncpg.connect``, in addition to the
+    authenticator argument.
+
+    :param authenticator: AuthClient instance to be used for authentication. If
+        not provided, the default AuthClient, if set, is used.
+    :type authenticator: approzium.AuthClient, optional
+    :raises: TypeError, if no AuthClient is given and no default one is set.
+    :rtype: ``asyncpg.Connection``
+    """
     if authenticator is None:
         authenticator = approzium.default_auth_client
     conn = await asyncpg.connect(

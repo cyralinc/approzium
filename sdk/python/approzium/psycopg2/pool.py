@@ -3,7 +3,7 @@ import psycopg2.pool
 from . import connect
 
 
-class AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):
+class _AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):
     def _connect(self, key=None):
         # originally, this line uses psycopg2.connect. we change it to use our
         # connect method instead
@@ -16,11 +16,13 @@ class AbstractConnectionPool(psycopg2.pool.AbstractConnectionPool):
         return conn
 
 
-class SimpleConnectionPool(AbstractConnectionPool, psycopg2.pool.SimpleConnectionPool):
+class SimpleConnectionPool(_AbstractConnectionPool, psycopg2.pool.SimpleConnectionPool):
+    """A Psycopg2 pool that can't be shared across different threads."""
     pass
 
 
 class ThreadedConnectionPool(
-    AbstractConnectionPool, psycopg2.pool.ThreadedConnectionPool
+    _AbstractConnectionPool, psycopg2.pool.ThreadedConnectionPool
 ):
+    """A Psycopg2 pool that works with the threading module"""
     pass
