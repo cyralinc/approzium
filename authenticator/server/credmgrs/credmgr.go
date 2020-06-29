@@ -35,8 +35,8 @@ type CredentialManager interface {
 
 // RetrieveConfigured checks the environment for configured cred
 // providers, and selects the first working configuration.
-func RetrieveConfigured() (CredentialManager, error) {
-	credMgr, err := newHashiCorpVaultCreds()
+func RetrieveConfigured(vaultTokenPath string) (CredentialManager, error) {
+	credMgr, err := newHashiCorpVaultCreds(vaultTokenPath)
 	if err != nil {
 		log.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
 	} else {

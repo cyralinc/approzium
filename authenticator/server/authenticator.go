@@ -78,8 +78,8 @@ type Authenticator struct {
 	requestCount   int
 }
 
-func New() (*Authenticator, error) {
-	credMgr, err := credmgrs.RetrieveConfigured()
+func New(config Config) (*Authenticator, error) {
+	credMgr, err := credmgrs.RetrieveConfigured(config.VaultTokenPath)
 	if err != nil {
 		return nil, err
 	}

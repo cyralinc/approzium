@@ -28,7 +28,7 @@ func main() {
 		PadLevelText:           true,
 	})
 
-	svr, err := server.New()
+	svr, err := server.New(config)
 	if err != nil {
 		log.Panicf("failed to create authenticator: %s", err)
 	}

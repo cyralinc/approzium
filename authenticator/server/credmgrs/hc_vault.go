@@ -3,6 +3,7 @@ package credmgrs
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	vault "github.com/hashicorp/vault/api"
@@ -14,29 +15,27 @@ import (
 // Someday we may wish to make this path configurable.
 const mountPath = "approzium"
 
-func newHashiCorpVaultCreds() (CredentialManager, error) {
+func newHashiCorpVaultCreds(tokenPath string) (CredentialManager, error) {
 	if addr := os.Getenv(vault.EnvVaultAddress); addr == "" {
 		return nil, errors.New("no vault address detected")
 	}
-
-	// This uses a default configuration for Vault. This includes reading
-	// Vault's environment variables and setting them as a configuration.
-	client, err := vault.NewClient(nil)
-	if err != nil {
-		return nil, err
+	credMgr := &hcVaultCredMgr{
+		tokenPath: tokenPath,
 	}
 
 	// Check that we're able to communicate with Vault by doing a test read.
+	client, err := credMgr.vaultClient()
+	if err != nil {
+		return nil, err
+	}
 	if _, err := client.Logical().Read(mountPath); err != nil {
 		return nil, err
 	}
-	return &hcVaultCredMgr{
-		vaultClient: client,
-	}, nil
+	return credMgr, nil
 }
 
 type hcVaultCredMgr struct {
-	vaultClient *vault.Client
+	tokenPath string
 }
 
 func (h *hcVaultCredMgr) Name() string {
@@ -44,8 +43,13 @@ func (h *hcVaultCredMgr) Name() string {
 }
 
 func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
+	client, err := h.vaultClient()
+	if err != nil {
+		return "", err
+	}
+
 	path := mountPath + "/" + identity.DBHost + ":" + identity.DBPort
-	secret, err := h.vaultClient.Logical().Read(path)
+	secret, err := client.Logical().Read(path)
 	if err != nil {
 		return "", err
 	}
@@ -98,4 +102,25 @@ func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
 		return "", fmt.Errorf("could not convert %s to string, type is %T", passwordRaw, passwordRaw)
 	}
 	return password, nil
+}
+
+// vaultClient retrieves a client using either the environmental VAULT_TOKEN,
+// or reading the latest token from the token file sink.
+func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
+	// Only use the token sink if there's not already an environmental
+	// VAULT_TOKEN.
+	if h.tokenPath != "" && os.Getenv(vault.EnvVaultToken) == "" {
+		tokenBytes, err := ioutil.ReadFile(h.tokenPath)
+		if err != nil {
+			return nil, err
+		}
+		// There is no way to directly pass in the token, so we
+		// must set it in the environment.
+		os.Setenv(vault.EnvVaultToken, string(tokenBytes))
+		defer os.Unsetenv(vault.EnvVaultToken)
+	}
+
+	// This uses a default configuration for Vault. This includes reading
+	// Vault's environment variables and setting them as a configuration.
+	return vault.NewClient(nil)
 }

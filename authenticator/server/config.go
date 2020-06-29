@@ -21,9 +21,10 @@ import "github.com/kelseyhightower/envconfig"
 // https://www.vaultproject.io/docs/commands#environment-variables.
 // At a minimum, VAULT_ADDR and VAULT_TOKEN must be set.
 type Config struct {
-	Host     string `default:"127.0.0.1"`
-	Port     int    `default:"6000"`
-	LogLevel string `envconfig:"log_level" default:"info"`
+	Host           string `default:"127.0.0.1"`
+	Port           int    `default:"6000"`
+	LogLevel       string `envconfig:"log_level" default:"info"`
+	VaultTokenPath string `envconfig:"vault_token_path"`
 }
 
 // ParseConfig returns the parsed config. A pointer is not returned

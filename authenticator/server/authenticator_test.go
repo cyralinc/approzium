@@ -32,7 +32,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New()
+	authenticator, err := New(Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New()
+	authenticator, err := New(Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -268,7 +268,7 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := New()
+	authenticator, err := New(Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -343,7 +343,7 @@ func TestFuzzAuthenticator(t *testing.T) {
 	// avoid them drowning out other tests.
 	log.SetLevel(log.FatalLevel)
 
-	authenticator, err := New()
+	authenticator, err := New(Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
