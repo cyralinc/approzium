@@ -82,7 +82,11 @@ Approzium is configured through environment variables.
 - `APPROZIUM_PORT`: Defaults to `"6000"`.
 - `APPROZIUM_LOG_LEVEL`: Defaults to `"info"`. Supported selections are `"trace"`, `"debug"`,
     `"info"`, `"warn"`, `"error"`, `"fatal"`, and `"panic"`. Upper case may be used.
+- `APPROZIUM_VAULT_TOKEN_PATH`: Optional, if set it will cause the latest Vault token to always
+    be pulled from the given file. See more on using this option
+    [here](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-aws).
 
 Approzium supports Vault as for storing credentials. To use Vault, at a minimum, the `VAULT_ADDR`
-and `VAULT_TOKEN` must be set. Additional Vault configuration is supported, as described
+must be set. Either the `VAULT_TOKEN` or `APPROZIUM_VAULT_TOKEN_PATH` must be set, with the `VAULT_TOKEN`
+taking precedence. Additional Vault configuration is supported, as described
 [here](https://www.vaultproject.io/docs/commands#environment-variables).
