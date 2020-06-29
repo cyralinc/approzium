@@ -19,6 +19,7 @@ python-docs:
 	(cd ../sdk/python/ && sed -i '/psycopg2/d' pyproject.toml) || true
 	(cd ../sdk/python/ && rm poetry.lock ) || true
 	(cd ../sdk/python/ && poetry install) || true
+	(cd ../sdk/python/ && poetry add psycopg2-binary) || true
 	(cd ../sdk/python/ && poetry add sphinx) || true
 	cd ../sdk/python/ && poetry run make -C docs/ html
 	mkdir -p static/api
