@@ -1,5 +1,5 @@
 approzium package
-=================
+*****************
 
 Module contents
 ---------------
@@ -9,11 +9,6 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
-.. toctree::
-   :maxdepth: 4
-
-   approzium.asyncpg
-   approzium.psycopg2
 
 approzium.psycopg2 subpackage
 -----------------------------
