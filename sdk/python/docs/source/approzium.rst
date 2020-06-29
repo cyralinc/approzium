@@ -18,34 +18,25 @@ Module contents
 approzium.psycopg2 subpackage
 -----------------------------
 
-.. automodule:: approzium.psycopg2.pool
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Module contents
----------------
-
 .. automodule:: approzium.psycopg2
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-approzium.asyncpg subpackage
-----------------------------
-
-.. automodule:: approzium.asyncpg.pool
+.. automodule:: approzium.psycopg2.pool
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
+approzium.asyncpg subpackage
+----------------------------
 
 .. automodule:: approzium.asyncpg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: approzium.asyncpg.pool
    :members:
    :undoc-members:
    :show-inheritance:
