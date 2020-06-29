@@ -7,9 +7,14 @@ edit: false
 
 # Python SDK
 
-## Quick Start
+Our Python SDK is designed to pull identity from your local environment. It currently supports:
 
-This guide gets you started with Approzium in Python with a simple working example.
+  - Pulling an assumed role ARN from AWS EC2 instances that have been launched into a role.
+  - Pulling an assumed role ARN from AWS Lambda functions that have been launched into an execution role.
+  - Pulling a role arn from a local development environment where "`$ aws configure`" has been run.
+
+It uses the well-known `boto3` library for pulling identity, and thus its behavior for parsing identity
+is exactly the same.
 
 ## API
 
