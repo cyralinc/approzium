@@ -268,7 +268,6 @@ func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashR
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
-
 func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
 	a.incrementRequestCount()
 
@@ -591,25 +590,25 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 }
 
 func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
-    //   salt = auth_data
-    //    hash1 = sha1(password.encode('utf-8')).digest()
-    //    hash2 = sha1(hash1).digest()
-    //    hash3 = sha1(salt + hash2).digest()
-    //    xored = [h1 ^ h3 for (h1, h3) in zip(hash1, hash3)]
-    //    hash4 = struct.pack('20B', *xored)
+	//   salt = auth_data
+	//    hash1 = sha1(password.encode('utf-8')).digest()
+	//    hash2 = sha1(hash1).digest()
+	//    hash3 = sha1(salt + hash2).digest()
+	//    xored = [h1 ^ h3 for (h1, h3) in zip(hash1, hash3)]
+	//    hash4 = struct.pack('20B', *xored)
 	hasher := sha1.New()
 	if _, err := io.WriteString(hasher, password); err != nil {
 		return nil, err
 	}
 	firstHash := hasher.Sum(nil)
 	hasher = sha1.New()
-    hasher.Write(firstHash)
+	hasher.Write(firstHash)
 	secondHash := hasher.Sum(nil)
-    hasher = sha1.New()
-    hasher.Write(salt)
-    hasher.Write(secondHash)
-    thirdHash := hasher.Sum(nil)
-    finalHash, err := xorBytes(firstHash, thirdHash)
+	hasher = sha1.New()
+	hasher.Write(salt)
+	hasher.Write(secondHash)
+	thirdHash := hasher.Sum(nil)
+	finalHash, err := xorBytes(firstHash, thirdHash)
 	if err != nil {
 		return nil, err
 	}

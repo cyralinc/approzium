@@ -6,7 +6,7 @@ from pathlib import Path
 
 import grpc
 
-from . import _postgres, _mysql
+from . import _mysql, _postgres
 from ._iam import (
     assume_role,
     get_local_arn,
@@ -127,7 +127,6 @@ class AuthClient(object):
             auth.server_signature = response.sproof
             return client_final, auth
 
-
     def _get_mysql_hash(self, dbhost, dbport, dbuser, auth_type, auth_info):
         if auth_type == _mysql.MYSQLNativePassword:
             salt = auth_info
@@ -139,7 +138,7 @@ class AuthClient(object):
             response = self._execute_request(request, "GetMYSQLSHA1Hash")
             return response.hash
         else:
-            raise Exception('Unexpected authentication method')
+            raise Exception("Unexpected authentication method")
 
     # The presigned GetCallerIdentity string expires every 15 minuts, so refresh it
     # after 5 minutes just to be safe.
