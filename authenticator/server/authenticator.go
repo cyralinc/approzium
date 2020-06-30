@@ -590,12 +590,6 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 }
 
 func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
-	//   salt = auth_data
-	//    hash1 = sha1(password.encode('utf-8')).digest()
-	//    hash2 = sha1(hash1).digest()
-	//    hash3 = sha1(salt + hash2).digest()
-	//    xored = [h1 ^ h3 for (h1, h3) in zip(hash1, hash3)]
-	//    hash4 = struct.pack('20B', *xored)
 	hasher := sha1.New()
 	if _, err := io.WriteString(hasher, password); err != nil {
 		return nil, err
