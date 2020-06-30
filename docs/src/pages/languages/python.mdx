@@ -7,6 +7,18 @@ edit: false
 
 # Python SDK
 
+Our Python SDK is designed to easily integrate into existing the database drivers workflow. All you have to do is use the `connect` method it provides. For example, if you are using Psycopg2, all you have to do to adopt Approzium into your client code base is:
+
+```diff
+-from psycopg2 import connect
++from approzium.psycopg2 import connect
++from approzium import AuthClient
+
+-conn = connect(password=verySecurePassword", ...)
++conn = connect(authenticator=AuthClient("authenticator:6000") ...)
+# conn is a native psycopg2.Connection object.
+```
+
 Our Python SDK is designed to pull identity from your local environment. It currently supports:
 
   - Pulling an assumed role ARN from AWS EC2 instances that have been launched into a role.
@@ -15,6 +27,10 @@ Our Python SDK is designed to pull identity from your local environment. It curr
 
 It uses the well-known `boto3` library for pulling identity, and thus its behavior for parsing identity
 is exactly the same.
+
+# Examples
+
+Checkout various examples on our [Github](https://github.com/approzium/approzium/tree/develop/sdk/python/examples)
 
 ## API Reference
 
