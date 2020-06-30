@@ -1,7 +1,6 @@
 from os import environ
 
 import approzium
-import pytest
 from approzium.mysql.connector import connect
 
 auth = approzium.AuthClient("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
