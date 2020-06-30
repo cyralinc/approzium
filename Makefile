@@ -10,7 +10,7 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_DBHOSTS=dbmd5 dbsha256
+TEST_DBHOSTS=dbmd5:5432 dbsha256:5432 dbmysql:3306
 TEST_DB=db
 TEST_DBPORT=5432
 TEST_DBPASS=password
@@ -52,7 +52,7 @@ enable-vault-path:
 	vault secrets enable -path=approzium -version=1 kv | true
 seed-vault-host:  # call this with "make seed-vault-host HOST=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
-		vault write approzium/$(HOST):$(TEST_DBPORT) -
+		vault write approzium/$(HOST) -
 seed-vault-all-hosts:
 	for HOST in $(TEST_DBHOSTS); do \
 		make seed-vault-host HOST=$$HOST; \
