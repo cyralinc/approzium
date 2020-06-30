@@ -15,7 +15,6 @@ def _do_auth(self, *args, **kwargs):
 
     host = self.server_host
     port = self.server_port
-    original__auth_response = self._protocol._auth_response
     self._protocol._auth_response = _auth_response
 
     res =  original__do_auth(self, *args, **kwargs)
