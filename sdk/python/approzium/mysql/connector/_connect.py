@@ -5,6 +5,8 @@ from ..._mysql import get_auth_resp
 
 
 def _do_auth(self, *args, **kwargs):
+    if self._password.__class__.__name__ != 'AuthClient':
+        return
     def _auth_response(
         client_flags, username, password, database, auth_plugin, auth_data, ssl_enabled
     ):
