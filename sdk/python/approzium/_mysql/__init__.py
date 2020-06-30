@@ -1,5 +1,4 @@
 import struct
-from hashlib import sha1
 
 MYSQLNativePassword = 'mysql_native_password'
 
