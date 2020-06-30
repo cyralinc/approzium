@@ -11,7 +11,7 @@ connopts = {
 }
 
 
-def test_connect(host, sslmode):
+def test_connect():
     conn = connect(**connopts, authenticator=auth)
     cur = conn.cursor()
     cur.execute("SELECT 1")
