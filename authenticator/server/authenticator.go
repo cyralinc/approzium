@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -267,6 +268,78 @@ func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashR
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
+
+func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
+	a.incrementRequestCount()
+
+	// Return early if we didn't get a valid salt.
+	salt := req.GetSalt()
+	if len(salt) != 20 {
+		msg := fmt.Sprintf("expected salt to be 20 bytes long, but got %d bytes", len(salt))
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+	}
+
+	if req.Awsauth == nil {
+		return nil, fmt.Errorf("AWS auth info is required")
+	}
+
+	// To expedite handling the request, let's verify the caller's identity at the same
+	// time as getting the password.
+	verifiedIAMArnChan := make(chan string, 1)
+	verificationErrChan := make(chan error, 1)
+	go func() {
+		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
+		if err != nil {
+			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
+			return
+		}
+		verifiedIAMArnChan <- verifiedIAMArn
+	}()
+
+	// Get the credentials.
+	claimedIamArn := req.Awsauth.ClaimedIamArn
+	dbHost := req.GetDbhost()
+	dbPort := req.GetDbport()
+	dbUser := req.GetDbuser()
+
+	databaseArn, err := toDatabaseARN(claimedIamArn)
+	if err != nil {
+		return nil, err
+	}
+	password, err := a.getCreds(credmgrs.DBKey{
+		IAMArn: databaseArn,
+		DBHost: dbHost,
+		DBPort: dbPort,
+		DBUser: dbUser,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	// Make sure the arn they claimed they had to get the creds was their actual arn.
+	select {
+	case verifiedIAMArn := <-verifiedIAMArnChan:
+		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
+		if err != nil {
+			return nil, err
+		}
+		if !match {
+			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+		}
+	case err = <-verificationErrChan:
+		return nil, err
+	}
+
+	// Everything checked out.
+	hash, err := computeMYSQLSHA1Hash(password, salt)
+	if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+	return &pb.MYSQLSHA1Response{Hash: hash}, nil
+}
+
 func (a *Authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	creds, err := a.credMgr.Password(identity)
 	if err != nil {
@@ -515,4 +588,30 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 	sproof := sproofHmac.Sum(nil)
 	sproof64 := base64.StdEncoding.EncodeToString(sproof)
 	return sproof64
+}
+
+func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
+    //   salt = auth_data
+    //    hash1 = sha1(password.encode('utf-8')).digest()
+    //    hash2 = sha1(hash1).digest()
+    //    hash3 = sha1(salt + hash2).digest()
+    //    xored = [h1 ^ h3 for (h1, h3) in zip(hash1, hash3)]
+    //    hash4 = struct.pack('20B', *xored)
+	hasher := sha1.New()
+	if _, err := io.WriteString(hasher, password); err != nil {
+		return nil, err
+	}
+	firstHash := hasher.Sum(nil)
+	hasher = sha1.New()
+    hasher.Write(firstHash)
+	secondHash := hasher.Sum(nil)
+    hasher = sha1.New()
+    hasher.Write(salt)
+    hasher.Write(secondHash)
+    thirdHash := hasher.Sum(nil)
+    finalHash, err := xorBytes(firstHash, thirdHash)
+	if err != nil {
+		return nil, err
+	}
+	return finalHash, nil
 }
