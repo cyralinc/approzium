@@ -9,7 +9,7 @@ connopts = {"user": environ["PSYCOPG2_TESTDB_USER"], "host": "dbmysql"}
 
 
 def test_connect():
-    conn = connect(**connopts, authenticator=auth)
+    conn = connect(**connopts, authenticator=auth, use_pure=True)
     cur = conn.cursor()
     cur.execute("SELECT 1")
     result = next(cur)
