@@ -5,6 +5,7 @@ package approzium.authenticator.protos;
 service Authenticator {
     rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
     rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
+    rpc GetMYSQLSHA1Hash(MYSQLSHA1HashRequest) returns (MYSQLSHA1Response) {}
 }
 
 enum AuthType {
@@ -40,6 +41,16 @@ message PGSHA256HashRequest {
     string authentication_msg = 9;
 }
 
+message MYSQLSHA1HashRequest {
+    AuthType authtype = 1;
+    ClientLanguage client_language = 2;
+    string dbhost = 3;
+    string dbport = 4;
+    string dbuser = 5;
+    AWSAuth awsauth = 6;
+    bytes salt = 7;
+}
+
 message PGMD5Response {
     string hash = 1;
 }
@@ -47,6 +58,10 @@ message PGMD5Response {
 message PGSHA256Response {
     string cproof = 1;
     string sproof = 2;
+}
+
+message MYSQLSHA1Response {
+    bytes hash = 1;
 }
 
 message AWSAuth {
