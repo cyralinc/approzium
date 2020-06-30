@@ -16,7 +16,6 @@ Our Python SDK is designed to easily integrate into existing the database driver
 
 -conn = connect(password=verySecurePassword", ...)
 +conn = connect(authenticator=AuthClient("authenticator:6000") ...)
-# conn is a native psycopg2.Connection object.
 ```
 
 Our Python SDK is designed to pull identity from your local environment. It currently supports:
@@ -28,7 +27,7 @@ Our Python SDK is designed to pull identity from your local environment. It curr
 It uses the well-known `boto3` library for pulling identity, and thus its behavior for parsing identity
 is exactly the same.
 
-# Examples
+## Examples
 
 Checkout various examples on our [Github](https://github.com/approzium/approzium/tree/develop/sdk/python/examples)
 
