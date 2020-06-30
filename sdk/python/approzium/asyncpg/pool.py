@@ -73,7 +73,7 @@ def create_pool(
     Takes same arguments as ``asyncpg.create_pool`` in addition to the
     `authenticator` argument
 
-    :return: An instance of :class:`~approziu.asyncpg.pool._ApproziumPool`.
+    :return: An instance of :class:`~approzium.asyncpg.pool._ApproziumPool`.
 
     Example:
 

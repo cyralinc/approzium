@@ -12,18 +12,16 @@ Here's how you might typically connect to your database.
 ```python
 from psycopg2 import connect
 
-conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword dbname=mydb")
+conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword")
 ```
 
 Here's what it would look like with Approzium. 😎
 ```python
-from approzium import Authenticator
+import approzium
 from approzium.psycopg2 import connect
 
-auth = Authenticator('authenticator:6000')
-
-# Look ma, no password!
-conn = connect("host=1.2.3.4 user=user1 dbname=mydb", authenticator=auth)
+approzium.default_auth_client = approzium.AuthClient('authenticator:6000')
+conn = connect("host=1.2.3.4 user=user1")  # Look ma, no password!
 ```
 
 You can get started with Approzium [here](/quickstart).
