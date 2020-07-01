@@ -265,7 +265,6 @@ func TestXorBytes(t *testing.T) {
 	}
 }
 
-/*
 
 // TestNoRaces is intended to be run via "$ go test -v -race" and will
 // fail if a race is detected.
@@ -297,15 +296,18 @@ func TestNoRaces(t *testing.T) {
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
 			authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbsha256",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           claimedARN,
-				},
+                PwdRequest: &pb.PasswordRequest{
+                    ClientLanguage: pb.ClientLanguage_GO,
+                    Dbhost:         "dbsha256",
+                    Dbport:         "5432",
+                    Dbuser:         "bob",
+                    Identity: &pb.PasswordRequest_Aws{
+                        &pb.AWSIdentity{
+                            SignedGetCallerIdentity: signedGetCallerIdentity,
+                            ClaimedIamArn:           claimedARN,
+                        },
+                    },
+                },
 				Salt:              "1234",
 				Iterations:        0,
 				AuthenticationMsg: "hello, world!",
@@ -317,15 +319,18 @@ func TestNoRaces(t *testing.T) {
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
 			authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbmd5",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           testEnv.ClaimedArn(),
-				},
+                PwdRequest: &pb.PasswordRequest{
+                    ClientLanguage: pb.ClientLanguage_GO,
+                    Dbhost:         "dbmd5",
+                    Dbport:         "5432",
+                    Dbuser:         "bob",
+                    Identity: &pb.PasswordRequest_Aws{
+                        &pb.AWSIdentity{
+                            SignedGetCallerIdentity: signedGetCallerIdentity,
+                            ClaimedIamArn:           testEnv.ClaimedArn(),
+                        },
+                    },
+                },
 				Salt: []byte{1, 2, 3, 4},
 			})
 			done <- true
@@ -345,7 +350,7 @@ func TestNoRaces(t *testing.T) {
 		}
 	}
 }
-*/
+
 
 // TestFuzzAuthenticator simply fuzzes its two request-receiving
 // methods to ensure a panic isn't caused by random values. If
