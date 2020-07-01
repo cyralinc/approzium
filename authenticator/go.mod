@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/aws/aws-sdk-go v1.32.5
+	github.com/getlantern/deepcopy v0.0.0-20160317154340-7f45deb8130a
 	github.com/golang/protobuf v1.3.3
 	github.com/google/gofuzz v1.1.0
 	github.com/google/uuid v1.1.1

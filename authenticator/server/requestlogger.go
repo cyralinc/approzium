@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pb "github.com/approzium/approzium/authenticator/server/protos"
+	"github.com/getlantern/deepcopy"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -57,7 +58,15 @@ func (l *requestLogger) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	l.logRequest(requestLogger, req, req.Awsauth)
+
+	sanitized := &pb.PGMD5HashRequest{}
+	if err := deepcopy.Copy(sanitized, req); err != nil {
+		return nil, err
+	}
+	if sanitized.Awsauth != nil {
+		sanitized.Awsauth.SignedGetCallerIdentity = redactedValue
+	}
+	l.logSanitizedRequest(requestLogger, req, req.Awsauth)
 
 	resp, respErr := l.wrapped.GetPGMD5Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
 
@@ -65,7 +74,7 @@ func (l *requestLogger) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		resp = &pb.PGMD5Response{}
 	}
 	resp.Requestid = requestId
-	l.logResponse(requestLogger, resp, respErr)
+	l.logSanitizedResponse(requestLogger, resp, respErr)
 	return resp, respErr
 }
 
@@ -74,7 +83,15 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	l.logRequest(requestLogger, req, req.Awsauth)
+
+	sanitized := &pb.PGSHA256HashRequest{}
+	if err := deepcopy.Copy(sanitized, req); err != nil {
+		return nil, err
+	}
+	if sanitized.Awsauth != nil {
+		sanitized.Awsauth.SignedGetCallerIdentity = redactedValue
+	}
+	l.logSanitizedRequest(requestLogger, req, req.Awsauth)
 
 	resp, respErr := l.wrapped.GetPGSHA256Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
 
@@ -82,11 +99,11 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		resp = &pb.PGSHA256Response{}
 	}
 	resp.Requestid = requestId
-	l.logResponse(requestLogger, resp, respErr)
+	l.logSanitizedResponse(requestLogger, resp, respErr)
 	return resp, respErr
 }
 
-func (l *requestLogger) logRequest(requestLogger *log.Entry, req interface{}, awsAuth *pb.AWSAuth) {
+func (l *requestLogger) logSanitizedRequest(requestLogger *log.Entry, req interface{}, awsAuth *pb.AWSAuth) {
 	// Log asynchronously to avoid blocking while lots of JSON conversion takes place.
 	preciseTime := time.Now().UTC()
 	go func() {
@@ -94,16 +111,6 @@ func (l *requestLogger) logRequest(requestLogger *log.Entry, req interface{}, aw
 		if err != nil {
 			requestLogger.Warnf("couldn't log request due to %s", err)
 			return
-		}
-		if !l.logRaw && awsAuth != nil {
-			if _, ok := reqMap["awsauth"]; !ok {
-				requestLogger.Warn("couldn't log request because aws auth not found")
-				return
-			}
-			reqMap["awsauth"] = map[string]interface{}{
-				"claimed_iam_arn":            awsAuth.ClaimedIamArn,
-				"signed_get_caller_identity": redactedValue,
-			}
 		}
 		fields := log.Fields{
 			"precise_time": preciseTime.Format(time.RFC3339Nano),
@@ -115,7 +122,7 @@ func (l *requestLogger) logRequest(requestLogger *log.Entry, req interface{}, aw
 	}()
 }
 
-func (l *requestLogger) logResponse(requestLogger *log.Entry, resp interface{}, respErr error) {
+func (l *requestLogger) logSanitizedResponse(requestLogger *log.Entry, resp interface{}, respErr error) {
 	// Log asynchronously to avoid blocking while lots of JSON conversion takes place.
 	preciseTime := time.Now().UTC()
 	go func() {
