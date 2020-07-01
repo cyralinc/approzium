@@ -103,6 +103,10 @@ func (a *Authenticator) LogRequestCount() {
 }
 
 func (a *Authenticator) getPassword(req *pb.PasswordRequest) (string, error) {
+	if req == nil {
+        return "", fmt.Errorf("Internal error: No password request is provided")
+	}
+
 	identity := req.GetIdentity()
 	if identity == nil {
 		return "", fmt.Errorf("No identity is provided")
