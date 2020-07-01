@@ -55,7 +55,8 @@ def connect(*args, authenticator=None, **kwargs):
     kwargs["password"] = authenticator
     use_pure = kwargs.get('use_pure', False)
     if not use_pure:
-        raise NotImplementedError("MySQL C-Extension based connection is not currently supported. Please use Pure Python implementation")
+        msg = "MySQL C-Extension based connection is not currently supported."
+        raise NotImplementedError(msg)
     with _patch__do_auth(MySQLConnection):
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
