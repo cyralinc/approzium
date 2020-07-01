@@ -103,16 +103,16 @@ func (a *Authenticator) LogRequestCount() {
 }
 
 func (a *Authenticator) getPassword(req *pb.PasswordRequest) (string, error) {
-    identity := req.GetIdentity()
-    if identity == nil {
+	identity := req.GetIdentity()
+	if identity == nil {
 		return "", fmt.Errorf("No identity is provided")
 	}
 
-    awsIdentity := identity.GetAws()
-    if awsIdentity == nil {
+	awsIdentity := identity.GetAws()
+	if awsIdentity == nil {
 		return "", fmt.Errorf("AWS auth info is required")
-    }
-    return "sheesh", nil
+	}
+	return "sheesh", nil
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
@@ -160,7 +160,7 @@ func (a *Authenticator) getPassword(req *pb.PasswordRequest) (string, error) {
 	case err = <-verificationErrChan:
 		return "", err
 	}
-    return password, nil
+	return password, nil
 }
 
 func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
@@ -174,12 +174,12 @@ func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-    password, err := a.getPassword(req.GetPwdRequest())
-    if err != nil {
+	password, err := a.getPassword(req.GetPwdRequest())
+	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
-    }
+	}
 
-    dbUser := req.GetPwdRequest().GetDbuser()
+	dbUser := req.GetPwdRequest().GetDbuser()
 	// Everything checked out.
 	hash, err := computePGMD5Hash(dbUser, password, salt)
 	if err != nil {
@@ -187,7 +187,6 @@ func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest
 	}
 	return &pb.PGMD5Response{Hash: hash}, nil
 }
-
 
 func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
 	a.incrementRequestCount()
@@ -216,10 +215,10 @@ func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashR
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-    password, err := a.getPassword(req.GetPwdRequest())
-    if err != nil {
+	password, err := a.getPassword(req.GetPwdRequest())
+	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
-    }
+	}
 
 	saltedPass, err := computePGSHA256SaltedPass(password, salt, int(iterations))
 	if err != nil {
@@ -247,10 +246,10 @@ func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-    password, err := a.getPassword(req.GetPwdRequest())
-    if err != nil {
+	password, err := a.getPassword(req.GetPwdRequest())
+	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
-    }
+	}
 
 	// Everything checked out.
 	hash, err := computeMYSQLSHA1Hash(password, salt)
