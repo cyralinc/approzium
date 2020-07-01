@@ -24,5 +24,3 @@ python-docs:
 	cd ../sdk/python/ && poetry run make -C docs/ html
 	mkdir -p static/api
 	cp -r ../sdk/python/docs/build/html static/api/python
-
-
