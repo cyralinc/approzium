@@ -83,6 +83,11 @@ class AuthClient(object):
 
     @property
     def attribution_info_json(self):
+        """Provides the same attribution info returned by
+        :func:`~AuthClient.attribution_info` as a JSON format string
+
+        :rtype: str
+        """
         info = self.attribution_info
         return json.dumps(info)
 
