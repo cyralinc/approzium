@@ -6,53 +6,50 @@ service Authenticator {
     rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
     rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
     rpc GetMYSQLSHA1Hash(MYSQLSHA1HashRequest) returns (MYSQLSHA1Response) {}
+    /* can add more here */
 }
 
-enum AuthType {
-    TYPE_NOT_PROVIDED = 0;
-    AWS = 1;
+message AWSIdentity {
+    string signed_get_caller_identity = 1;
+    string claimed_iam_arn = 2;
+}
+
+message Identity {
+    oneof identity {
+        AWSIdentity aws = 1;
+        /* can add more here */
+    }
 }
 
 enum ClientLanguage {
     LANGUAGE_NOT_PROVIDED = 0;
     PYTHON = 1;
     GO = 2;
+    /* can add more here */
+}
+
+message PasswordRequest {
+    Identity identity = 1;
+    ClientLanguage client_language = 2;
+    string dbhost = 3;
+    string dbport = 4;
+    string dbuser = 5;
 }
 
 message PGMD5HashRequest {
-    AuthType authtype = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
-    AWSAuth awsauth = 6;
-    bytes salt = 7;
-}
-
-message PGSHA256HashRequest {
-    AuthType authtype = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
-    AWSAuth awsauth = 6;
-    string salt = 7;
-    uint32 iterations = 8;
-    string authentication_msg = 9;
-}
-
-message MYSQLSHA1HashRequest {
-    AuthType authtype = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
-    AWSAuth awsauth = 6;
-    bytes salt = 7;
+    PasswordRequest pwd_request = 1;
+    bytes salt = 2;
 }
 
 message PGMD5Response {
     string hash = 1;
+}
+
+message PGSHA256HashRequest {
+    PasswordRequest pwd_request = 1;
+    string salt = 2;
+    uint32 iterations = 3;
+    string authentication_msg = 4;
 }
 
 message PGSHA256Response {
@@ -60,11 +57,11 @@ message PGSHA256Response {
     string sproof = 2;
 }
 
-message MYSQLSHA1Response {
-    bytes hash = 1;
+message MYSQLSHA1HashRequest {
+    PasswordRequest pwd_request = 1;
+    bytes salt = 2;
 }
 
-message AWSAuth {
-    string signed_get_caller_identity = 1;
-    string claimed_iam_arn = 2;
+message MYSQLSHA1Response {
+    bytes hash = 1;
 }

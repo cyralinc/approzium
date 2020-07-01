@@ -102,6 +102,67 @@ func (a *Authenticator) LogRequestCount() {
 	}()
 }
 
+func (a *Authenticator) getPassword(req *pb.PasswordRequest) (string, error) {
+    identity := req.GetIdentity()
+    if identity == nil {
+		return "", fmt.Errorf("No identity is provided")
+	}
+
+    awsIdentity := identity.GetAws()
+    if awsIdentity == nil {
+		return "", fmt.Errorf("AWS auth info is required")
+    }
+    return "sheesh", nil
+	// To expedite handling the request, let's verify the caller's identity at the same
+	// time as getting the password.
+	verifiedIAMArnChan := make(chan string, 1)
+	verificationErrChan := make(chan error, 1)
+	go func() {
+		verifiedIAMArn, err := getAwsIdentity(awsIdentity.SignedGetCallerIdentity, req.ClientLanguage)
+		if err != nil {
+			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
+			return
+		}
+		verifiedIAMArnChan <- verifiedIAMArn
+	}()
+
+	// Get the credentials.
+	claimedIamArn := awsIdentity.ClaimedIamArn
+	dbHost := req.GetDbhost()
+	dbPort := req.GetDbport()
+	dbUser := req.GetDbuser()
+
+	databaseArn, err := toDatabaseARN(claimedIamArn)
+	if err != nil {
+		return "", err
+	}
+	password, err := a.getCreds(credmgrs.DBKey{
+		IAMArn: databaseArn,
+		DBHost: dbHost,
+		DBPort: dbPort,
+		DBUser: dbUser,
+	})
+	if err != nil {
+		log.Error(err)
+		return "", status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	// Make sure the arn they claimed they had to get the creds was their actual arn.
+	select {
+	case verifiedIAMArn := <-verifiedIAMArnChan:
+		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
+		if err != nil {
+			return "", err
+		}
+		if !match {
+			return "", status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
+		}
+	case err = <-verificationErrChan:
+		return "", err
+	}
+    return password, nil
+}
+
 func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	a.incrementRequestCount()
 
@@ -113,58 +174,12 @@ func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	if req.Awsauth == nil {
-		return nil, fmt.Errorf("AWS auth info is required")
-	}
+    password, err := a.getPassword(req.GetPwdRequest())
+    if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+    }
 
-	// To expedite handling the request, let's verify the caller's identity at the same
-	// time as getting the password.
-	verifiedIAMArnChan := make(chan string, 1)
-	verificationErrChan := make(chan error, 1)
-	go func() {
-		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
-		if err != nil {
-			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
-			return
-		}
-		verifiedIAMArnChan <- verifiedIAMArn
-	}()
-
-	// Get the credentials.
-	claimedIamArn := req.Awsauth.ClaimedIamArn
-	dbHost := req.GetDbhost()
-	dbPort := req.GetDbport()
-	dbUser := req.GetDbuser()
-
-	databaseArn, err := toDatabaseARN(claimedIamArn)
-	if err != nil {
-		return nil, err
-	}
-	password, err := a.getCreds(credmgrs.DBKey{
-		IAMArn: databaseArn,
-		DBHost: dbHost,
-		DBPort: dbPort,
-		DBUser: dbUser,
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-
-	// Make sure the arn they claimed they had to get the creds was their actual arn.
-	select {
-	case verifiedIAMArn := <-verifiedIAMArnChan:
-		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
-		if err != nil {
-			return nil, err
-		}
-		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
-		}
-	case err = <-verificationErrChan:
-		return nil, err
-	}
-
+    dbUser := req.GetPwdRequest().GetDbuser()
 	// Everything checked out.
 	hash, err := computePGMD5Hash(dbUser, password, salt)
 	if err != nil {
@@ -172,6 +187,7 @@ func (a *Authenticator) GetPGMD5Hash(_ context.Context, req *pb.PGMD5HashRequest
 	}
 	return &pb.PGMD5Response{Hash: hash}, nil
 }
+
 
 func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
 	a.incrementRequestCount()
@@ -200,44 +216,10 @@ func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashR
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	if req.Awsauth == nil {
-		return nil, fmt.Errorf("AWS auth info is required")
-	}
-
-	// To expedite handling the request, let's verify the caller's identity at the same
-	// time as getting the password.
-	verifiedIAMArnChan := make(chan string, 1)
-	verificationErrChan := make(chan error, 1)
-	go func() {
-		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
-		if err != nil {
-			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
-			return
-		}
-		verifiedIAMArnChan <- verifiedIAMArn
-	}()
-
-	// Get the credentials.
-	claimedIamArn := req.Awsauth.ClaimedIamArn
-	dbHost := req.GetDbhost()
-	dbPort := req.GetDbport()
-	dbUser := req.GetDbuser()
-
-	databaseArn, err := toDatabaseARN(claimedIamArn)
-	if err != nil {
-		return nil, err
-	}
-
-	password, err := a.getCreds(credmgrs.DBKey{
-		IAMArn: databaseArn,
-		DBHost: dbHost,
-		DBPort: dbPort,
-		DBUser: dbUser,
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
+    password, err := a.getPassword(req.GetPwdRequest())
+    if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+    }
 
 	saltedPass, err := computePGSHA256SaltedPass(password, salt, int(iterations))
 	if err != nil {
@@ -251,20 +233,6 @@ func (a *Authenticator) GetPGSHA256Hash(_ context.Context, req *pb.PGSHA256HashR
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	sproof := computePGSHA256Sproof(saltedPass, authMsg)
-
-	// Make sure the arn they claimed they had to get the creds was their actual arn.
-	select {
-	case verifiedIAMArn := <-verifiedIAMArnChan:
-		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
-		if err != nil {
-			return nil, err
-		}
-		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
-		}
-	case err = <-verificationErrChan:
-		return nil, err
-	}
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
@@ -279,57 +247,10 @@ func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	if req.Awsauth == nil {
-		return nil, fmt.Errorf("AWS auth info is required")
-	}
-
-	// To expedite handling the request, let's verify the caller's identity at the same
-	// time as getting the password.
-	verifiedIAMArnChan := make(chan string, 1)
-	verificationErrChan := make(chan error, 1)
-	go func() {
-		verifiedIAMArn, err := getAwsIdentity(req.Awsauth.SignedGetCallerIdentity, req.ClientLanguage)
-		if err != nil {
-			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
-			return
-		}
-		verifiedIAMArnChan <- verifiedIAMArn
-	}()
-
-	// Get the credentials.
-	claimedIamArn := req.Awsauth.ClaimedIamArn
-	dbHost := req.GetDbhost()
-	dbPort := req.GetDbport()
-	dbUser := req.GetDbuser()
-
-	databaseArn, err := toDatabaseARN(claimedIamArn)
-	if err != nil {
-		return nil, err
-	}
-	password, err := a.getCreds(credmgrs.DBKey{
-		IAMArn: databaseArn,
-		DBHost: dbHost,
-		DBPort: dbPort,
-		DBUser: dbUser,
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-
-	// Make sure the arn they claimed they had to get the creds was their actual arn.
-	select {
-	case verifiedIAMArn := <-verifiedIAMArnChan:
-		match, err := arnsMatch(claimedIamArn, verifiedIAMArn)
-		if err != nil {
-			return nil, err
-		}
-		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIAMArn))
-		}
-	case err = <-verificationErrChan:
-		return nil, err
-	}
+    password, err := a.getPassword(req.GetPwdRequest())
+    if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+    }
 
 	// Everything checked out.
 	hash, err := computeMYSQLSHA1Hash(password, salt)
