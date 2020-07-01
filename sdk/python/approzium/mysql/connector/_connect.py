@@ -1,7 +1,7 @@
 import approzium
 import mysql.connector
 from contextlib import contextmanager
-from mysql.connector import MySQLConnection, CMySQLConnection
+from mysql.connector import MySQLConnection
 
 from ..._mysql import get_auth_resp
 
@@ -9,7 +9,7 @@ from ..._mysql import get_auth_resp
 
 
 @contextmanager
-def _patch__do_auth(sql_connection_class):
+def _patch__do_auth(sql_connection_class=MySQLConnection):
     original__do_auth = sql_connection_class._do_auth
 
     def _do_auth(self, *args, **kwargs):
@@ -53,6 +53,9 @@ def connect(*args, authenticator=None, **kwargs):
     if authenticator is None:
         raise TypeError("Auth client not specified and not default auth client is set")
     kwargs["password"] = authenticator
+    use_pure = kwargs.get('use_pure', False)
+    if not use_pure:
+        raise NotImplementedError("MySQL C-Extension based connection is not currently supported. Please use Pure Python implementation")
     with _patch__do_auth(MySQLConnection):
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
