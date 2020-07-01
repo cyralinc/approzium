@@ -18,9 +18,12 @@ See https://approzium.org/ for a Quick Start, or elaboration on the architecture
 
 ## Support
 
-We currently answer community questions via a public Slack channel, [# help-approzium](https://app.slack.com/client/T013VTLTTJ5/C0166QPU6LW/thread/C013VTN50JV-1593627063.014500).
-Our developers frequent this forum, but are not in it at all times. Please be patient, we will lend assistance as soon
-as we can!
+For questions, please either open a Github issue, or visit us in our public Slack channel.
+
+To visit us in Slack, use [this invite](https://join.slack.com/t/approzium/shared_invite/zt-fg9bdcfa-H9YFnlg3XeosKyMIYadmcg). 
+Then venture to [# help-and-questions](https://app.slack.com/client/T013VTLTTJ5/C013FTJPAN9).
+Our developers frequent our Slack forum, but are not in it at all times. Please be patient, we will lend assistance as 
+soon as we can!
 
 ## Developing
 
