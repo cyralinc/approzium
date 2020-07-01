@@ -37,15 +37,18 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbmd5",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
-		},
+        PwdRequest: &pb.PasswordRequest {
+            ClientLanguage: pb.ClientLanguage_GO,
+            Dbhost:         "dbmd5",
+            Dbport:         "5432",
+            Dbuser:         "bob",
+            Identity:       &pb.PasswordRequest_Aws {
+                &pb.AWSIdentity {
+                    SignedGetCallerIdentity: signedGetCallerIdentity,
+                    ClaimedIamArn:           testEnv.ClaimedArn(),
+                },
+            },
+        },
 		Salt: []byte{1, 2, 3, 4},
 	})
 	if err != nil {
@@ -54,20 +57,23 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 	if resp.Hash != "d576ce99165615bb3f4331154ca6660c" {
 		t.Fatalf("expected %s but received %s", "d576ce99165615bb3f4331154ca6660c", resp.Hash)
 	}
-
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
-		},
+        PwdRequest: &pb.PasswordRequest {
+            ClientLanguage: pb.ClientLanguage_GO,
+            Dbhost:         "foo",
+            Dbport:         "5432",
+            Dbuser:         "bob",
+            Identity:       &pb.PasswordRequest_Aws {
+                &pb.AWSIdentity {
+                    SignedGetCallerIdentity: signedGetCallerIdentity,
+                    ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+                },
+            },
+        },
 		Salt: []byte{1, 2, 3, 4},
 	})
+
 	if err == nil {
 		t.Fatal("using a claimed arn that doesn't belong to me should fail")
 	}
@@ -89,15 +95,18 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbsha256",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
-		},
+        PwdRequest: &pb.PasswordRequest {
+            ClientLanguage: pb.ClientLanguage_GO,
+            Dbhost:         "dbsha256",
+            Dbport:         "5432",
+            Dbuser:         "bob",
+            Identity:       &pb.PasswordRequest_Aws {
+                &pb.AWSIdentity {
+                    SignedGetCallerIdentity: signedGetCallerIdentity,
+                    ClaimedIamArn:           testEnv.ClaimedArn(),
+                },
+            },
+        },
 		Salt:              "1234",
 		Iterations:        0,
 		AuthenticationMsg: "hello, world!",
@@ -114,15 +123,18 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
-		},
+        PwdRequest: &pb.PasswordRequest {
+            ClientLanguage: pb.ClientLanguage_GO,
+            Dbhost:         "foo",
+            Dbport:         "5432",
+            Dbuser:         "bob",
+            Identity:       &pb.PasswordRequest_Aws {
+                &pb.AWSIdentity {
+                    SignedGetCallerIdentity: signedGetCallerIdentity,
+                    ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+                },
+            },
+        },
 		Salt:              "1234",
 		Iterations:        0,
 		AuthenticationMsg: "hello, world!",
@@ -252,6 +264,7 @@ func TestXorBytes(t *testing.T) {
 		t.Fatalf("expected %#v, but received %#v", expected, result)
 	}
 }
+/*
 
 // TestNoRaces is intended to be run via "$ go test -v -race" and will
 // fail if a race is detected.
@@ -331,6 +344,7 @@ func TestNoRaces(t *testing.T) {
 		}
 	}
 }
+*/
 
 // TestFuzzAuthenticator simply fuzzes its two request-receiving
 // methods to ensure a panic isn't caused by random values. If
