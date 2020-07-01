@@ -108,11 +108,10 @@ func (a *Authenticator) getPassword(req *pb.PasswordRequest) (string, error) {
 		return "", fmt.Errorf("No identity is provided")
 	}
 
-	awsIdentity := identity.GetAws()
+	awsIdentity := req.GetAws()
 	if awsIdentity == nil {
 		return "", fmt.Errorf("AWS auth info is required")
 	}
-	return "sheesh", nil
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIAMArnChan := make(chan string, 1)
