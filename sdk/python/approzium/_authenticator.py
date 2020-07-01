@@ -88,15 +88,17 @@ class AuthClient(object):
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # authentication info
         identity = authenticator_pb2.Identity(
-            aws = authenticator_pb2.AWSIdentity(
+            aws=authenticator_pb2.AWSIdentity(
                 signed_get_caller_identity=self.signed_gci,
                 claimed_iam_arn=self.claimed_arn,
             )
         )
         password_request = authenticator_pb2.PasswordRequest(
             identity=identity,
-            client_language = authenticator_pb2.PYTHON,
-            dbhost=dbhost, dbport=dbport, dbuser=dbuser
+            client_language=authenticator_pb2.PYTHON,
+            dbhost=dbhost,
+            dbport=dbport,
+            dbuser=dbuser,
         )
         request.pwd_request.CopyFrom(password_request)
         response = getattr(stub, getmethodname)(request)
@@ -110,11 +112,10 @@ class AuthClient(object):
             salt = auth_info
             if len(salt) != 4:
                 raise Exception("salt not right size")
-            request = authenticator_pb2.PGMD5HashRequest(
-                salt=salt,
+            request = authenticator_pb2.PGMD5HashRequest(salt=salt,)
+            response = self._execute_request(
+                request, "GetPGMD5Hash", dbhost, dbport, dbuser
             )
-            response = self._execute_request(request, "GetPGMD5Hash", dbhost,
-                                             dbport, dbuser)
             return response.hash
         elif auth_type == _postgres.AUTH_REQ_SASL:
             auth = auth_info
@@ -124,8 +125,9 @@ class AuthClient(object):
                 iterations=auth.password_iterations,
                 authentication_msg=auth.authorization_message,
             )
-            response = self._execute_request(request, "GetPGSHA256Hash",
-                                             dbhost, dbport, dbuser)
+            response = self._execute_request(
+                request, "GetPGSHA256Hash", dbhost, dbport, dbuser
+            )
             client_final = auth.create_client_final_message(response.cproof)
             auth.server_signature = response.sproof
             return client_final, auth
@@ -135,11 +137,10 @@ class AuthClient(object):
             salt = auth_info
             if len(salt) != 20:
                 raise Exception("salt not right size")
-            request = authenticator_pb2.MYSQLSHA1HashRequest(
-                salt=salt,
+            request = authenticator_pb2.MYSQLSHA1HashRequest(salt=salt,)
+            response = self._execute_request(
+                request, "GetMYSQLSHA1Hash", dbhost, dbport, dbuser
             )
-            response = self._execute_request(request, "GetMYSQLSHA1Hash",
-                                             dbhost, dbport, dbuser)
             return response.hash
         else:
             raise Exception("Unexpected authentication method")
