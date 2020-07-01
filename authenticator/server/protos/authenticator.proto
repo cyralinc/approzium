@@ -14,13 +14,6 @@ message AWSIdentity {
     string claimed_iam_arn = 2;
 }
 
-message Identity {
-    oneof identity {
-        AWSIdentity aws = 1;
-        /* can add more here */
-    }
-}
-
 enum ClientLanguage {
     LANGUAGE_NOT_PROVIDED = 0;
     PYTHON = 1;
@@ -29,11 +22,14 @@ enum ClientLanguage {
 }
 
 message PasswordRequest {
-    Identity identity = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
+    ClientLanguage client_language = 1;
+    string dbhost = 2;
+    string dbport = 3;
+    string dbuser = 4;
+    oneof identity {
+        AWSIdentity aws = 5;
+        /* can add more here */
+    }
 }
 
 message PGMD5HashRequest {
