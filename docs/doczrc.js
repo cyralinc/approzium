@@ -6,7 +6,6 @@ export default {
     'Overview',
     'Quickstart',
     'Architecture',
-    'Examples',
     'Compatibility'
   ],
   ignore: [

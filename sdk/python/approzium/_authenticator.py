@@ -1,4 +1,5 @@
 # needed to be able to import protos code
+import json
 import sys
 from datetime import datetime, timedelta
 from itertools import count
@@ -40,7 +41,6 @@ class AuthClient(object):
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
-        self.iam_role = iam_role
 
         # Parse the claimed ARN once because it'll never change.
         # Parse the signed_gci at startup, and then we'll update
@@ -67,7 +67,7 @@ class AuthClient(object):
 
         **Return Structure**:
             * *authenticator_address* (*str*): address of authenticator service used
-            * *iam_role* (*str*): IAM Amazon resource number (ARN) used as identity
+            * *iam_arn* (*str*): IAM Amazon resource number (ARN) used as identity
             * *authenticated* (*bool*): whether the AuthClient was verified by the
                                         authenticator service.
             * *num_connections* (*int*): number of connections made through this
@@ -75,10 +75,20 @@ class AuthClient(object):
         """
         info = {}
         info["authenticator_address"] = self.server_address
-        info["iam_role"] = self.iam_role
+        info["iam_arn"] = self.claimed_arn
         info["authenticated"] = self.authenticated
         info["num_connections"] = self.n_conns
         return info
+
+    @property
+    def attribution_info_json(self):
+        """Provides the same attribution info returned by
+        :func:`~AuthClient.attribution_info` as a JSON format string
+
+        :rtype: str
+        """
+        info = self.attribution_info
+        return json.dumps(info)
 
     def _execute_request(self, request, getmethodname, dbhost, dbport, dbuser):
         # The presigned GetCallerIdentity call expires every 15 minutes.
