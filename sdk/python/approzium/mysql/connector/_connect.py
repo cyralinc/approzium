@@ -1,11 +1,10 @@
+from contextlib import contextmanager
+
 import approzium
 import mysql.connector
-from contextlib import contextmanager
 from mysql.connector import MySQLConnection
 
 from ..._mysql import get_auth_resp
-
-
 
 
 @contextmanager
@@ -17,7 +16,13 @@ def _patch__do_auth(sql_connection_class=MySQLConnection):
             return
 
         def _auth_response(
-            client_flags, username, password, database, auth_plugin, auth_data, ssl_enabled
+            client_flags,
+            username,
+            password,
+            database,
+            auth_plugin,
+            auth_data,
+            ssl_enabled,
         ):
             authenticator = password
             is_secure_connection = (
@@ -40,6 +45,7 @@ def _patch__do_auth(sql_connection_class=MySQLConnection):
 
         res = original__do_auth(self, *args, **kwargs)
         return res
+
     try:
         sql_connection_class._do_auth = _do_auth
         yield
@@ -53,7 +59,7 @@ def connect(*args, authenticator=None, **kwargs):
     if authenticator is None:
         raise TypeError("Auth client not specified and not default auth client is set")
     kwargs["password"] = authenticator
-    use_pure = kwargs.get('use_pure', False)
+    use_pure = kwargs.get("use_pure", False)
     if not use_pure:
         msg = "MySQL C-Extension based connection is not currently supported."
         raise NotImplementedError(msg)
