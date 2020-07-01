@@ -367,21 +367,21 @@ func TestFuzzAuthenticator(t *testing.T) {
 	}
 
 	fuzzer := fuzz.New().Funcs(
-        // have to tell go-fuzz how to fuzz PasswordRequest field because it contains an interface
-        func(o *pb.PasswordRequest, c fuzz.Continue) {
-            c.Fuzz(&o.ClientLanguage)
-            c.Fuzz(&o.Dbhost)
-            c.Fuzz(&o.Dbport)
-            c.Fuzz(&o.Dbuser)
-            o.Identity = &pb.PasswordRequest_Aws{&pb.AWSIdentity{},}
-            c.Fuzz(o.Identity)
-        },
-    )
+		// have to tell go-fuzz how to fuzz PasswordRequest field because it contains an interface
+		func(o *pb.PasswordRequest, c fuzz.Continue) {
+			c.Fuzz(&o.ClientLanguage)
+			c.Fuzz(&o.Dbhost)
+			c.Fuzz(&o.Dbport)
+			c.Fuzz(&o.Dbuser)
+			o.Identity = &pb.PasswordRequest_Aws{&pb.AWSIdentity{}}
+			c.Fuzz(o.Identity)
+		},
+	)
 
 	for i := 0; i < 1000; i++ {
 		req1 := &pb.PGSHA256HashRequest{}
 		fuzzer.Fuzz(req1)
-        authenticator.GetPGSHA256Hash(nil, req1)
+		authenticator.GetPGSHA256Hash(nil, req1)
 
 		req2 := &pb.PGMD5HashRequest{}
 		fuzzer.Fuzz(req2)
