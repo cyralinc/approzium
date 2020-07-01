@@ -1,6 +1,6 @@
 # needed to be able to import protos code
-import sys
 import json
+import sys
 from datetime import datetime, timedelta
 from itertools import count
 from pathlib import Path
@@ -79,7 +79,6 @@ class AuthClient(object):
         info["authenticated"] = self.authenticated
         info["num_connections"] = self.n_conns
         return info
-
 
     @property
     def attribution_info_json(self):
