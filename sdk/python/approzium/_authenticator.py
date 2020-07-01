@@ -87,14 +87,12 @@ class AuthClient(object):
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # authentication info
-        identity = authenticator_pb2.Identity(
-            aws=authenticator_pb2.AWSIdentity(
-                signed_get_caller_identity=self.signed_gci,
-                claimed_iam_arn=self.claimed_arn,
-            )
+        aws_identity=authenticator_pb2.AWSIdentity(
+            signed_get_caller_identity=self.signed_gci,
+            claimed_iam_arn=self.claimed_arn,
         )
         password_request = authenticator_pb2.PasswordRequest(
-            identity=identity,
+            aws=aws_identity,
             client_language=authenticator_pb2.PYTHON,
             dbhost=dbhost,
             dbport=dbport,
