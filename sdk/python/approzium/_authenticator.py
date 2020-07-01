@@ -1,5 +1,6 @@
 # needed to be able to import protos code
 import sys
+import json
 from datetime import datetime, timedelta
 from itertools import count
 from pathlib import Path
@@ -78,6 +79,12 @@ class AuthClient(object):
         info["authenticated"] = self.authenticated
         info["num_connections"] = self.n_conns
         return info
+
+
+    @property
+    def attribution_info_json(self):
+        info = self.attribution_info
+        return json.dumps(info)
 
     def _execute_request(self, request, getmethodname):
         # The presigned GetCallerIdentity call expires every 15 minutes.
