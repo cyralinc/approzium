@@ -40,7 +40,6 @@ class AuthClient(object):
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
-        self.iam_role = iam_role
 
         # Parse the claimed ARN once because it'll never change.
         # Parse the signed_gci at startup, and then we'll update
@@ -75,7 +74,7 @@ class AuthClient(object):
         """
         info = {}
         info["authenticator_address"] = self.server_address
-        info["iam_role"] = self.iam_role
+        info["iam_arn"] = self.claimed_arn
         info["authenticated"] = self.authenticated
         info["num_connections"] = self.n_conns
         return info
