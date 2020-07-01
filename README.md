@@ -2,12 +2,25 @@
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
 identity is provided through the platform on which you're running.
 
+----
+
+**Please note**: We take Approzium's security and our users' trust very seriously. If you believe you have found a security 
+issue in Approzium, _please responsibly disclose_ by contacting us at [security@cyral.com](mailto:security@cyral.com).
+
+----
+
 We currently support AWS for identity, and have a Python SDK for Postgres drivers. This project is under active development, please
 do stay tuned for more identity platforms, databases, and SDK languages.
 
 ## Docs
 
 See https://approzium.org/ for a Quick Start, or elaboration on the architecture and API.
+
+## Support
+
+We currently answer community questions via a public Slack channel, [# help-approzium](https://app.slack.com/client/T013VTLTTJ5/C0166QPU6LW/thread/C013VTN50JV-1593627063.014500).
+Our developers frequent this forum, but are not in it at all times. Please be patient, we will lend assistance as soon
+as we can!
 
 ## Developing
 
