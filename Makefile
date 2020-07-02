@@ -61,7 +61,7 @@ seed-vault-all-hosts:
 run-testsuite: run-gotests run-pg2tests
 
 run-gotests:
-	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
+	cd authenticator && CGO_ENABLED=1 go test -v -race -p 1 ./...
 
 run-pythontests: enable-vault-path seed-vault-all-hosts
 	cd sdk/python && poetry run pytest --workers auto
