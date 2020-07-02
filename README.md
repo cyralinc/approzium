@@ -1,6 +1,6 @@
 # approzium
 
-[![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://ansicolortags.readthedocs.io/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://approzium.readthedocs.io/?badge=latest)
 
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
 identity is provided through the platform on which you're running.
