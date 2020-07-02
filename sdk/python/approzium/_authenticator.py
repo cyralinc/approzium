@@ -7,7 +7,7 @@ from pathlib import Path
 
 import grpc
 
-from . import _postgres
+from . import _postgres, _mysql
 from ._iam import (
     assume_role,
     get_local_arn,
