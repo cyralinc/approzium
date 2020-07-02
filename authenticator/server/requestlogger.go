@@ -63,10 +63,10 @@ func (l *requestLogger) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	if err := deepcopy.Copy(sanitized, req); err != nil {
 		return nil, err
 	}
-	if sanitized.Awsauth != nil {
-		sanitized.Awsauth.SignedGetCallerIdentity = redactedValue
+	if sanitized.PwdRequest != nil && sanitized.PwdRequest.GetAws() != nil {
+		sanitized.PwdRequest.GetAws().SignedGetCallerIdentity = redactedValue
 	}
-	l.logSanitizedRequest(requestLogger, req, req.Awsauth)
+	l.logSanitizedRequest(requestLogger, sanitized)
 
 	resp, respErr := l.wrapped.GetPGMD5Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
 
@@ -88,10 +88,10 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	if err := deepcopy.Copy(sanitized, req); err != nil {
 		return nil, err
 	}
-	if sanitized.Awsauth != nil {
-		sanitized.Awsauth.SignedGetCallerIdentity = redactedValue
+	if sanitized.PwdRequest != nil && sanitized.PwdRequest.GetAws() != nil {
+		sanitized.PwdRequest.GetAws().SignedGetCallerIdentity = redactedValue
 	}
-	l.logSanitizedRequest(requestLogger, req, req.Awsauth)
+	l.logSanitizedRequest(requestLogger, sanitized)
 
 	resp, respErr := l.wrapped.GetPGSHA256Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
 
@@ -103,7 +103,7 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return resp, respErr
 }
 
-func (l *requestLogger) logSanitizedRequest(requestLogger *log.Entry, req interface{}, awsAuth *pb.AWSAuth) {
+func (l *requestLogger) logSanitizedRequest(requestLogger *log.Entry, req interface{}) {
 	// Log asynchronously to avoid blocking while lots of JSON conversion takes place.
 	preciseTime := time.Now().UTC()
 	go func() {
