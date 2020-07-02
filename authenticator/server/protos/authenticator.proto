@@ -24,10 +24,8 @@ message PasswordRequest {
     string dbhost = 2;
     string dbport = 3;
     string dbuser = 4;
-    oneof identity {
-        AWSIdentity aws = 5;
-        /* can add more here */
-    }
+    AWSIdentity aws = 5;
+    /* can add more here */
 }
 
 message PGMD5HashRequest {

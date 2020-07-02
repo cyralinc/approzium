@@ -76,9 +76,6 @@ func (a *authenticator) logRequestCount() {
 
 func (a *authenticator) getPassword(ctx context.Context, req *pb.PasswordRequest) (string, error) {
 	reqLogger := getRequestLogger(ctx)
-	if req.GetIdentity() == nil {
-		return "", fmt.Errorf("No identity is provided")
-	}
 
 	// Currently, only AWS identity is supported
 	awsIdentity := req.GetAws()
