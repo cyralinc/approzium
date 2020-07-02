@@ -140,6 +140,19 @@ class AuthClient(object):
             auth.server_signature = response.sproof
             return client_final, auth
 
+    def _get_mysql_hash(self, dbhost, dbport, dbuser, auth_type, auth_info):
+        if auth_type == _mysql.MYSQLNativePassword:
+            salt = auth_info
+            if len(salt) != 20:
+                raise Exception("salt not right size")
+            request = authenticator_pb2.MYSQLSHA1HashRequest(salt=salt,)
+            response = self._execute_request(
+                request, "GetMYSQLSHA1Hash", dbhost, dbport, dbuser
+            )
+            return response.hash
+        else:
+            raise Exception("Unexpected authentication method")
+
     # The presigned GetCallerIdentity string expires every 15 minuts, so refresh it
     # after 5 minutes just to be safe.
     def _update_gci_if_needed(self):
