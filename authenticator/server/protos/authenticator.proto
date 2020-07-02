@@ -59,4 +59,5 @@ message PGSHA256Response {
 
 message MYSQLSHA1Response {
     bytes hash = 1;
+    string requestid = 2;
 }

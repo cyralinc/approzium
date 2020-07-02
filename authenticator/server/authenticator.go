@@ -194,7 +194,7 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
-func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
+func (a *authenticator) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
 	a.incrementRequestCount()
 
 	// Return early if we didn't get a valid salt.
@@ -205,7 +205,7 @@ func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1Has
 		return nil, status.Errorf(codes.InvalidArgument, msg)
     }
 
-	password, err := a.getPassword(req.GetPwdRequest())
+	password, err := a.getPassword(ctx, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
 	}
@@ -216,6 +216,7 @@ func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1Has
 		return nil, status.Errorf(codes.Unknown, err.Error())
 	}
 	return &pb.MYSQLSHA1Response{Hash: hash}, nil
+}
 
 func (a *authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	creds, err := a.credMgr.Password(identity)
