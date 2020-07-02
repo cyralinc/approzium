@@ -76,15 +76,15 @@ func (a *authenticator) logRequestCount() {
 
 func (a *authenticator) getPassword(ctx context.Context, req *pb.PasswordRequest) (string, error) {
 	reqLogger := getRequestLogger(ctx)
-    if req.GetIdentity() == nil {
-        return "", fmt.Errorf("No identity is provided")
-    }
+	if req.GetIdentity() == nil {
+		return "", fmt.Errorf("No identity is provided")
+	}
 
-    // Currently, only AWS identity is supported
-    awsIdentity := req.GetAws()
-    if awsIdentity == nil {
-        return "", fmt.Errorf("AWS auth info is required")
-    }
+	// Currently, only AWS identity is supported
+	awsIdentity := req.GetAws()
+	if awsIdentity == nil {
+		return "", fmt.Errorf("AWS auth info is required")
+	}
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIdentityChan := make(chan *identity.Verified, 1)
@@ -130,7 +130,7 @@ func (a *authenticator) getPassword(ctx context.Context, req *pb.PasswordRequest
 	case err = <-verificationErrChan:
 		return "", err
 	}
-    return password, nil
+	return password, nil
 }
 
 func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
@@ -143,12 +143,12 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-    password, err := a.getPassword(ctx, req.GetPwdRequest())
+	password, err := a.getPassword(ctx, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
 	}
 
-    dbUser := req.GetPwdRequest().GetDbuser();
+	dbUser := req.GetPwdRequest().GetDbuser()
 	// Everything checked out.
 	hash, err := computePGMD5Hash(dbUser, password, salt)
 	if err != nil {
@@ -178,7 +178,7 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("iterations too high, received %d but maximum is %d", iterations, maxIterations))
 	}
 
-    password, err := a.getPassword(ctx, req.GetPwdRequest())
+	password, err := a.getPassword(ctx, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
