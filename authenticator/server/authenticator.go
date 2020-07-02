@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -193,6 +194,29 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
+func (a *Authenticator) GetMYSQLSHA1Hash(_ context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
+	a.incrementRequestCount()
+
+	// Return early if we didn't get a valid salt.
+	salt := req.GetSalt()
+	if len(salt) != 20 {
+		msg := fmt.Sprintf("expected salt to be 20 bytes long, but got %d bytes", len(salt))
+		log.Error(msg)
+		return nil, status.Errorf(codes.InvalidArgument, msg)
+    }
+
+	password, err := a.getPassword(req.GetPwdRequest())
+	if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+
+	// Everything checked out.
+	hash, err := computeMYSQLSHA1Hash(password, salt)
+	if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+	return &pb.MYSQLSHA1Response{Hash: hash}, nil
+
 func (a *authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
 	creds, err := a.credMgr.Password(identity)
 	if err != nil {
@@ -299,4 +323,24 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 	sproof := sproofHmac.Sum(nil)
 	sproof64 := base64.StdEncoding.EncodeToString(sproof)
 	return sproof64
+}
+
+func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
+	hasher := sha1.New()
+	if _, err := io.WriteString(hasher, password); err != nil {
+		return nil, err
+	}
+	firstHash := hasher.Sum(nil)
+	hasher = sha1.New()
+	hasher.Write(firstHash)
+	secondHash := hasher.Sum(nil)
+	hasher = sha1.New()
+	hasher.Write(salt)
+	hasher.Write(secondHash)
+	thirdHash := hasher.Sum(nil)
+	finalHash, err := xorBytes(firstHash, thirdHash)
+	if err != nil {
+		return nil, err
+	}
+	return finalHash, nil
 }

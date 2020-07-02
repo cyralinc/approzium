@@ -5,6 +5,7 @@ package approzium.authenticator.protos;
 service Authenticator {
     rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
     rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
+    rpc GetMYSQLSHA1Hash(MYSQLSHA1HashRequest) returns (MYSQLSHA1Response) {}
     /* can add more here */
 }
 
@@ -40,6 +41,11 @@ message PGSHA256HashRequest {
     string authentication_msg = 4;
 }
 
+message MYSQLSHA1HashRequest {
+    PasswordRequest pwd_request = 1;
+    bytes salt = 2;
+}
+
 message PGMD5Response {
     string hash = 1;
     string requestid = 2;
@@ -49,4 +55,8 @@ message PGSHA256Response {
     string cproof = 1;
     string sproof = 2;
     string requestid = 3;
+}
+
+message MYSQLSHA1Response {
+    bytes hash = 1;
 }
