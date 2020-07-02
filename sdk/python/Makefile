@@ -1,5 +1,5 @@
 deps:
-	python3 -m grpc_tools.protoc -I../../authenticator/protos --python_out=approzium/_protos --grpc_python_out=approzium/_protos ../../authenticator/protos/authenticator.proto
+	python3 -m grpc_tools.protoc -I../../authenticator/server/protos --python_out=approzium/_protos --grpc_python_out=approzium/_protos ../../authenticator/server/protos/authenticator.proto
 
 download_psycopg2_testsuite:
 	$(eval TMP := $(shell mktemp -d))
