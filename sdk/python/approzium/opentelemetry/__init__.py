@@ -5,9 +5,6 @@ from opentelemetry.ext.dbapi import DatabaseApiIntegration
 original_DatabaseApiIntegration = None
 
 class ApproziumDatabaseApiIntegration(DatabaseApiIntegration):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def get_connection_attributes(self, connection):
         super().get_connection_attributes(connection)
         # check if this is an Approzium connection
