@@ -21,14 +21,23 @@ func main() {
 	if err != nil {
 		log.Panicf("couldn't parse log level: %s", err)
 	}
-	log.SetLevel(logLevel)
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp:          true,
-		DisableLevelTruncation: true,
-		PadLevelText:           true,
-	})
+	logger := log.New()
+	logger.Level = logLevel
 
-	svr, err := server.New(config)
+	switch strings.ToLower(config.LogFormat) {
+	case "text":
+		logger.SetFormatter(&log.TextFormatter{
+			FullTimestamp:          true,
+			DisableLevelTruncation: true,
+			PadLevelText:           true,
+		})
+	case "json":
+		logger.SetFormatter(&log.JSONFormatter{})
+	default:
+		log.Panicf("unsupported log format: %s", config.LogFormat)
+	}
+
+	svr, err := server.New(logger, config)
 	if err != nil {
 		log.Panicf("failed to create authenticator: %s", err)
 	}
@@ -39,8 +48,6 @@ func main() {
 		log.Panicf("failed to listen on %s: %s", serviceAddress, err)
 	}
 	log.Infof("authenticator listening for requests on %s\n", serviceAddress)
-
-	svr.LogRequestCount()
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterAuthenticatorServer(grpcServer, svr)

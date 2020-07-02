@@ -35,20 +35,20 @@ type CredentialManager interface {
 
 // RetrieveConfigured checks the environment for configured cred
 // providers, and selects the first working configuration.
-func RetrieveConfigured(vaultTokenPath string) (CredentialManager, error) {
+func RetrieveConfigured(logger *log.Logger, vaultTokenPath string) (CredentialManager, error) {
 	credMgr, err := newHashiCorpVaultCreds(vaultTokenPath)
 	if err != nil {
-		log.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
+		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
 	} else {
-		log.Info("selected HashiCorp Vault as credential manager")
+		logger.Info("selected HashiCorp Vault as credential manager")
 		return credMgr, nil
 	}
 
-	credMgr, err = newLocalFileCreds()
+	credMgr, err = newLocalFileCreds(logger)
 	if err != nil {
-		log.Debugf("didn't select local file as credential manager due to err: %s", err)
+		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
 	} else {
-		log.Info("selected local file as credential manager")
+		logger.Info("selected local file as credential manager")
 		return credMgr, err
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")

@@ -39,6 +39,7 @@ message PGMD5HashRequest {
 
 message PGMD5Response {
     string hash = 1;
+    string requestid = 2;
 }
 
 message PGSHA256HashRequest {
@@ -51,6 +52,7 @@ message PGSHA256HashRequest {
 message PGSHA256Response {
     string cproof = 1;
     string sproof = 2;
+    string requestid = 3;
 }
 
 message MYSQLSHA1HashRequest {

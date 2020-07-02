@@ -24,6 +24,8 @@ type Config struct {
 	Host           string `default:"127.0.0.1"`
 	Port           int    `default:"6000"`
 	LogLevel       string `envconfig:"log_level" default:"info"`
+	LogFormat      string `envconfig:"log_format" default:"text"` // Also supports "json".
+	LogRaw         bool   `envconfig:"log_raw" default:"false"`
 	VaultTokenPath string `envconfig:"vault_token_path"`
 }
 
