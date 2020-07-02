@@ -203,7 +203,7 @@ func (a *authenticator) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1H
 		msg := fmt.Sprintf("expected salt to be 20 bytes long, but got %d bytes", len(salt))
 		log.Error(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
-    }
+	}
 
 	password, err := a.getPassword(ctx, req.GetPwdRequest())
 	if err != nil {
