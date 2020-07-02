@@ -8,7 +8,7 @@ python-versions = ">=3.5"
 version = "1.10"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "An asyncio PostgreSQL driver"
 name = "asyncpg"
 optional = false
@@ -355,7 +355,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "2e959c371b808fc6ed24b724267e4c2a21ed3587f335d309db4bbf9cfe17de44"
+content-hash = "0b4a9bb8ab2ff4591a1cd7bd206e2275975abe464f1f182434a615fa177aca11"
 python-versions = "^3.5"
 
 [metadata.files]

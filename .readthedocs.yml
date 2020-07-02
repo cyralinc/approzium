@@ -21,5 +21,4 @@ python:
       - method: pip
         path: sdk/python
         extra_requirements:
-            - dev
-            - docs
+            - sqllibs
