@@ -1,19 +1,9 @@
-package server
+package config
 
 import "github.com/kelseyhightower/envconfig"
 
 // Config is an object for storing configuration variables set through
-// Approzium's environment. Supports:
-// 		- APPROZIUM_HOST: Defaults to 127.0.0.1.
-//		- APPROZIUM_PORT: Defaults to 6000.
-//		- APPROZIUM_LOG_LEVEL: Defaults to info. Valid values are:
-//			- trace
-//			- debug
-//			- info
-//			- warn
-//			- error
-//			- fatal
-//			- panic
+// Approzium's environment.
 //
 // For those using Vault for storage, Approzium will read Vault's address
 // and the Vault token it should use through Vault's normal environment
@@ -21,12 +11,14 @@ import "github.com/kelseyhightower/envconfig"
 // https://www.vaultproject.io/docs/commands#environment-variables.
 // At a minimum, VAULT_ADDR and VAULT_TOKEN must be set.
 type Config struct {
-	Host           string `default:"127.0.0.1"`
-	HTTPPort       int    `envconfig:"http_port" default:"6000"`
-	GRPCPort       int    `envconfig:"grpc_port" default:"6001"`
-	LogLevel       string `envconfig:"log_level" default:"info"`
-	LogFormat      string `envconfig:"log_format" default:"text"` // Also supports "json".
-	LogRaw         bool   `envconfig:"log_raw" default:"false"`
+	Host     string `default:"127.0.0.1"`
+	HTTPPort int    `envconfig:"http_port" default:"6000"`
+	GRPCPort int    `envconfig:"grpc_port" default:"6001"`
+
+	LogLevel  string `envconfig:"log_level" default:"info"`
+	LogFormat string `envconfig:"log_format" default:"text"` // Also supports "json".
+	LogRaw    bool   `envconfig:"log_raw" default:"false"`
+
 	VaultTokenPath string `envconfig:"vault_token_path"`
 }
 
