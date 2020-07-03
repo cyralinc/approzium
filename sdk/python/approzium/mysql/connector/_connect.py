@@ -57,7 +57,7 @@ def _patch_MySQLConnection(include_pooling=False):
 
 
 def _parse_kwargs(kwargs):
-    authenticator = kwargs.pop('authenticator', None)
+    authenticator = kwargs.pop("authenticator", None)
     if authenticator is None:
         authenticator = approzium.default_auth_client
     if authenticator is None:
@@ -69,6 +69,7 @@ def _parse_kwargs(kwargs):
 Pass use_pure=True"
         raise NotImplementedError(msg)
     return use_pure, authenticator
+
 
 def connect(*args, authenticator=None, **kwargs):
     """Creates a MySQL connector connection through Approzium authentication. Takes
