@@ -5,7 +5,7 @@ from approzium.mysql.connector import connect
 
 auth = approzium.AuthClient("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
 # use Psycopg2 defined test environment variables
-connopts = {"user": environ["PSYCOPG2_TESTDB_USER"], "host": "dbmysql"}
+connopts = {"user": environ["PSYCOPG2_TESTDB_USER"], "host": "dbmysqlsha1"}
 
 
 def test_connect():
