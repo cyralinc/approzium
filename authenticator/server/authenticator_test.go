@@ -170,12 +170,12 @@ func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
 				ClaimedIamArn:           testEnv.ClaimedArn(),
 			},
 		},
-		Salt:              make([]byte, 20),
+		Salt: make([]byte, 20),
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-    expected := []byte{0x7, 0x20, 0x87, 0xd1, 0x6f, 0xdf, 0xab, 0xc5, 0x5b, 0x16, 0x44, 0xbb, 0x90, 0x42, 0x5, 0xc6, 0xd, 0x50, 0x5f, 0xcf}
+	expected := []byte{0x7, 0x20, 0x87, 0xd1, 0x6f, 0xdf, 0xab, 0xc5, 0x5b, 0x16, 0x44, 0xbb, 0x90, 0x42, 0x5, 0xc6, 0xd, 0x50, 0x5f, 0xcf}
 	if !reflect.DeepEqual(resp.Hash, expected) {
 		t.Fatalf("expected %#v but received %#v", expected, resp.Hash)
 	}
@@ -192,7 +192,7 @@ func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
 				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
 			},
 		},
-		Salt:              make([]byte, 20),
+		Salt: make([]byte, 20),
 	})
 	if err == nil {
 		t.Fatal("using a claimed arn that doesn't belong to me should fail")
