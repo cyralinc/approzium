@@ -2,11 +2,16 @@ package server
 
 import (
 	"context"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/approzium/approzium/authenticator/server/api"
 	pb "github.com/approzium/approzium/authenticator/server/protos"
 	testtools "github.com/approzium/approzium/authenticator/server/testing"
 	"github.com/google/gofuzz"
@@ -40,7 +45,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New(testLogger, Config{})
+	authenticator, err := buildServer(testLogger, Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +97,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New(testLogger, Config{})
+	authenticator, err := buildServer(testLogger, Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +220,7 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := New(testLogger, Config{})
+	authenticator, err := buildServer(testLogger, Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -285,7 +290,7 @@ func TestFuzzAuthenticator(t *testing.T) {
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
-	authenticator, err := New(testLogger, Config{})
+	authenticator, err := buildServer(testLogger, Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -314,4 +319,52 @@ func TestFuzzXorBytes(t *testing.T) {
 
 		xorBytes(a, b)
 	}
+}
+
+func TestMetrics(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+
+	// Start the API, which includes an endpoint for Prometheus to mine metrics.
+	config := Config{
+		Host:     "127.0.0.1",
+		HTTPPort: 6000,
+	}
+	_ = api.Start(testLogger, config.Host, strconv.Itoa(config.HTTPPort))
+
+	// Make some calls to increment the metrics.
+	svr, err := buildServer(testLogger, config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	svr.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{})
+
+	// See what we get for metrics.
+	resp, err := http.Get("http://localhost:6000/v1/metrics/prometheus")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 but received %d", resp.StatusCode)
+	}
+
+	actualResponse, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedResponse, err := ioutil.ReadFile("testing/prometheus.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if clean(expectedResponse) != clean(actualResponse) {
+		t.Fatalf("expected %s but received %s", expectedResponse, actualResponse)
+	}
+}
+
+func clean(b []byte) string {
+	cleaned := strings.ReplaceAll(string(b), " ", "")
+	cleaned = strings.ReplaceAll(cleaned, "\n", "")
+	return cleaned
 }

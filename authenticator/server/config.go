@@ -22,7 +22,8 @@ import "github.com/kelseyhightower/envconfig"
 // At a minimum, VAULT_ADDR and VAULT_TOKEN must be set.
 type Config struct {
 	Host           string `default:"127.0.0.1"`
-	Port           int    `default:"6000"`
+	HTTPPort       int    `envconfig:"http_port" default:"6000"`
+	GRPCPort       int    `envconfig:"grpc_port" default:"6001"`
 	LogLevel       string `envconfig:"log_level" default:"info"`
 	LogFormat      string `envconfig:"log_format" default:"text"` // Also supports "json".
 	LogRaw         bool   `envconfig:"log_raw" default:"false"`

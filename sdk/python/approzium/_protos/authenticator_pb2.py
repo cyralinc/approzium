@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='approzium.authenticator.protos',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1e\x61pprozium.authenticator.protos\"\x8f\x02\n\x10PGMD5HashRequest\x12:\n\x08\x61uthtype\x18\x01 \x01(\x0e\x32(.approzium.authenticator.protos.AuthType\x12G\n\x0f\x63lient_language\x18\x02 \x01(\x0e\x32..approzium.authenticator.protos.ClientLanguage\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x38\n\x07\x61wsauth\x18\x06 \x01(\x0b\x32\'.approzium.authenticator.protos.AWSAuth\x12\x0c\n\x04salt\x18\x07 \x01(\x0c\"\xc2\x02\n\x13PGSHA256HashRequest\x12:\n\x08\x61uthtype\x18\x01 \x01(\x0e\x32(.approzium.authenticator.protos.AuthType\x12G\n\x0f\x63lient_language\x18\x02 \x01(\x0e\x32..approzium.authenticator.protos.ClientLanguage\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x38\n\x07\x61wsauth\x18\x06 \x01(\x0b\x32\'.approzium.authenticator.protos.AWSAuth\x12\x0c\n\x04salt\x18\x07 \x01(\t\x12\x12\n\niterations\x18\x08 \x01(\r\x12\x1a\n\x12\x61uthentication_msg\x18\t \x01(\t\"\x1d\n\rPGMD5Response\x12\x0c\n\x04hash\x18\x01 \x01(\t\"2\n\x10PGSHA256Response\x12\x0e\n\x06\x63proof\x18\x01 \x01(\t\x12\x0e\n\x06sproof\x18\x02 \x01(\t\"F\n\x07\x41WSAuth\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t**\n\x08\x41uthType\x12\x15\n\x11TYPE_NOT_PROVIDED\x10\x00\x12\x07\n\x03\x41WS\x10\x01*?\n\x0e\x43lientLanguage\x12\x19\n\x15LANGUAGE_NOT_PROVIDED\x10\x00\x12\n\n\x06PYTHON\x10\x01\x12\x06\n\x02GO\x10\x02\x32\xfe\x01\n\rAuthenticator\x12q\n\x0cGetPGMD5Hash\x12\x30.approzium.authenticator.protos.PGMD5HashRequest\x1a-.approzium.authenticator.protos.PGMD5Response\"\x00\x12z\n\x0fGetPGSHA256Hash\x12\x33.approzium.authenticator.protos.PGSHA256HashRequest\x1a\x30.approzium.authenticator.protos.PGSHA256Response\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x13\x61uthenticator.proto\x12\x1e\x61pprozium.authenticator.protos\"\x8f\x02\n\x10PGMD5HashRequest\x12:\n\x08\x61uthtype\x18\x01 \x01(\x0e\x32(.approzium.authenticator.protos.AuthType\x12G\n\x0f\x63lient_language\x18\x02 \x01(\x0e\x32..approzium.authenticator.protos.ClientLanguage\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x38\n\x07\x61wsauth\x18\x06 \x01(\x0b\x32\'.approzium.authenticator.protos.AWSAuth\x12\x0c\n\x04salt\x18\x07 \x01(\x0c\"\xc2\x02\n\x13PGSHA256HashRequest\x12:\n\x08\x61uthtype\x18\x01 \x01(\x0e\x32(.approzium.authenticator.protos.AuthType\x12G\n\x0f\x63lient_language\x18\x02 \x01(\x0e\x32..approzium.authenticator.protos.ClientLanguage\x12\x0e\n\x06\x64\x62host\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x62port\x18\x04 \x01(\t\x12\x0e\n\x06\x64\x62user\x18\x05 \x01(\t\x12\x38\n\x07\x61wsauth\x18\x06 \x01(\x0b\x32\'.approzium.authenticator.protos.AWSAuth\x12\x0c\n\x04salt\x18\x07 \x01(\t\x12\x12\n\niterations\x18\x08 \x01(\r\x12\x1a\n\x12\x61uthentication_msg\x18\t \x01(\t\"0\n\rPGMD5Response\x12\x0c\n\x04hash\x18\x01 \x01(\t\x12\x11\n\trequestid\x18\x02 \x01(\t\"E\n\x10PGSHA256Response\x12\x0e\n\x06\x63proof\x18\x01 \x01(\t\x12\x0e\n\x06sproof\x18\x02 \x01(\t\x12\x11\n\trequestid\x18\x03 \x01(\t\"F\n\x07\x41WSAuth\x12\"\n\x1asigned_get_caller_identity\x18\x01 \x01(\t\x12\x17\n\x0f\x63laimed_iam_arn\x18\x02 \x01(\t**\n\x08\x41uthType\x12\x15\n\x11TYPE_NOT_PROVIDED\x10\x00\x12\x07\n\x03\x41WS\x10\x01*?\n\x0e\x43lientLanguage\x12\x19\n\x15LANGUAGE_NOT_PROVIDED\x10\x00\x12\n\n\x06PYTHON\x10\x01\x12\x06\n\x02GO\x10\x02\x32\xfe\x01\n\rAuthenticator\x12q\n\x0cGetPGMD5Hash\x12\x30.approzium.authenticator.protos.PGMD5HashRequest\x1a-.approzium.authenticator.protos.PGMD5Response\"\x00\x12z\n\x0fGetPGSHA256Hash\x12\x33.approzium.authenticator.protos.PGSHA256HashRequest\x1a\x30.approzium.authenticator.protos.PGSHA256Response\"\x00\x62\x06proto3'
 )
 
 _AUTHTYPE = _descriptor.EnumDescriptor(
@@ -40,8 +40,8 @@ _AUTHTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=809,
-  serialized_end=851,
+  serialized_start=847,
+  serialized_end=889,
 )
 _sym_db.RegisterEnumDescriptor(_AUTHTYPE)
 
@@ -67,8 +67,8 @@ _CLIENTLANGUAGE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=853,
-  serialized_end=916,
+  serialized_start=891,
+  serialized_end=954,
 )
 _sym_db.RegisterEnumDescriptor(_CLIENTLANGUAGE)
 
@@ -255,6 +255,13 @@ _PGMD5RESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='requestid', full_name='approzium.authenticator.protos.PGMD5Response.requestid', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -268,7 +275,7 @@ _PGMD5RESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=654,
-  serialized_end=683,
+  serialized_end=702,
 )
 
 
@@ -293,6 +300,13 @@ _PGSHA256RESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='requestid', full_name='approzium.authenticator.protos.PGSHA256Response.requestid', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -305,8 +319,8 @@ _PGSHA256RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=685,
-  serialized_end=735,
+  serialized_start=704,
+  serialized_end=773,
 )
 
 
@@ -343,8 +357,8 @@ _AWSAUTH = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=737,
-  serialized_end=807,
+  serialized_start=775,
+  serialized_end=845,
 )
 
 _PGMD5HASHREQUEST.fields_by_name['authtype'].enum_type = _AUTHTYPE
@@ -405,8 +419,8 @@ _AUTHENTICATOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=919,
-  serialized_end=1173,
+  serialized_start=957,
+  serialized_end=1211,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetPGMD5Hash',

@@ -6,7 +6,14 @@ import (
 	"testing"
 
 	vault "github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
+
+var testLogEntry = func() *log.Entry {
+	logEntry := log.WithFields(log.Fields{"test": "logger"})
+	logEntry.Level = log.FatalLevel
+	return logEntry
+}()
 
 // To run these tests, first start Vault locally like so:
 // "$ vault server -dev -dev-root-token-id=root"
@@ -80,7 +87,7 @@ func TestHcVaultCredMgr_WithTokenPath(t *testing.T) {
 		DBPort: "5432",
 		DBUser: "dbuser1",
 	}
-	password, err := credMgr.Password(identity)
+	password, err := credMgr.Password(testLogEntry, identity)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +139,7 @@ func TestHcVaultCredMgr_WithoutTokenPath(t *testing.T) {
 		DBPort: "5432",
 		DBUser: "dbuser1",
 	}
-	password, err := credMgr.Password(identity)
+	password, err := credMgr.Password(testLogEntry, identity)
 	if err != nil {
 		t.Fatal(err)
 	}

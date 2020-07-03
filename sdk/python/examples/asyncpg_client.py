@@ -4,7 +4,7 @@ from os import environ
 from approzium import Authenticator
 from approzium.asyncpg import connect
 
-auth = Authenticator("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
+auth = Authenticator("authenticator:6001", iam_role=environ.get("TEST_IAM_ROLE"))
 
 
 async def run():

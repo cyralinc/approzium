@@ -9,16 +9,18 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"net"
+	"strconv"
 	"strings"
-	"sync"
-	"time"
 
+	"github.com/approzium/approzium/authenticator/server/api"
 	"github.com/approzium/approzium/authenticator/server/credmgrs"
 	"github.com/approzium/approzium/authenticator/server/identity"
 	pb "github.com/approzium/approzium/authenticator/server/protos"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/pbkdf2"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -35,47 +37,91 @@ import (
 // community feedback.
 var maxIterations = uint32(15000 * 10)
 
-type authenticator struct {
-	// The authenticator's logger lacks context about requests being made
-	// and should not be used within code that's part of executing a request.
-	logger  *log.Logger
-	credMgr credmgrs.CredentialManager
+// Start begins a GRPC server, and an API server. It hangs indefinitely until
+// an error is returned from either, terminating the application. Both servers
+// respond to CTRL+C shutdowns.
+func Start(logger *log.Logger, config Config) error {
+	apiErrChan := api.Start(logger, config.Host, strconv.Itoa(config.HTTPPort))
 
-	// Please increment the request counter via incrementRequestCount.
-	// When reading the request count, please RLock before, and RUnlock
-	// afterwards.
-	requestCountMu sync.RWMutex
-	requestCount   int
+	svr, err := buildServer(logger, config)
+	if err != nil {
+		return err
+	}
+
+	grpcErrChan := startGrpc(logger, config, svr)
+
+	select {
+	case err = <-apiErrChan:
+	case err = <-grpcErrChan:
+	}
+	return err
 }
 
-func New(logger *log.Logger, config Config) (pb.AuthenticatorServer, error) {
+func buildServer(logger *log.Logger, config Config) (pb.AuthenticatorServer, error) {
+	// Calls pass through the following layers during handling.
+	// 	- First, a layer that captures request metrics.
+	//	- Next, a layer that adds a request ID, creates a request logger, and logs
+	//		all inbound and outbound requests.
+	//	- Lastly, this layer, the authenticator, that handles logic.
+	authenticator, err := newAuthenticator(logger, config)
+	if err != nil {
+		return nil, err
+	}
+
+	svr, err := newRequestMetrics(newRequestLogger(logger, config.LogRaw, authenticator))
+	if err != nil {
+		return nil, err
+	}
+	return svr, nil
+}
+
+func startGrpc(logger *log.Logger, config Config, svr pb.AuthenticatorServer) <-chan error {
+	errChan := make(chan error)
+
+	serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.GRPCPort)
+	lis, err := net.Listen("tcp", serviceAddress)
+	if err != nil {
+		errChan <- err
+		return errChan
+	}
+
+	logger.Infof("grpc listening for requests on %s", serviceAddress)
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterAuthenticatorServer(grpcServer, svr)
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			errChan <- err
+		}
+	}()
+	return errChan
+}
+
+func newAuthenticator(logger *log.Logger, config Config) (pb.AuthenticatorServer, error) {
 	credMgr, err := credmgrs.RetrieveConfigured(logger, config.VaultTokenPath)
 	if err != nil {
 		return nil, err
 	}
-	authSvr := &authenticator{
-		logger:  logger,
-		credMgr: credMgr,
+	identityVerifier, err := identity.NewVerifier()
+	if err != nil {
+		return nil, err
 	}
-	authSvr.logRequestCount()
-	return newRequestLogger(logger, config.LogRaw, authSvr), nil
+	return &authenticator{
+		logger:           logger,
+		credMgr:          credMgr,
+		identityVerifier: identityVerifier,
+	}, nil
 }
 
-// logRequestCount asynchronously begins an optional ongoing log of the number of
-// requests that have been received.
-func (a *authenticator) logRequestCount() {
-	go func() {
-		for {
-			a.requestCountMu.RLock()
-			a.logger.Debugf("authenticator running. %d requests received", a.requestCount)
-			a.requestCountMu.RUnlock()
-			time.Sleep(10 * time.Second)
-		}
-	}()
+type authenticator struct {
+	// The authenticator's logger lacks context about requests being made
+	// and should not be used within code that's part of executing a request.
+	logger           *log.Logger
+	credMgr          credmgrs.CredentialManager
+	identityVerifier identity.Verifier
 }
 
 func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
-	a.incrementRequestCount()
 	reqLogger := getRequestLogger(ctx)
 
 	// Return early if we didn't get a valid salt.
@@ -90,7 +136,12 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	verifiedIdentityChan := make(chan *identity.Verified, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIdentity, err := identity.Get(reqLogger, &identity.Proof{AwsAuth: req.Awsauth}, req.ClientLanguage)
+		proof := &identity.Proof{
+			AuthType:   req.Authtype,
+			ClientLang: req.ClientLanguage,
+			AwsAuth:    req.Awsauth,
+		}
+		verifiedIdentity, err := a.identityVerifier.Get(reqLogger, proof)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -111,7 +162,7 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	if err != nil {
 		return nil, err
 	}
-	password, err := a.getCreds(credmgrs.DBKey{
+	password, err := a.getCreds(reqLogger, credmgrs.DBKey{
 		IAMArn: databaseArn,
 		DBHost: dbHost,
 		DBPort: dbPort,
@@ -124,7 +175,7 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	// Make sure the arn they claimed they had to get the creds was their actual arn.
 	select {
 	case verifiedIdentity := <-verifiedIdentityChan:
-		match, err := verifiedIdentity.Matches(claimedIamArn)
+		match, err := a.identityVerifier.Matches(reqLogger, claimedIamArn, verifiedIdentity)
 		if err != nil {
 			return nil, err
 		}
@@ -144,7 +195,6 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 }
 
 func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
-	a.incrementRequestCount()
 	reqLogger := getRequestLogger(ctx)
 
 	// Return early if we didn't get a valid auth message or salt.
@@ -170,7 +220,12 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	verifiedIdentityChan := make(chan *identity.Verified, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
-		verifiedIdentity, err := identity.Get(reqLogger, &identity.Proof{AwsAuth: req.Awsauth}, req.ClientLanguage)
+		proof := &identity.Proof{
+			AuthType:   req.Authtype,
+			ClientLang: req.ClientLanguage,
+			AwsAuth:    req.Awsauth,
+		}
+		verifiedIdentity, err := a.identityVerifier.Get(reqLogger, proof)
 		if err != nil {
 			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
 			return
@@ -192,7 +247,7 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, err
 	}
 
-	password, err := a.getCreds(credmgrs.DBKey{
+	password, err := a.getCreds(reqLogger, credmgrs.DBKey{
 		IAMArn: databaseArn,
 		DBHost: dbHost,
 		DBPort: dbPort,
@@ -216,7 +271,7 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	// Make sure the arn they claimed they had to get the creds was their actual arn.
 	select {
 	case verifiedIdentity := <-verifiedIdentityChan:
-		match, err := verifiedIdentity.Matches(claimedIamArn)
+		match, err := a.identityVerifier.Matches(reqLogger, claimedIamArn, verifiedIdentity)
 		if err != nil {
 			return nil, err
 		}
@@ -229,18 +284,12 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
-func (a *authenticator) getCreds(identity credmgrs.DBKey) (string, error) {
-	creds, err := a.credMgr.Password(identity)
+func (a *authenticator) getCreds(reqLogger *log.Entry, identity credmgrs.DBKey) (string, error) {
+	creds, err := a.credMgr.Password(reqLogger, identity)
 	if err != nil {
 		return "", fmt.Errorf("password not found for identity %s due to %s, using %s", identity, err, a.credMgr.Name())
 	}
 	return creds, nil
-}
-
-func (a *authenticator) incrementRequestCount() {
-	a.requestCountMu.Lock()
-	a.requestCount++
-	a.requestCountMu.Unlock()
 }
 
 // toDatabaseARN either uses the original ARN to check the database

@@ -43,9 +43,10 @@ func TestVerifyService(t *testing.T) {
 			ExpectErr:               true,
 		},
 	}
+	a := &aws{}
 	for _, testCase := range testCases {
 		t.Run(testCase.TestName, func(t *testing.T) {
-			verifiedARN, err := getAwsIdentity(testCase.SignedGetCallerIdentity, pb.ClientLanguage_GO)
+			verifiedARN, err := a.getAwsIdentity(testCase.SignedGetCallerIdentity, pb.ClientLanguage_GO)
 			if testCase.ExpectErr {
 				if err == nil {
 					t.Fatal("expected err")
@@ -60,7 +61,7 @@ func TestVerifyService(t *testing.T) {
 			}
 
 			// We don't expect an error. Let's make sure we got the expected response.
-			match, err := arnsMatch(testCase.ExpectedArn, verifiedARN)
+			match, err := a.arnsMatch(testCase.ExpectedArn, verifiedARN)
 			if err != nil {
 				t.Fatal(err)
 			}
