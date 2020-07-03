@@ -10,6 +10,7 @@ from ..._mysql import get_auth_resp
 class ApproziumMySQLConnection(MySQLConnection):
     def _do_auth(self, *args, **kwargs):
         if self._password.__class__.__name__ == "AuthClient":
+
             def _auth_response(
                 client_flags,
                 username,
@@ -21,7 +22,8 @@ class ApproziumMySQLConnection(MySQLConnection):
             ):
                 authenticator = password
                 is_secure_connection = (
-                    client_flags & mysql.connector.constants.ClientFlag.SECURE_CONNECTION
+                    client_flags
+                    & mysql.connector.constants.ClientFlag.SECURE_CONNECTION
                 )
                 auth_response = get_auth_resp(
                     authenticator,
@@ -39,6 +41,7 @@ class ApproziumMySQLConnection(MySQLConnection):
             self._protocol._auth_response = _auth_response
 
         return super(ApproziumMySQLConnection, self)._do_auth(*args, **kwargs)
+
 
 @contextmanager
 def _patch_MySQLConnection():
