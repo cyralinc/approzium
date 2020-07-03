@@ -361,6 +361,10 @@ func TestFuzzAuthenticator(t *testing.T) {
 		req2 := &pb.PGMD5HashRequest{}
 		fuzzer.Fuzz(req2)
 		authenticator.GetPGMD5Hash(context.Background(), req2)
+
+		req3 := &pb.MYSQLSHA1HashRequest{}
+		fuzzer.Fuzz(req3)
+		authenticator.GetMYSQLSHA1Hash(context.Background(), req3)
 	}
 }
 
