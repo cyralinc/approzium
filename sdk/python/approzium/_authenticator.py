@@ -90,21 +90,25 @@ class AuthClient(object):
         info = self.attribution_info
         return json.dumps(info)
 
-    def _execute_request(self, request, getmethodname):
+    def _execute_request(self, request, getmethodname, dbhost, dbport, dbuser):
         # The presigned GetCallerIdentity call expires every 15 minutes.
         self._update_gci_if_needed()
 
         channel = grpc.insecure_channel(self.server_address)
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
-        # add authentication info
-        request.authtype = authenticator_pb2.AWS
-        request.client_language = authenticator_pb2.PYTHON
-        request.awsauth.CopyFrom(
-            authenticator_pb2.AWSAuth(
-                signed_get_caller_identity=self.signed_gci,
-                claimed_iam_arn=self.claimed_arn,
-            )
+        # authentication info
+        aws_identity = authenticator_pb2.AWSIdentity(
+            signed_get_caller_identity=self.signed_gci,
+            claimed_iam_arn=self.claimed_arn,
         )
+        password_request = authenticator_pb2.PasswordRequest(
+            aws=aws_identity,
+            client_language=authenticator_pb2.PYTHON,
+            dbhost=dbhost,
+            dbport=dbport,
+            dbuser=dbuser,
+        )
+        request.pwd_request.CopyFrom(password_request)
         response = getattr(stub, getmethodname)(request)
         # if no exception is raised, request was successful
         self.authenticated = True
@@ -116,23 +120,22 @@ class AuthClient(object):
             salt = auth_info
             if len(salt) != 4:
                 raise Exception("salt not right size")
-            request = authenticator_pb2.PGMD5HashRequest(
-                dbhost=dbhost, dbuser=dbuser, dbport=dbport, salt=salt,
+            request = authenticator_pb2.PGMD5HashRequest(salt=salt,)
+            response = self._execute_request(
+                request, "GetPGMD5Hash", dbhost, dbport, dbuser
             )
-            response = self._execute_request(request, "GetPGMD5Hash")
             return response.hash
         elif auth_type == _postgres.AUTH_REQ_SASL:
             auth = auth_info
             auth._generate_auth_msg()
             request = authenticator_pb2.PGSHA256HashRequest(
-                dbhost=dbhost,
-                dbport=dbport,
-                dbuser=dbuser,
                 salt=auth.password_salt,
                 iterations=auth.password_iterations,
                 authentication_msg=auth.authorization_message,
             )
-            response = self._execute_request(request, "GetPGSHA256Hash")
+            response = self._execute_request(
+                request, "GetPGSHA256Hash", dbhost, dbport, dbuser
+            )
             client_final = auth.create_client_final_message(response.cproof)
             auth.server_signature = response.sproof
             return client_final, auth

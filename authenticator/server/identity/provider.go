@@ -9,7 +9,7 @@ import (
 )
 
 type Proof struct {
-	AwsAuth *pb.AWSAuth
+	AwsAuth *pb.AWSIdentity
 }
 
 type Verified struct {

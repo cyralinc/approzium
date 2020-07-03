@@ -45,14 +45,15 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbmd5",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmd5",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
 		},
 		Salt: []byte{1, 2, 3, 4},
 	})
@@ -65,14 +66,15 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "foo",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
 		},
 		Salt: []byte{1, 2, 3, 4},
 	})
@@ -97,14 +99,15 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 	resp, err := authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbsha256",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbsha256",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
 		},
 		Salt:              "1234",
 		Iterations:        0,
@@ -122,14 +125,15 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 
 	// Now use a bad claimed arn and make sure we fail.
 	resp, err = authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "foo",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
 		},
 		Salt:              "1234",
 		Iterations:        0,
@@ -229,14 +233,15 @@ func TestNoRaces(t *testing.T) {
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
 			authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbsha256",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           claimedARN,
+				PwdRequest: &pb.PasswordRequest{
+					ClientLanguage: pb.ClientLanguage_GO,
+					Dbhost:         "dbsha256",
+					Dbport:         "5432",
+					Dbuser:         "bob",
+					Aws: &pb.AWSIdentity{
+						SignedGetCallerIdentity: signedGetCallerIdentity,
+						ClaimedIamArn:           claimedARN,
+					},
 				},
 				Salt:              "1234",
 				Iterations:        0,
@@ -249,14 +254,15 @@ func TestNoRaces(t *testing.T) {
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
 			authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbmd5",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           testEnv.ClaimedArn(),
+				PwdRequest: &pb.PasswordRequest{
+					ClientLanguage: pb.ClientLanguage_GO,
+					Dbhost:         "dbmd5",
+					Dbport:         "5432",
+					Dbuser:         "bob",
+					Aws: &pb.AWSIdentity{
+						SignedGetCallerIdentity: signedGetCallerIdentity,
+						ClaimedIamArn:           testEnv.ClaimedArn(),
+					},
 				},
 				Salt: []byte{1, 2, 3, 4},
 			})
@@ -291,6 +297,7 @@ func TestFuzzAuthenticator(t *testing.T) {
 	}
 
 	fuzzer := fuzz.New()
+
 	for i := 0; i < 1000; i++ {
 		req1 := &pb.PGSHA256HashRequest{}
 		fuzzer.Fuzz(req1)
