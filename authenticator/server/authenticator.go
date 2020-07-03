@@ -200,7 +200,7 @@ func (a *authenticator) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1H
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
 	if len(salt) != 20 {
-        return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("expected salt to be 20 bytes long, but got %d bytes", len(salt)))
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("expected salt to be 20 bytes long, but got %d bytes", len(salt)))
 	}
 
 	password, err := a.getPassword(ctx, req.GetPwdRequest())
