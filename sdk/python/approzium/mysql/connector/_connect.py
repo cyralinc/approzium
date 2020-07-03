@@ -44,16 +44,20 @@ class ApproziumMySQLConnection(MySQLConnection):
 
 
 @contextmanager
-def _patch_MySQLConnection():
+def _patch_MySQLConnection(include_pooling=False):
     mysql.connector.MySQLConnection = ApproziumMySQLConnection
+    if include_pooling:
+        mysql.connector.pooling.MySQLConnection = ApproziumMySQLConnection
     try:
         yield
     finally:
         mysql.connector.MySQLConnection = MySQLConnection
+        if include_pooling:
+            mysql.connector.pooling.MySQLConnection = MySQLConnection
 
 
 def _parse_kwargs(kwargs):
-    authenticator = kwargs.get('authenticator', None)
+    authenticator = kwargs.pop('authenticator', None)
     if authenticator is None:
         authenticator = approzium.default_auth_client
     if authenticator is None:
@@ -61,7 +65,8 @@ def _parse_kwargs(kwargs):
     kwargs["password"] = authenticator
     use_pure = kwargs.get("use_pure", False)
     if not use_pure:
-        msg = "MySQL C-Extension based connection is not currently supported."
+        msg = "MySQL C-Extension based connection is not currently supported.\
+Pass use_pure=True"
         raise NotImplementedError(msg)
     return use_pure, authenticator
 
