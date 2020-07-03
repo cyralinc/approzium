@@ -6,7 +6,6 @@ from mysql.connector.pooling import MySQLConnectionPool
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = approzium.AuthClient("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
-# approzium.default_auth_client = auth
 dbconfig = {
     "user": "bob",
     "authenticator": auth,
