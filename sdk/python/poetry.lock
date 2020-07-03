@@ -149,7 +149,7 @@ version = "8.4.0"
 category = "main"
 description = "MySQL driver written in Python"
 name = "mysql-connector-python"
-optional = false
+optional = true
 python-versions = "*"
 version = "8.0.20"
 
@@ -369,10 +369,10 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [extras]
-sqllibs = ["psycopg2", "asyncpg"]
+sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python"]
 
 [metadata]
-content-hash = "ecaaabee6097b6c774ba054a5b98616cfdeffb0f9d46ba226bf71f556e78eb9a"
+content-hash = "9652524954528695df8a20fb993f7577bbb3d5b571f99def3add4b158cc62938"
 python-versions = "^3.5"
 
 [metadata.files]
