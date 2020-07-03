@@ -10,7 +10,7 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_DBHOSTS=dbmd5:5432 dbsha256:5432 dbmysql:3306
+TEST_DBHOSTS=dbmd5:5432 dbsha256:5432 dbmysqlsha1:3306
 TEST_DB=db
 TEST_DBPORT=5432
 TEST_DBPASS=password
