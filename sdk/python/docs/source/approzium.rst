@@ -35,3 +35,11 @@ approzium.asyncpg subpackage
    :members:
    :undoc-members:
    :show-inheritance:
+
+approzium.mysql.connector subpackage
+----------------------------
+
+.. automodule:: approzium.mysql.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
