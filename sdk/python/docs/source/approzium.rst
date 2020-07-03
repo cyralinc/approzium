@@ -43,3 +43,8 @@ approzium.mysql.connector subpackage
    :members:
    :undoc-members:
    :show-inheritance:
+
+.. automodule:: approzium.mysql.connector.pooling
+   :members:
+   :undoc-members:
+   :show-inheritance:
