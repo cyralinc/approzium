@@ -52,6 +52,19 @@ def _patch_MySQLConnection():
         mysql.connector.MySQLConnection = MySQLConnection
 
 
+def _parse_kwargs(kwargs):
+    authenticator = kwargs.get('authenticator', None)
+    if authenticator is None:
+        authenticator = approzium.default_auth_client
+    if authenticator is None:
+        raise TypeError("Auth client not specified and not default auth client is set")
+    kwargs["password"] = authenticator
+    use_pure = kwargs.get("use_pure", False)
+    if not use_pure:
+        msg = "MySQL C-Extension based connection is not currently supported."
+        raise NotImplementedError(msg)
+    return use_pure, authenticator
+
 def connect(*args, authenticator=None, **kwargs):
     """Creates a MySQL connector connection through Approzium authentication. Takes
     the same arguments as ``mysql.connector.connect``, in addition to the
@@ -78,15 +91,7 @@ def connect(*args, authenticator=None, **kwargs):
         supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
         an exception is raised.
     """
-    if authenticator is None:
-        authenticator = approzium.default_auth_client
-    if authenticator is None:
-        raise TypeError("Auth client not specified and not default auth client is set")
-    kwargs["password"] = authenticator
-    use_pure = kwargs.get("use_pure", False)
-    if not use_pure:
-        msg = "MySQL C-Extension based connection is not currently supported."
-        raise NotImplementedError(msg)
+    _parse_kwargs(kwargs)
     with _patch_MySQLConnection():
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
