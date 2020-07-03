@@ -68,11 +68,11 @@ def connect(*args, authenticator=None, **kwargs):
 
     .. code-block:: python
 
-    >>> import approzium
-    >>> from approzium.mysql.connector import connect
-    >>> auth = approzium.AuthClient("myauthenticator.com:6000")
-    >>> con = connect(user="bob", host="myhost.com" authenticator=auth)  # no password!
-    >>> # use the connection just like any other MySQL connector connection
+        >>> import approzium
+        >>> from approzium.mysql.connector import connect
+        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> con = connect(user="bob", host="myhost.com" authenticator=auth)
+        >>> # use the connection just like any other MySQL connector connection
 
     .. warning::
         Currently, only the pure Python MySQL connector implementation is
