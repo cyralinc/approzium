@@ -74,8 +74,7 @@ func (a *authenticator) logRequestCount() {
 	}()
 }
 
-func (a *authenticator) getPassword(ctx context.Context, req *pb.PasswordRequest) (string, error) {
-	reqLogger := getRequestLogger(ctx)
+func (a *authenticator) getPassword(reqLogger *log.Entry, req *pb.PasswordRequest) (string, error) {
 
 	// Currently, only AWS identity is supported
 	awsIdentity := req.GetAws()
@@ -140,7 +139,8 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
-	password, err := a.getPassword(ctx, req.GetPwdRequest())
+	reqLogger := getRequestLogger(ctx)
+	password, err := a.getPassword(reqLogger, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
 	}
@@ -175,7 +175,8 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("iterations too high, received %d but maximum is %d", iterations, maxIterations))
 	}
 
-	password, err := a.getPassword(ctx, req.GetPwdRequest())
+	reqLogger := getRequestLogger(ctx)
+	password, err := a.getPassword(reqLogger, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
