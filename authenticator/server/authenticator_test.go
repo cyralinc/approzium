@@ -144,6 +144,61 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 	}
 }
 
+// TestAuthenticator_GetPGSHA256Hash issues real STS GetCallerIdentity because at the
+// time of writing there were no documented limits. Hitting the real API will allow
+// us to catch if it changes.
+func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	authenticator, err := New(testLogger, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := authenticator.GetMYSQLSHA1Hash(testCtx, &pb.MYSQLSHA1HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmysql",
+			Dbport:         "3306",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
+		},
+		Salt:              make([]byte, 20),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+    expected := []byte{0x7, 0x20, 0x87, 0xd1, 0x6f, 0xdf, 0xab, 0xc5, 0x5b, 0x16, 0x44, 0xbb, 0x90, 0x42, 0x5, 0xc6, 0xd, 0x50, 0x5f, 0xcf}
+	if !reflect.DeepEqual(resp.Hash, expected) {
+		t.Fatalf("expected %#v but received %#v", expected, resp.Hash)
+	}
+
+	// Now use a bad claimed arn and make sure we fail.
+	resp, err = authenticator.GetMYSQLSHA1Hash(testCtx, &pb.MYSQLSHA1HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmysql",
+			Dbport:         "3306",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
+		},
+		Salt:              make([]byte, 20),
+	})
+	if err == nil {
+		t.Fatal("using a claimed arn that doesn't belong to me should fail")
+	}
+}
+
 func TestToDatabaseARN(t *testing.T) {
 	// Make sure role session names get stripped for assumed roles because
 	// users won't be planting creds in databases with session names, since
