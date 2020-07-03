@@ -1,5 +1,4 @@
 from ._connect import _parse_kwargs, _patch_MySQLConnection
-import mysql.connector.pooling
 from mysql.connector.pooling import MySQLConnectionPool
 
 

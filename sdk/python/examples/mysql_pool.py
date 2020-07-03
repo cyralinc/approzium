@@ -1,8 +1,6 @@
 from os import environ
 
 import approzium
-import mysql.connector.pooling
-from mysql.connector.pooling import MySQLConnectionPool
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = approzium.AuthClient("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
