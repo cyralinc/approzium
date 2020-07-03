@@ -54,6 +54,31 @@ def _patch__do_auth(sql_connection_class=MySQLConnection):
 
 
 def connect(*args, authenticator=None, **kwargs):
+    """Creates a MySQL connector connection through Approzium authentication. Takes
+    the same arguments as ``mysql.connector.connect``, in addition to the
+    authenticator argument.
+
+    :param authenticator: AuthClient instance to be used for authentication. If
+        not provided, the default AuthClient, if set, is used.
+    :type authenticator: approzium.AuthClient, optional
+    :raises: TypeError, if no AuthClient is given and no default one is set.
+    :rtype: ``mysql.connector.MySQLConnection``
+
+    Example:
+
+    .. code-block:: python
+
+        >>> import approzium
+        >>> from approzium.mysql.connector import connect
+        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> con = connect(user="bob", host="myhost.com" authenticator=auth)  # no password!
+        >>> # use the connection just like any other MySQL connector connection
+
+    .. warning::
+        Currently, only the pure Python MySQL connector implementation is
+        supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
+        an exception is raised.
+    """
     if authenticator is None:
         authenticator = approzium.default_auth_client
     if authenticator is None:
