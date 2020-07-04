@@ -5,7 +5,7 @@ from ._connect import _parse_kwargs, _patch_MySQLConnection
 
 class MySQLConnectionPool(MySQLConnectionPool):
     def set_config(self, **kwargs):
-        _parse_kwargs(kwargs)
+        kwargs = _parse_kwargs(kwargs)
         super(MySQLConnectionPool, self).set_config(**kwargs)
 
     def add_connection(self, cnx=None):
