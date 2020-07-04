@@ -97,7 +97,7 @@ def connect(*args, authenticator=None, **kwargs):
         supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
         an exception is raised.
     """
-    _parse_kwargs({'authenticator': authenticator, **kwargs})
+    _parse_kwargs({"authenticator": authenticator, **kwargs})
     with _patch_MySQLConnection():
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
