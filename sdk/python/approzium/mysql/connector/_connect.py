@@ -68,7 +68,7 @@ def _parse_kwargs(kwargs):
         msg = "MySQL C-Extension based connection is not currently supported.\
 Pass use_pure=True"
         raise NotImplementedError(msg)
-    return use_pure, authenticator
+    return kwargs
 
 
 def connect(*args, authenticator=None, **kwargs):
@@ -97,7 +97,7 @@ def connect(*args, authenticator=None, **kwargs):
         supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
         an exception is raised.
     """
-    _parse_kwargs({"authenticator": authenticator, **kwargs})
+    kwargs = _parse_kwargs({"authenticator": authenticator, **kwargs})
     with _patch_MySQLConnection():
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
