@@ -1,9 +1,10 @@
 import logging
 
-import approzium
 import asyncpg
 from asyncpg.connect_utils import _ConnectionParameters
 from asyncpg.protocol import Protocol
+
+import approzium
 
 from .._postgres import PGAuthClient, construct_msg, parse_msg
 
