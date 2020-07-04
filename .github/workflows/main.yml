@@ -50,7 +50,7 @@ jobs:
         run: |
           pip install isort black flake8
 
-      - run: cd sdk/python && isort -y .
+      - run: cd sdk/python && isort .
       - run: cd sdk/python && black .
       - run: cd sdk/python && flake8
 
