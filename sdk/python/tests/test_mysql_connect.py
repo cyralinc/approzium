@@ -6,8 +6,11 @@ from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = approzium.AuthClient("authenticator:6000", iam_role=environ.get("TEST_IAM_ROLE"))
 # use Psycopg2 defined test environment variables
-connopts = {"user": environ["PSYCOPG2_TESTDB_USER"], "host": "dbmysqlsha1",
-            "use_pure": True}
+connopts = {
+    "user": environ["PSYCOPG2_TESTDB_USER"],
+    "host": "dbmysqlsha1",
+    "use_pure": True,
+}
 
 
 def test_connect():
