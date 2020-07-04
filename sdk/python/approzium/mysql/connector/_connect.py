@@ -61,7 +61,7 @@ def _parse_kwargs(kwargs):
     if authenticator is None:
         authenticator = approzium.default_auth_client
     if authenticator is None:
-        raise TypeError("Auth client not specified and not default auth client is set")
+        raise TypeError("Auth client not specified and no default auth client is set")
     kwargs["password"] = authenticator
     use_pure = kwargs.get("use_pure", False)
     if not use_pure:
@@ -97,7 +97,7 @@ def connect(*args, authenticator=None, **kwargs):
         supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
         an exception is raised.
     """
-    _parse_kwargs({'authenticator': authenticator, **kwargs})
+    _parse_kwargs({"authenticator": authenticator, **kwargs})
     with _patch_MySQLConnection():
         conn = mysql.connector.connect(*args, **kwargs)
     return conn
