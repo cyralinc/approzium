@@ -96,6 +96,14 @@ def connect(*args, authenticator=None, **kwargs):
         Currently, only the pure Python MySQL connector implementation is
         supported. Therefore, you have to pass in ``use_pure=True``, otherwise,
         an exception is raised.
+
+    .. note:
+        Currently, only secure password authentication using
+        `mysql_native_password` is supported. For more details, read MySQL's
+        `documentation`_
+
+    .. _documentation:
+        https://dev.mysql.com/doc/internals/en/secure-password-authentication.html
     """
     kwargs = _parse_kwargs({"authenticator": authenticator, **kwargs})
     with _patch_MySQLConnection():
