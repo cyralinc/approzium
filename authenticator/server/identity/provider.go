@@ -18,7 +18,7 @@ type Proof struct {
 }
 
 type Verified struct {
-	authType
+	authType authType
 	iamArn string
 }
 
