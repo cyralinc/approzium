@@ -4,23 +4,24 @@ import (
 	"strings"
 
 	"github.com/approzium/approzium/authenticator/server"
+	"github.com/approzium/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	config, err := server.ParseConfig()
+	c, err := config.ParseConfig()
 	if err != nil {
 		log.Errorf("couldn't parse config: %s", err)
 	}
 
-	logLevel, err := log.ParseLevel(strings.ToLower(config.LogLevel))
+	logLevel, err := log.ParseLevel(strings.ToLower(c.LogLevel))
 	if err != nil {
 		log.Errorf("couldn't parse log level: %s", err)
 	}
 	logger := log.New()
 	logger.Level = logLevel
 
-	switch strings.ToLower(config.LogFormat) {
+	switch strings.ToLower(c.LogFormat) {
 	case "text":
 		logger.SetFormatter(&log.TextFormatter{
 			FullTimestamp:          true,
@@ -30,10 +31,10 @@ func main() {
 	case "json":
 		logger.SetFormatter(&log.JSONFormatter{})
 	default:
-		logger.Errorf("unsupported log format: %s", config.LogFormat)
+		logger.Errorf("unsupported log format: %s", c.LogFormat)
 	}
 
-	if err := server.Start(logger, config); err != nil {
+	if err := server.Start(logger, c); err != nil {
 		logger.Errorf("authenticator ended due to %s", err)
 	}
 }

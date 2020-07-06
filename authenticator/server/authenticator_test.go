@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/approzium/approzium/authenticator/server/api"
+	"github.com/approzium/approzium/authenticator/server/config"
 	pb "github.com/approzium/approzium/authenticator/server/protos"
 	testtools "github.com/approzium/approzium/authenticator/server/testing"
 	"github.com/google/gofuzz"
@@ -20,12 +20,7 @@ import (
 )
 
 var (
-	testEnv    = &testtools.AwsEnv{}
-	testLogger = func() *log.Logger {
-		logger := log.New()
-		logger.Level = log.FatalLevel
-		return logger
-	}()
+	testEnv      = &testtools.AwsEnv{}
 	testLogEntry = func() *log.Entry {
 		logEntry := log.WithFields(log.Fields{"test": "logger"})
 		logEntry.Level = log.FatalLevel
@@ -45,7 +40,7 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := buildServer(testLogger, Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +92,7 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := buildServer(testLogger, Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,7 +215,7 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := buildServer(testLogger, Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +285,7 @@ func TestFuzzAuthenticator(t *testing.T) {
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
-	authenticator, err := buildServer(testLogger, Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -326,14 +321,14 @@ func TestMetrics(t *testing.T) {
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
 	// Start the API, which includes an endpoint for Prometheus to mine metrics.
-	config := Config{
+	config := config.Config{
 		Host:     "127.0.0.1",
 		HTTPPort: 6000,
 	}
-	_ = api.Start(testLogger, config.Host, strconv.Itoa(config.HTTPPort))
+	_ = api.Start(testtools.TestLogger(), config)
 
 	// Make some calls to increment the metrics.
-	svr, err := buildServer(testLogger, config)
+	svr, err := buildServer(testtools.TestLogger(), config)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -11,3 +11,4 @@ server:
 
 deps:
 	cd server && protoc -I protos authenticator.proto --go_out=plugins=grpc:protos && cd -
+	cd server && protoc -I protos health.proto --go_out=plugins=grpc:protos && cd -

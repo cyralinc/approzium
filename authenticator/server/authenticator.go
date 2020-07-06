@@ -1,5 +1,15 @@
 package server
 
+/*
+
+This server is stateless - it doesn't currently cache anything, perform
+any writes, or have knowledge of other Approzium clusters. Because of this,
+it can be highly available simply by running multiple instances. Please
+do not add code that caches state unless we are planning to change to
+a stateful, clustered design. Thanks!
+
+*/
+
 import (
 	"context"
 	"crypto/hmac"
@@ -10,10 +20,10 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strconv"
 	"strings"
 
 	"github.com/approzium/approzium/authenticator/server/api"
+	"github.com/approzium/approzium/authenticator/server/config"
 	"github.com/approzium/approzium/authenticator/server/credmgrs"
 	"github.com/approzium/approzium/authenticator/server/identity"
 	pb "github.com/approzium/approzium/authenticator/server/protos"
@@ -40,14 +50,13 @@ var maxIterations = uint32(15000 * 10)
 // Start begins a GRPC server, and an API server. It hangs indefinitely until
 // an error is returned from either, terminating the application. Both servers
 // respond to CTRL+C shutdowns.
-func Start(logger *log.Logger, config Config) error {
-	apiErrChan := api.Start(logger, config.Host, strconv.Itoa(config.HTTPPort))
+func Start(logger *log.Logger, config config.Config) error {
+	apiErrChan := api.Start(logger, config)
 
 	svr, err := buildServer(logger, config)
 	if err != nil {
 		return err
 	}
-
 	grpcErrChan := startGrpc(logger, config, svr)
 
 	select {
@@ -57,7 +66,7 @@ func Start(logger *log.Logger, config Config) error {
 	return err
 }
 
-func buildServer(logger *log.Logger, config Config) (pb.AuthenticatorServer, error) {
+func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {
 	// Calls pass through the following layers during handling.
 	// 	- First, a layer that captures request metrics.
 	//	- Next, a layer that adds a request ID, creates a request logger, and logs
@@ -75,7 +84,7 @@ func buildServer(logger *log.Logger, config Config) (pb.AuthenticatorServer, err
 	return svr, nil
 }
 
-func startGrpc(logger *log.Logger, config Config, svr pb.AuthenticatorServer) <-chan error {
+func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.AuthenticatorServer) <-chan error {
 	errChan := make(chan error)
 
 	serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.GRPCPort)
@@ -88,7 +97,8 @@ func startGrpc(logger *log.Logger, config Config, svr pb.AuthenticatorServer) <-
 	logger.Infof("grpc listening for requests on %s", serviceAddress)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterAuthenticatorServer(grpcServer, svr)
+	pb.RegisterAuthenticatorServer(grpcServer, authenticatorServer)
+	pb.RegisterHealthServer(grpcServer, newHealthServer())
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
 			errChan <- err
@@ -97,7 +107,7 @@ func startGrpc(logger *log.Logger, config Config, svr pb.AuthenticatorServer) <-
 	return errChan
 }
 
-func newAuthenticator(logger *log.Logger, config Config) (pb.AuthenticatorServer, error) {
+func newAuthenticator(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {
 	credMgr, err := credmgrs.RetrieveConfigured(logger, config.VaultTokenPath)
 	if err != nil {
 		return nil, err
