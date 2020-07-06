@@ -32,6 +32,9 @@ Contents
     api
 
 .. toctree::
+    examples
+
+.. toctree::
     :caption: Other Links
 
     Approzium General Documentation <https://approzium.org>
