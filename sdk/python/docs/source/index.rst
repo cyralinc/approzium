@@ -29,7 +29,7 @@ Contents
     :caption: API Reference
     :maxdepth: 7
 
-    approzium
+    api
 
 .. toctree::
     :caption: Other Links
