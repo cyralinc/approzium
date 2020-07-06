@@ -11,6 +11,7 @@ from unittest import SkipTest
 
 import pg2_testsuite  # noqa: E402 F401
 import psycopg2
+
 from approzium import Authenticator, set_default_authenticator
 
 # once get hash is mocked, import connect method

@@ -1,9 +1,17 @@
 package testing
 
 import (
-	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os"
+
+	log "github.com/sirupsen/logrus"
 )
+
+const EnvVarAcceptanceTests = "APPROZIUM_ACC"
+
+func ShouldRunAcceptanceTests() bool {
+	return os.Getenv(EnvVarAcceptanceTests) != ""
+}
 
 func TestLogger() *log.Logger {
 	logger := log.New()

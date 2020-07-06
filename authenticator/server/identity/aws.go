@@ -52,13 +52,13 @@ func (a *aws) Get(_ *log.Entry, proof *Proof) (*Verified, error) {
 		return nil, err
 	}
 	return &Verified{
-		AuthType: pb.AuthType_AWS,
-		IamArn:   iamArn,
+		authType: authTypeAws,
+		iamArn:   iamArn,
 	}, nil
 }
 
 func (a *aws) Matches(_ *log.Entry, claimedIdentity string, verifiedIdentity *Verified) (bool, error) {
-	return a.arnsMatch(claimedIdentity, verifiedIdentity.IamArn)
+	return a.arnsMatch(claimedIdentity, verifiedIdentity.iamArn)
 }
 
 // getAwsIdentity takes a signed get caller identity string and executes

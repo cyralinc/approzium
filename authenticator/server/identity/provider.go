@@ -1,6 +1,7 @@
 package identity
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,14 +13,13 @@ import (
 )
 
 type Proof struct {
-	AuthType   pb.AuthType
 	ClientLang pb.ClientLanguage
-	AwsAuth    *pb.AWSAuth
+	AwsAuth *pb.AWSIdentity
 }
 
 type Verified struct {
-	AuthType pb.AuthType
-	IamArn   string
+	authType
+	iamArn string
 }
 
 type Verifier interface {
@@ -113,17 +113,17 @@ func (t *tracker) Get(reqLogger *log.Entry, proof *Proof) (*Verified, error) {
 
 	var verifiedIdentity *Verified
 	var err error
-	switch proof.AuthType {
-	case pb.AuthType_AWS:
+	switch {
+	case proof.AwsAuth != nil:
 		verifiedIdentity, err = t.aws.Get(reqLogger, proof)
 	default:
-		return nil, fmt.Errorf("unexpected auth type %d received", proof.AuthType)
+		return nil, errors.New("no identity verification received")
 	}
 	if err != nil {
 		t.numVerFailures.Inc(1)
 		reqLogger.Warn(fmt.Sprintf("couldn't verify %s: %s", proof, err))
 	} else {
-		reqLogger.Info(fmt.Sprintf("verified %s", verifiedIdentity))
+		reqLogger.Info(fmt.Sprintf("verified %+v", verifiedIdentity))
 	}
 	return verifiedIdentity, err
 }
@@ -133,13 +133,13 @@ func (t *tracker) Matches(reqLogger *log.Entry, claimedIdentity string, verified
 
 	var matches bool
 	var err error
-	switch verifiedIdentity.AuthType {
-	case pb.AuthType_AWS:
+	switch verifiedIdentity.authType {
+	case authTypeAws:
 		start := time.Now().UTC()
 		matches, err = t.aws.Matches(reqLogger, claimedIdentity, verifiedIdentity)
 		t.awsReqMilliseconds.Set(time.Now().UTC().Sub(start).Milliseconds())
 	default:
-		return false, fmt.Errorf("unexpected auth type %d received", verifiedIdentity.AuthType)
+		return false, fmt.Errorf("unexpected auth type %d received", verifiedIdentity.authType)
 	}
 	if !matches || err != nil {
 		t.numMatchFailures.Inc(1)
@@ -152,3 +152,10 @@ func (t *tracker) Matches(reqLogger *log.Entry, claimedIdentity string, verified
 	}
 	return matches, err
 }
+
+type authType int
+
+const (
+	authTypeUnknown authType = iota
+	authTypeAws
+)

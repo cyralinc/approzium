@@ -131,25 +131,20 @@ type authenticator struct {
 	identityVerifier identity.Verifier
 }
 
-func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
-	reqLogger := getRequestLogger(ctx)
-
-	// Return early if we didn't get a valid salt.
-	salt := req.GetSalt()
-	if len(salt) != 4 {
-		msg := fmt.Sprintf("expected salt to be 4 bytes long, but got %d bytes", len(salt))
-		return nil, status.Errorf(codes.InvalidArgument, msg)
+func (a *authenticator) getPassword(reqLogger *log.Entry, req *pb.PasswordRequest) (string, error) {
+	// Currently, only AWS identity is supported
+	awsIdentity := req.GetAws()
+	if awsIdentity == nil {
+		return "", fmt.Errorf("AWS auth info is required")
 	}
-
 	// To expedite handling the request, let's verify the caller's identity at the same
 	// time as getting the password.
 	verifiedIdentityChan := make(chan *identity.Verified, 1)
 	verificationErrChan := make(chan error, 1)
 	go func() {
 		proof := &identity.Proof{
-			AuthType:   req.Authtype,
 			ClientLang: req.ClientLanguage,
-			AwsAuth:    req.Awsauth,
+			AwsAuth:    req.Aws,
 		}
 		verifiedIdentity, err := a.identityVerifier.Get(reqLogger, proof)
 		if err != nil {
@@ -159,18 +154,14 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		verifiedIdentityChan <- verifiedIdentity
 	}()
 
-	// Get the credentials.
-	if req.Awsauth == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "aws auth must be provided")
-	}
-	claimedIamArn := req.Awsauth.ClaimedIamArn
+	claimedIamArn := awsIdentity.ClaimedIamArn
 	dbHost := req.GetDbhost()
 	dbPort := req.GetDbport()
 	dbUser := req.GetDbuser()
 
 	databaseArn, err := toDatabaseARN(reqLogger, claimedIamArn)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	password, err := a.getCreds(reqLogger, credmgrs.DBKey{
 		IAMArn: databaseArn,
@@ -179,7 +170,7 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 		DBUser: dbUser,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return "", status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	// Make sure the arn they claimed they had to get the creds was their actual arn.
@@ -187,15 +178,32 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	case verifiedIdentity := <-verifiedIdentityChan:
 		match, err := a.identityVerifier.Matches(reqLogger, claimedIamArn, verifiedIdentity)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIdentity))
+			return "", status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %+v", claimedIamArn, verifiedIdentity))
 		}
 	case err = <-verificationErrChan:
-		return nil, err
+		return "", err
+	}
+	return password, nil
+}
+
+func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
+	// Return early if we didn't get a valid salt.
+	salt := req.GetSalt()
+	if len(salt) != 4 {
+		msg := fmt.Sprintf("expected salt to be 4 bytes long, but got %d bytes", len(salt))
+		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
 
+	reqLogger := getRequestLogger(ctx)
+	password, err := a.getPassword(reqLogger, req.GetPwdRequest())
+	if err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+
+	dbUser := req.GetPwdRequest().GetDbuser()
 	// Everything checked out.
 	hash, err := computePGMD5Hash(dbUser, password, salt)
 	if err != nil {
@@ -205,8 +213,6 @@ func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 }
 
 func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256HashRequest) (*pb.PGSHA256Response, error) {
-	reqLogger := getRequestLogger(ctx)
-
 	// Return early if we didn't get a valid auth message or salt.
 	authMsg := req.GetAuthenticationMsg()
 	if len(authMsg) == 0 {
@@ -225,44 +231,8 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("iterations too high, received %d but maximum is %d", iterations, maxIterations))
 	}
 
-	// To expedite handling the request, let's verify the caller's identity at the same
-	// time as getting the password.
-	verifiedIdentityChan := make(chan *identity.Verified, 1)
-	verificationErrChan := make(chan error, 1)
-	go func() {
-		proof := &identity.Proof{
-			AuthType:   req.Authtype,
-			ClientLang: req.ClientLanguage,
-			AwsAuth:    req.Awsauth,
-		}
-		verifiedIdentity, err := a.identityVerifier.Get(reqLogger, proof)
-		if err != nil {
-			verificationErrChan <- status.Errorf(codes.Unauthenticated, err.Error())
-			return
-		}
-		verifiedIdentityChan <- verifiedIdentity
-	}()
-
-	// Get the credentials.
-	if req.Awsauth == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "aws auth must be provided")
-	}
-	claimedIamArn := req.Awsauth.ClaimedIamArn
-	dbHost := req.GetDbhost()
-	dbPort := req.GetDbport()
-	dbUser := req.GetDbuser()
-
-	databaseArn, err := toDatabaseARN(reqLogger, claimedIamArn)
-	if err != nil {
-		return nil, err
-	}
-
-	password, err := a.getCreds(reqLogger, credmgrs.DBKey{
-		IAMArn: databaseArn,
-		DBHost: dbHost,
-		DBPort: dbPort,
-		DBUser: dbUser,
-	})
+	reqLogger := getRequestLogger(ctx)
+	password, err := a.getPassword(reqLogger, req.GetPwdRequest())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -277,20 +247,6 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	sproof := computePGSHA256Sproof(saltedPass, authMsg)
-
-	// Make sure the arn they claimed they had to get the creds was their actual arn.
-	select {
-	case verifiedIdentity := <-verifiedIdentityChan:
-		match, err := a.identityVerifier.Matches(reqLogger, claimedIamArn, verifiedIdentity)
-		if err != nil {
-			return nil, err
-		}
-		if !match {
-			return nil, status.Errorf(codes.Unauthenticated, fmt.Sprintf("claimed IAM arn %s did not match actual IAM arn of %s", claimedIamArn, verifiedIdentity))
-		}
-	case err = <-verificationErrChan:
-		return nil, err
-	}
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
