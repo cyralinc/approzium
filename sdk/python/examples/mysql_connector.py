@@ -11,7 +11,8 @@ cur.execute("SELECT 1")
 result = next(cur)
 print(result)
 
-cnxpool = MySQLConnectionPool(pool_name="mypool", pool_size=3, **dbconfig)
+cnxpool = MySQLConnectionPool(pool_name="mypool", pool_size=3,
+                              user="bob", host="dbmysql", authenticator=auth)
 print("Connection Pool Established")
 conn = cnxpool.get_connection()
 cur = conn.cursor()
