@@ -12,11 +12,11 @@ Approzium Python SDK is implemented as thin wrappers that integrate with existin
 
 Currently, it supports Python 3.5+ and AWS-based identity.
 
-Get started at Getting_Started_.
-
 .. _Approzium: https://approzium.org/
 .. _roadmap: https://approzium.org/src-pages-roadmap
-.. _Getting_Started: :doc:`getting-started`
+
+:doc:`getting-started`
+    Get started with Approzium
 
 
 API Documentation
