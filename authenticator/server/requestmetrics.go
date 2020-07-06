@@ -101,3 +101,17 @@ func (m *requestMetrics) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Ha
 	m.reqMilliseconds.Set(time.Now().UTC().Sub(start).Milliseconds())
 	return resp, err
 }
+
+func (m *requestMetrics) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
+	start := time.Now().UTC()
+	m.numRequests.Inc(1)
+
+	resp, err := m.wrapped.GetMYSQLSHA1Hash(ctx, req)
+	if err != nil {
+		m.numErrResponses.Inc(1)
+	}
+
+	m.numResponses.Inc(1)
+	m.reqMilliseconds.Set(time.Now().UTC().Sub(start).Milliseconds())
+	return resp, err
+}
