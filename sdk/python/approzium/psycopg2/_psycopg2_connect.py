@@ -1,8 +1,9 @@
 import logging
 import select
 
-import approzium
 import psycopg2
+
+import approzium
 
 from .._postgres import PGAuthClient
 from ._psycopg2_ctypes import (
