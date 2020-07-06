@@ -100,7 +100,7 @@ def connect(dsn=None, cursor_factory=None, authenticator=None, **kwargs):
 
         >>> import approzium
         >>> from approzium.psycopg2 import connect
-        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> auth = approzium.AuthClient("myauthenticator.com:6001")
         >>> con = connect("host=DB.com dbname=mydb", authenticator=auth)  # no password!
         >>> # use the connection just like any other Psycopg2 connection
     """

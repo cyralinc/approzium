@@ -81,7 +81,7 @@ def create_pool(
 
         >>> import approzium
         >>> from approzium.asyncpg import create_pool
-        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> auth = approzium.AuthClient("myauthenticator.com:6001")
         >>> pool = await create_pool(user='postgres', authenticator=auth)
         >>> con = await pool.acquire()
         >>> try:
