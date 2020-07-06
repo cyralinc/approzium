@@ -13,9 +13,7 @@ async def run():
     await conn.fetch("""SELECT 1""")
     await conn.close()
 
-    pool = await create_pool(
-        user="bob", database="db", host="host", authenticator=auth
-    )
+    pool = await create_pool(user="bob", database="db", host="host", authenticator=auth)
     print("Connection Established!")
     async with pool.acquire() as conn:
         await conn.fetch("""SELECT 1""")
