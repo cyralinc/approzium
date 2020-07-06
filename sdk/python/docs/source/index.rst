@@ -29,6 +29,7 @@ Contents
     :caption: Other Links
 
     Github <https://github.com/approzium/approzium>
+    Slack (#help-and-questions) <https://github.com/approzium/approzium#support>
 
 
 Indices and tables
