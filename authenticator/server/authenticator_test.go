@@ -155,7 +155,7 @@ func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New(testLogger, Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
