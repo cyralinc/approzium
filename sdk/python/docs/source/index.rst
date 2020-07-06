@@ -20,10 +20,16 @@ Contents
 ========
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 5
+    :caption: User Guide
 
-   userguide
-   approzium
+    userguide
+
+.. toctree::
+    :caption: API Reference
+    :maxdepth: 7
+
+    approzium
 
 .. toctree::
     :caption: Other Links
