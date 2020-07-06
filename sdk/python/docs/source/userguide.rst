@@ -1,6 +1,3 @@
-User Guide
-**********
-
 Installation
 ------------
 
@@ -9,7 +6,7 @@ The last stable release is available on PyPI and can be installed with ``pip``::
     $ python3 -m pip install approzium
 
 Requirements
--------------
+------------
 
 * CPython_ >= 3.5
 
