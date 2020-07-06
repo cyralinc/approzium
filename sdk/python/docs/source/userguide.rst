@@ -11,9 +11,7 @@ The last stable release is available on PyPI and can be installed with ``pip``::
 Requirements
 -------------
 
-* Python -- one of the following:
-
-    - CPython_ >= 3.5
+* CPython_ >= 3.5
 
 .. _CPython: http://www.python.org/
 
