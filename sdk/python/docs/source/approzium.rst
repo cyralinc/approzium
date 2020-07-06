@@ -1,5 +1,5 @@
-approzium package
-*****************
+API Doc
+*******
 
 Module contents
 ---------------
