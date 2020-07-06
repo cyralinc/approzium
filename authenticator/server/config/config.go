@@ -5,11 +5,8 @@ import "github.com/kelseyhightower/envconfig"
 // Config is an object for storing configuration variables set through
 // Approzium's environment.
 //
-// For those using Vault for storage, Approzium will read Vault's address
-// and the Vault token it should use through Vault's normal environment
-// variables described here:
-// https://www.vaultproject.io/docs/commands#environment-variables.
-// At a minimum, VAULT_ADDR and VAULT_TOKEN must be set.
+// Please see https://approzium.org/configuration for elaboration upon
+// each parameter.
 type Config struct {
 	Host     string `default:"127.0.0.1"`
 	HTTPPort int    `envconfig:"http_port" default:"6000"`
