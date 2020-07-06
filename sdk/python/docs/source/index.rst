@@ -15,12 +15,9 @@ Currently, it supports Python 3.5+ and AWS-based identity.
 .. _Approzium: https://approzium.org/
 .. _roadmap: https://approzium.org/src-pages-roadmap
 
-:doc:`getting-started`
-    Get started with Approzium
 
-
-API Documentation
-=================
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
