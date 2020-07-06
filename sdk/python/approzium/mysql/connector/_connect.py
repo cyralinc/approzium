@@ -89,7 +89,7 @@ def connect(*args, authenticator=None, **kwargs):
         >>> import approzium
         >>> from approzium.mysql.connector import connect
         >>> auth = approzium.AuthClient("myauthenticator.com:6000")
-        >>> con = connect(user="bob", host="myhost.com" authenticator=auth)
+        >>> con = connect(user="bob", host="host.com" authenticator=auth, use_pure=True)
         >>> # use the connection just like any other MySQL connector connection
 
     .. warning::
