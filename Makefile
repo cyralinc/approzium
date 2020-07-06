@@ -10,7 +10,7 @@ dc-build: ssl/rootCA.key
 test: run-tests-in-docker
 
 # PARAMETERS USED FOR TESTS
-TEST_DBHOSTS=dbmd5 dbsha256
+TEST_DBADDRS=dbmd5:5432 dbsha256:5432 dbmysqlsha1:3306
 TEST_DB=db
 TEST_DBPORT=5432
 TEST_DBPASS=password
@@ -39,7 +39,7 @@ vault_secret = { $\
 ] $\
 }
 pg2_testsuite_env = TEST_IAM_ROLE=${TEST_IAM_ROLE} PSYCOPG2_TESTDB=$(TEST_DB) $\
-		PSYCOPG2_TESTDB_HOST=$(TEST_DBHOST) PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT)
+		PSYCOPG2_TESTDB_ADDR=$(TEST_DBADDR) PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT)
 		PSYCOPG2_TESTDB_USER=$(TEST_DBUSER)
 
 
@@ -50,12 +50,12 @@ ssl/rootCA.key:
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
 	vault secrets enable -path=approzium -version=1 kv | true
-seed-vault-host:  # call this with "make seed-vault-host HOST=foo"
+seed-vault-host:  # call this with "make seed-vault-host ADDR=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
-		vault write approzium/$(HOST):$(TEST_DBPORT) -
+		vault write approzium/$(ADDR) -
 seed-vault-all-hosts:
-	for HOST in $(TEST_DBHOSTS); do \
-		make seed-vault-host HOST=$$HOST; \
+	for ADDR in $(TEST_DBADDRS); do \
+		make seed-vault-host ADDR=$$ADDR; \
 	done
 
 run-testsuite: run-gotests run-pg2tests
@@ -67,9 +67,9 @@ run-pythontests: enable-vault-path seed-vault-all-hosts
 	cd sdk/python && poetry run pytest --workers auto
 
 run-pg2tests: enable-vault-path seed-vault-all-hosts
-	for HOST in $(TEST_DBHOSTS); do \
-		make seed-vault-host HOST=$$HOST \
-		echo '###### Testing with DBHOST' $$HOST 'SSL=ON #####'; \
+	for ADDR in $(TEST_DBADDRS); do \
+		make seed-vault-host ADDR=$$ADDR \
+		echo '###### Testing with DBADDR' $$ADDR 'SSL=ON #####'; \
 		PGSSLMODE=require PSYCOPG2_TESTDB_HOST=$$HOST make -C sdk/python/ test; \
 		echo '###### Testing with DBHOST' $$HOST 'SSL=OFF #####'; \
 		PGSSLMODE=disable PSYCOPG2_TESTDB_HOST=$$HOST make -C sdk/python/ test; \
