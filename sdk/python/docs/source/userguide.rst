@@ -27,9 +27,11 @@ The following database driver libraries are supported:
       +------------+-----------------+----------------------------------------------------------+
       | Database   | Driver          | Authentication Methods                                   |
       +============+=================+==========================================================+
-      | Postgres   | Psycopg2        | MD5 (Postgres default) and SCRAM-SHA-256 authentication  |
+      | Postgres   | Psycopg2_        | MD5 (Postgres default) and SCRAM-SHA-256 authentication  |
       +------------+-----------------+----------------------------------------------------------+
       | Postgres   | Asyncpg         | Same as above                                            |
       +------------+-----------------+----------------------------------------------------------+
       | MySQL      | MySQL Connector | Native password authentication                           |
       +------------+-----------------+----------------------------------------------------------+
+
+.. _Psycopg2: https://github.com/psycopg/psycopg2
