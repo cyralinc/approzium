@@ -1,9 +1,10 @@
 from os import environ
 from select import select
 
-import approzium
 import psycopg2
 import pytest
+
+import approzium
 from approzium.psycopg2 import connect
 from approzium.psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 

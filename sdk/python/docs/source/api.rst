@@ -36,6 +36,7 @@ approzium.asyncpg
 approzium.mysql.connector
 -------------------------
 
+
 .. automodule:: approzium.mysql.connector
    :members:
    :undoc-members:

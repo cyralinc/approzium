@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 
-import approzium
 import mysql.connector
 from mysql.connector import MySQLConnection
+
+import approzium
 
 from ..._mysql import get_auth_resp
 
