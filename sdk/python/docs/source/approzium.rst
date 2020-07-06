@@ -1,5 +1,5 @@
-approzium package
-*****************
+API Reference
+*************
 
 Module contents
 ---------------
@@ -32,6 +32,19 @@ approzium.asyncpg subpackage
    :show-inheritance:
 
 .. automodule:: approzium.asyncpg.pool
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+approzium.mysql.connector subpackage
+----------------------------
+
+.. automodule:: approzium.mysql.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: approzium.mysql.connector.pooling
    :members:
    :undoc-members:
    :show-inheritance:

@@ -25,4 +25,5 @@ services:
             - authenticator
             - dbmd5
             - dbsha256
+            - dbmysqlsha1
             - vault

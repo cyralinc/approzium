@@ -103,6 +103,31 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	return resp, respErr
 }
 
+func (l *requestLogger) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1HashRequest) (*pb.MYSQLSHA1Response, error) {
+	requestId, requestLogger, err := l.buildContextualLogger()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	sanitized := &pb.MYSQLSHA1HashRequest{}
+	if err := deepcopy.Copy(sanitized, req); err != nil {
+		return nil, err
+	}
+	if sanitized.PwdRequest != nil && sanitized.PwdRequest.GetAws() != nil {
+		sanitized.PwdRequest.GetAws().SignedGetCallerIdentity = redactedValue
+	}
+	l.logSanitizedRequest(requestLogger, sanitized)
+
+	resp, respErr := l.wrapped.GetMYSQLSHA1Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
+
+	if resp == nil {
+		resp = &pb.MYSQLSHA1Response{}
+	}
+	resp.Requestid = requestId
+	l.logSanitizedResponse(requestLogger, resp, respErr)
+	return resp, respErr
+}
+
 func (l *requestLogger) logSanitizedRequest(requestLogger *log.Entry, req interface{}) {
 	// Log asynchronously to avoid blocking while lots of JSON conversion takes place.
 	preciseTime := time.Now().UTC()
