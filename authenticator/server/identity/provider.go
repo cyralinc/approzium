@@ -19,7 +19,7 @@ type Proof struct {
 
 type Verified struct {
 	authType authType
-	iamArn string
+	iamArn   string
 }
 
 type Verifier interface {
