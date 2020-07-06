@@ -34,6 +34,7 @@ Contents
 .. toctree::
     :caption: Examples
     :maxdepth: 7
+
     examples
 
 .. toctree::
