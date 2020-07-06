@@ -25,6 +25,11 @@ Contents
    userguide
    approzium
 
+.. toctree::
+    :caption: Other Links
+
+    Github <https://github.com/approzium/approzium>
+
 
 Indices and tables
 ==================
