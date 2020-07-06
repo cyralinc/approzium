@@ -14,7 +14,7 @@ import (
 
 type Proof struct {
 	ClientLang pb.ClientLanguage
-	AwsAuth *pb.AWSIdentity
+	AwsAuth    *pb.AWSIdentity
 }
 
 type Verified struct {
