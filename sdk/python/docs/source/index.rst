@@ -34,6 +34,7 @@ Contents
 .. toctree::
     :caption: Other Links
 
+    Approzium General Documentation <https://approzium.com>
     Github <https://github.com/approzium/approzium>
     Slack (#help-and-questions) <https://github.com/approzium/approzium#support>
 
