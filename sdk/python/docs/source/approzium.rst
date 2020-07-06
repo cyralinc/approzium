@@ -1,5 +1,5 @@
-API Doc
-*******
+API Reference
+*************
 
 Module contents
 ---------------
