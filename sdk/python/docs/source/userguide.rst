@@ -52,7 +52,7 @@ Approzium Python SDK is designed to have a small footprint on the source code of
 
 2. By default, the AuthClient automatically detects the environment that the service is running in. Currently, only AWS-based identity is supported, so it will detect that.
 
-3. Set this auth client to be the default one. This can help you reduce code bloat:
+3. Set this auth client to be the default one:
 
     .. code-block:: python
 
