@@ -1,0 +1,46 @@
+# Defines common services used for development purposes
+# set COMPOSE_DOCKER_CLI_BUILD=1
+# set DOCKER_BUILDKIT=1
+version: '3.5'
+
+x-test-variables: &test-variables
+    POSTGRES_PASSWORD: 'password'
+    POSTGRES_USER: 'bob'
+    POSTGRES_DB: 'db'
+services:
+    dbsha256:
+        build: ssl
+        image: approzium_postgres_ssl
+        command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
+        environment:
+            <<: *test-variables
+            POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
+            POSTGRES_HOST_AUTH_METHOD: 'scram-sha-256'
+    dbmd5:
+        build: ssl
+        image: approzium_postgres_ssl
+        command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
+        environment: *test-variables
+    dbmysqlsha1:
+        image: mysql:5.7
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+            - MYSQL_DATABASE=db
+            - MYSQL_USER=bob
+            - MYSQL_PASSWORD=password
+    vault:
+        image: "vault:latest"
+        environment:
+            - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+            - VAULT_DEV_ROOT_TOKEN_ID=root
+        entrypoint: vault server -dev
+    authenticator:
+        build:
+            context: ./
+            target: build
+        environment:
+            - APPROZIUM_HOST=0.0.0.0
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
+        depends_on:
+            - vault
