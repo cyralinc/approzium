@@ -26,7 +26,7 @@ except KeyError:
     print("Please set env var 'TEST_IAM_ROLE' to a valid value")
     sys.exit(1)
 
-auth = Authenticator("authenticator:6000", test_iam_role)
+auth = Authenticator("authenticator:6001", test_iam_role)
 set_default_authenticator(auth)
 
 # replace connect method

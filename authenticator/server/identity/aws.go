@@ -10,6 +10,7 @@ import (
 
 	pb "github.com/approzium/approzium/authenticator/server/protos"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	log "github.com/sirupsen/logrus"
 )
 
 // validSTSEndpoints is presented as a variable so it
@@ -40,10 +41,30 @@ var validSTSEndpoints = []string{
 	"sts.sa-east-1.amazonaws.com",
 }
 
+type aws struct{}
+
+func (a *aws) Get(_ *log.Entry, proof *Proof) (*Verified, error) {
+	if proof.AwsAuth == nil {
+		return nil, fmt.Errorf("AWS auth info is required")
+	}
+	iamArn, err := a.getAwsIdentity(proof.AwsAuth.SignedGetCallerIdentity, proof.ClientLang)
+	if err != nil {
+		return nil, err
+	}
+	return &Verified{
+		authType: authTypeAws,
+		iamArn:   iamArn,
+	}, nil
+}
+
+func (a *aws) Matches(_ *log.Entry, claimedIdentity string, verifiedIdentity *Verified) (bool, error) {
+	return a.arnsMatch(claimedIdentity, verifiedIdentity.iamArn)
+}
+
 // getAwsIdentity takes a signed get caller identity string and executes
 // the request to the given AWS STS endpoint. It returns the caller's
 // full IAM arn.
-func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
+func (a *aws) getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
 	u, err := url.Parse(signedGetCallerIdentity)
 	if err != nil {
 		return "", err
@@ -68,10 +89,10 @@ func getAwsIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLang
 	if query.Get("Action") != "GetCallerIdentity" {
 		return "", fmt.Errorf("invalid action for GetCallerIdentity: %s", query.Get("Action"))
 	}
-	return executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
+	return a.executeGetCallerIdentity(signedGetCallerIdentity, clientLanguage)
 }
 
-func executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
+func (a *aws) executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.ClientLanguage) (string, error) {
 	var resp *http.Response
 	var err error
 	switch clientLanguage {
@@ -106,7 +127,10 @@ func executeGetCallerIdentity(signedGetCallerIdentity string, clientLanguage pb.
 
 // arnsMatch compares a claimed arn that the caller states they'll
 // have, and an actual arn returned by the AWS get caller identity call.
-func arnsMatch(claimedArn, actualArn string) (bool, error) {
+func (a *aws) arnsMatch(claimedArn, actualArn string) (bool, error) {
+	if claimedArn == "" || actualArn == "" {
+		return false, nil
+	}
 	if claimedArn == actualArn {
 		return true, nil
 	}
