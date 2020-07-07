@@ -33,8 +33,10 @@ soon as we can!
 
 We welcome community contributions!
 
+We use `docker-compose.yml` to quickly and easily provide you with a development environment that mimics real life.
 To spin up an end-to-end development environment based in Docker:
 
+- Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
 - In your local environment, run `$ aws configure` and add an access key and secret.
 - Run `$ make dc-build`. This will build the authenticator and development Docker images.
 - Run `$ docker-compose up`. This will run the authenticator with a Vault backend and will run test database servers (Postgres and MySQL).
@@ -44,14 +46,11 @@ To spin up an end-to-end development environment based in Docker:
     * Give your AWS-identity access to the test server: `$ make seed-vault-addr ADDR=dbmd5:5432`
     * Create a connection: `$ cd sdk/python/examples && poetry run python3 psycopg2_connect.py`.
 
-## Testing
+### Testing
 
 Our end-to-end tests take a few minutes to run. Please run them once locally before you submit a PR.
 
-We use `docker-compose.yml` to quickly and easily provide you with a development environment that mimics real life. 
-Please check it out for helpful hints on how to reach one container from another. To run the end-to-end test, from our 
-home directory:
-- Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
+To run the end-to-end test, from our home directory:
 - Run `make test`. That's it!
 
 ## Credits
