@@ -1,6 +1,7 @@
 # approzium
 
-[![Build Status](https://github.com/approzium/approzium/workflows/.github/workflows/main.yml/badge.svg)]()
+![test](https://github.com/approzium/approzium/workflows/test/badge.svg)
+![lint](https://github.com/approzium/approzium/workflows/lint/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://approzium.readthedocs.io/?badge=latest)
 
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
