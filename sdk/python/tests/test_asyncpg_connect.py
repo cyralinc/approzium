@@ -6,8 +6,9 @@ import approzium
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = approzium.AuthClient("authenticator:6001",
-                            iam_role=environ.get("TEST_ASSUMABLE_ARN"))
+auth = approzium.AuthClient(
+    "authenticator:6001", iam_role=environ.get("TEST_ASSUMABLE_ARN")
+)
 # use Psycopg2 defined test environment variables
 connopts = {
     "user": environ["PSYCOPG2_TESTDB_USER"],
