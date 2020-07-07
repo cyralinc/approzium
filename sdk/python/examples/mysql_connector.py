@@ -2,7 +2,7 @@ import approzium
 from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
-auth = approzium.AuthClient("authenticator:6000")
+auth = approzium.AuthClient("authenticator:6001")
 conn = connect(user="bob", authenticator=auth, host="dbmysql", use_pure=True)
 print("Connection Established")
 

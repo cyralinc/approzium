@@ -4,7 +4,7 @@ from approzium import Authenticator
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = Authenticator("authenticator:6000")
+auth = Authenticator("authenticator:6001")
 
 
 async def run():
