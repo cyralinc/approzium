@@ -36,14 +36,14 @@ We welcome community contributions!
 To spin up an end-to-end development environment based in Docker:
 
 - In your local environment, run `$ aws configure` and add an access key and secret.
-  - Make sure the access key and secret you configure can assume at least one role.
-- Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
-- Run `$ make dc-build`.
-- Run `$ docker-compose up`.
-- In another window, `$ make dev`.
-- To use our Python SDK to shoot a request at the authenticator, run
-  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/examples/pg2_client.py`.
-  
+- Run `$ make dc-build`. This will build the authenticator and development Docker images.
+- Run `$ docker-compose up`. This will run the authenticator with a Vault backend and will run test database servers (Postgres and MySQL).
+- In another window, `$ make dev`. This will start a shell in the development environment.
+- You now have a full development and testing environment!
+- For example, to use our Python SDK to create an Approzium connection to a Postgres server:
+    * Give your AWS-identity access to the test server: `$ make seed-vault-addr ADDR=dbmd5:5432`
+    * Create a connection: `$ cd sdk/python/examples && poetry run python3 psycopg2_connect.py`.
+
 ## Testing
 
 Our end-to-end tests take a few minutes to run. Please run them once locally before you submit a PR.
