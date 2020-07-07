@@ -1,7 +1,12 @@
 # Targets that can be run from host machine
+
+# following lines sets the TEST_IAM_ROLE to the value reported by AWS CLI if it is not
+# already set as an environment variable
+TEST_IAM_ROLE?=$(export AWS_PAGER="" && aws sts get-caller-identity --query Arn --output text)
+
 # Starts a bash shell in the dev environment
 dev:
-	make run-in-docker CMD="bash"
+	make run-in-docker CMD="bash" TEST_IAM_ROLE=$(value TEST_IAM_ROLE)
 dev-env: dc-build
 	$(docker_env) docker-compose up
 dc-build: ssl/rootCA.key
@@ -22,7 +27,7 @@ TEST_DBUSER=bob
 # This target just saves a bit of typing
 # It takes argument CMD and runs it in the tests service
 run-in-docker:
-	$(docker_env) $(pg2_testsuite_env) docker-compose $(dc_files) run tests $(CMD)
+	$(docker_env) $(pg2_testsuite_env) TEST_IAM_ROLE=$(TEST_IAM_ROLE) docker-compose $(dc_files) run tests $(CMD)
 
 dc_files=-f docker-compose.yml -f docker-compose.test.yml
 # Enable Buildkit in docker commands
@@ -38,7 +43,7 @@ vault_secret = { $\
 	"${TEST_IAM_ROLE}" $\
 ] $\
 }
-pg2_testsuite_env = TEST_IAM_ROLE=${TEST_IAM_ROLE} PSYCOPG2_TESTDB=$(TEST_DB) $\
+pg2_testsuite_env = PSYCOPG2_TESTDB=$(TEST_DB) $\
 		PSYCOPG2_TESTDB_ADDR=$(TEST_DBADDR) PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT)
 		PSYCOPG2_TESTDB_USER=$(TEST_DBUSER)
 
@@ -50,12 +55,12 @@ ssl/rootCA.key:
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
 	vault secrets enable -path=approzium -version=1 kv | true
-seed-vault-host:  # call this with "make seed-vault-host ADDR=foo"
+seed-vault-addr:  # call this with "make seed-vault-host ADDR=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
 		vault write approzium/$(ADDR) -
-seed-vault-all-hosts:
+seed-vault-all-addrs:
 	for ADDR in $(TEST_DBADDRS); do \
-		make seed-vault-host ADDR=$$ADDR; \
+		make seed-vault-addr ADDR=$$ADDR; \
 	done
 
 run-testsuite: run-gotests run-pg2tests
