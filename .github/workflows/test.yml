@@ -22,12 +22,9 @@ jobs:
       - name: Run Go tests
         run: make run-in-docker CMD="make run-gotests"
         env:
-          TEST_IAM_ROLE: ${{ secrets.TEST_IAM_ROLE }}
+          TEST_ASSUMABLE_ARN: ${{ secrets.TEST_ASSUMABLE_ARN }}
 
       - name: Run Python tests
         run: make run-in-docker CMD="make run-pythontests"
         env:
-          TEST_IAM_ROLE: ${{ secrets.TEST_IAM_ROLE }}
-
-      #- name: Run E2E test
-      #  run: make test
+          TEST_ASSUMABLE_ARN: ${{ secrets.TEST_ASSUMABLE_ARN }}
