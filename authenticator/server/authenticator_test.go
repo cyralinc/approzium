@@ -387,6 +387,9 @@ func TestFuzzXorBytes(t *testing.T) {
 }
 
 func TestMetrics(t *testing.T) {
+	if !testtools.ShouldRunAcceptanceTests() {
+		t.Skip("Skipping because acceptance tests are off")
+	}
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
