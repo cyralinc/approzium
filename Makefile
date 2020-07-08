@@ -6,7 +6,7 @@ TEST_BASE_ARN?=$(export AWS_PAGER="" && aws sts get-caller-identity --query Arn 
 
 # Starts a bash shell in the dev environment
 dev:
-	make run-in-docker CMD="bash" TEST_BASE_ARN=$(value TEST_BASE_ARN)
+	make run-in-docker CMD="bash"
 dev-env: dc-build
 	$(docker_env) docker-compose up
 dc-build: ssl/rootCA.key
@@ -40,9 +40,9 @@ vault_secret = { $\
 	"${TEST_BASE_ARN}" $\
 ] $\
 }
-testsuite_env = TEST_ASSUMABLE_ARN=$(TEST_ASSUMABLE_ARN) PSYCOPG2_TESTDB=$(TEST_DB) $\
-		PSYCOPG2_TESTDB_ADDR=$(TEST_DBADDR) PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT)
-		PSYCOPG2_TESTDB_USER=$(TEST_DBUSER)
+testsuite_env = TEST_ASSUMABLE_ARN=$(TEST_ASSUMABLE_ARN) TEST_BASE_ARN=$(value TEST_BASE_ARN) $\
+		PSYCOPG2_TESTDB=$(TEST_DB) PSYCOPG2_TESTDB_ADDR=$(TEST_DBADDR) $\
+		PSYCOPG2_TESTDB_PORT=$(TEST_DBPORT) PSYCOPG2_TESTDB_USER=$(TEST_DBUSER)
 
 
 # Generates self-signed certificates that can be used to run Postgres DBs with SSL
