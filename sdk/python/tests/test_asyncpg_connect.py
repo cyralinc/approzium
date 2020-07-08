@@ -1,10 +1,10 @@
 from os import environ
+
 import pytest
 
 import approzium
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
-
 
 # use Psycopg2 defined test environment variables
 connopts = {

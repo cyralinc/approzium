@@ -1,7 +1,8 @@
 from os import environ
 
-import approzium
 import pytest
+
+import approzium
 from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
