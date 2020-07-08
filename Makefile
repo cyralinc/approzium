@@ -27,7 +27,7 @@ TEST_DBUSER=bob
 # This target just saves a bit of typing
 # It takes argument CMD and runs it in the tests service
 run-in-docker:
-	$(docker_env) $(testsuite_env) TEST_ASSUMABLE_ARN=$(TEST_ASSUMABLE_ARN) docker-compose $(dc_files) run tests $(CMD)
+	$(docker_env) $(testsuite_env) docker-compose $(dc_files) run tests $(CMD)
 
 dc_files=-f docker-compose.yml -f docker-compose.test.yml
 # Enable Buildkit in docker commands
