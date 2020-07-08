@@ -1,6 +1,9 @@
 package config
 
-import "github.com/ilyakaznacheev/cleanenv"
+import (
+	"github.com/ilyakaznacheev/cleanenv"
+	"os"
+)
 
 // Config is an object for storing configuration variables set through
 // Approzium's environment.
@@ -17,6 +20,7 @@ type Config struct {
 	LogRaw    bool   `yaml:"log_raw" env:"APPROZIUM_LOG_RAW" env-default:"false"`
 
 	VaultTokenPath string `yaml:"vault_token_path" env:"APPROZIUM_VAULT_TOKEN_PATH"`
+	ConfigFilePath string `env:"APPROZIUM_CONFIG_FILE_PATH"`
 }
 
 // ParseConfig returns the parsed config. A pointer is not returned
@@ -25,6 +29,19 @@ func ParseConfig() (Config, error) {
 	var config Config
 	if err := cleanenv.ReadEnv(&config); err != nil {
 		return Config{}, err
+	}
+	if config.ConfigFilePath == "" {
+		// default config file path is config.yml in current working directory
+		if _, err := os.Stat("config.yml"); err == nil {
+			config.ConfigFilePath = "config.yml"
+		}
+	}
+
+	if config.ConfigFilePath != "" {
+		err := cleanenv.ReadConfig(config.ConfigFilePath, &config)
+		if err != nil {
+			return Config{}, err
+		}
 	}
 	return config, nil
 }
