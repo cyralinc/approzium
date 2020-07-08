@@ -28,6 +28,3 @@ jobs:
         run: make run-in-docker CMD="make run-pythontests"
         env:
           TEST_ASSUMABLE_ARN: ${{ secrets.TEST_ASSUMABLE_ARN }}
-
-      #- name: Run E2E test
-      #  run: make test
