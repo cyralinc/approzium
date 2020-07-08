@@ -36,7 +36,8 @@ docker_env=COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1
 vault_secret = { $\
 "password": "$(TEST_DBPASS)", $\
 "iam_arns": [ $\
-	"${TEST_ASSUMABLE_ARN}" $\
+	"${TEST_ASSUMABLE_ARN}", $\
+	"${TEST_BASE_ARN}" $\
 ] $\
 }
 testsuite_env = TEST_ASSUMABLE_ARN=$(TEST_ASSUMABLE_ARN) PSYCOPG2_TESTDB=$(TEST_DB) $\
