@@ -32,7 +32,7 @@ func ParseConfig() (Config, error) {
 	}
 	if config.ConfigFilePath == "" {
 		// if not config file path is provided and confif.yml exists in the current
-        // directory, then use it
+		// directory, then use it
 		if _, err := os.Stat("config.yml"); err == nil {
 			config.ConfigFilePath = "config.yml"
 		}
