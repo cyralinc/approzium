@@ -52,7 +52,7 @@ ssl/rootCA.key:
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
 	vault secrets enable -path=approzium -version=1 kv | true
-seed-vault-addr:  # call this with "make seed-vault-host ADDR=foo"
+seed-vault-addr:  # call this with "make seed-vault-addr ADDR=foo"
 	echo '{"$(TEST_DBUSER)": $(vault_secret)}' | \
 		vault write approzium/$(ADDR) -
 seed-vault-all-addrs:
