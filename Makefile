@@ -11,7 +11,7 @@ dev-env: dc-build
 	$(docker_env) docker-compose up
 dc-build: ssl/rootCA.key
 	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
-test: # dc-build
+test: dc-build
 	make run-in-docker CMD="make run-testsuite"
 
 # PARAMETERS USED FOR TESTS
