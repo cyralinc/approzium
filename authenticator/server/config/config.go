@@ -1,8 +1,7 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
-	"os"
+	"github.com/spf13/viper"
 )
 
 // Config is an object for storing configuration variables set through
@@ -11,38 +10,47 @@ import (
 // Please see https://approzium.org/configuration for elaboration upon
 // each parameter.
 type Config struct {
-	Host     string `yaml:"host" env:"APPROZIUM_HOST" env-default:"127.0.0.1"`
-	HTTPPort int    `yaml:"http_port" env:"APPROZIUM_HTTP_PORT" env-default:"6000"`
-	GRPCPort int    `yaml:"grpc_port" env:"APPROZIUM_GRPC_PORT" env-default:"6001"`
+	Host     string
+	HTTPPort int
+	GRPCPort int
 
-	LogLevel  string `yaml:"log_level" env:"APPROZIUM_LOG_LEVEL" env-default:"info"`
-	LogFormat string `yaml:"log_format" env:"APPROZIUM_LOG_FORMAT" env-default:"text"` // Also supports "json".
-	LogRaw    bool   `yaml:"log_raw" env:"APPROZIUM_LOG_RAW" env-default:"false"`
-
-	VaultTokenPath string `yaml:"vault_token_path" env:"APPROZIUM_VAULT_TOKEN_PATH"`
-	ConfigFilePath string `env:"APPROZIUM_CONFIG_FILE_PATH"`
+	LogLevel       string
+	LogFormat      string // Also supports "json".
+	LogRaw         bool
+	VaultTokenPath string
+	ConfigFilePath string
 }
 
 // ParseConfig returns the parsed config. A pointer is not returned
 // because after first parse, the config is immutable.
 func ParseConfig() (Config, error) {
 	var config Config
-	if err := cleanenv.ReadEnv(&config); err != nil {
+	setConfigDefaults()
+	setConfigEnvVars()
+	err := viper.Unmarshal(&config)
+	if err != nil {
 		return Config{}, err
 	}
-	if config.ConfigFilePath == "" {
-		// if not config file path is provided and confif.yml exists in the current
-		// directory, then use it
-		if _, err := os.Stat("config.yml"); err == nil {
-			config.ConfigFilePath = "config.yml"
-		}
-	}
-
-	if config.ConfigFilePath != "" {
-		err := cleanenv.ReadConfig(config.ConfigFilePath, &config)
-		if err != nil {
-			return Config{}, err
-		}
-	}
 	return config, nil
+}
+
+func setConfigEnvVars() {
+	viper.SetEnvPrefix("approzium")
+	viper.BindEnv("Host", "APPROZIUM_HOST")
+	viper.BindEnv("HTTPPort", "APPROZIUM_HTTP_PORT")
+	viper.BindEnv("GRPCPort", "APPROZIUM_GRPC_PORT")
+	viper.BindEnv("LogLevel", "APPROZIUM_LOG_LEVEL")
+	viper.BindEnv("LogFormat", "APPROZIUM_LOG_FORMAT")
+	viper.BindEnv("LogRaw", "APPROZIUM_LOG_RAW")
+	viper.BindEnv("VaultTokenPath", "APPROZIUM_VAULT_TOKEN_PATH")
+	viper.BindEnv("ConfigFilePath", "APPROZIUM_CONFIG_FILE_PATH")
+}
+
+func setConfigDefaults() {
+	viper.SetDefault("Host", "127.0.0.1")
+	viper.SetDefault("HTTPPort", "6000")
+	viper.SetDefault("GRPCPort", "6001")
+	viper.SetDefault("LogLevel", "info")
+	viper.SetDefault("LogFormat", "text")
+	viper.SetDefault("LogRaw", false)
 }
