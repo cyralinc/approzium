@@ -8,11 +8,16 @@ route: /configuration
 
 XXX: update this to include config file capability
 
-| Name, shorthand | Environment variable | Default | Description                                 |
-|-----------------|----------------------|---------|---------------------------------------------|
-| --host          | APPROZIUM_HOST       |         |                                             |
-| --http_port     | APPROZIUM_HTTP_PORT  | 6000    | Port for HTTP(S) API endpoints              |
-| --grpc_port     | APPROZIUM_GRPC_PORT  | 6001    | Port for authenticator endpoint for clients |
+| Name, shorthand    | Environment variable       | Default    | Description                                 |
+|--------------------|----------------------------|------------|---------------------------------------------|
+| --host             | APPROZIUM_HOST             |            |                                             |
+| --http_port        | APPROZIUM_HTTP_PORT        | 6000       | Port for HTTP(S) API endpoints              |
+| --grpc_port        | APPROZIUM_GRPC_PORT        | 6001       | Port for authenticator endpoint for clients |
+| --log_level        | APPROZIUM_LOG_LEVEL        | info       |                                             |
+| --log_format       | APPROZIUM_LOG_FORMAT       | text       |                                             |
+| --log_raw          | APPROZIUM_LOG_RAW          | false      |                                             |
+| --vault_token_path | APPROZIUM_VAULT_TOKEN_PATH |            |                                             |
+| --config           | APPROZIUM_CONFIG_FILE_PATH | config.yml |                                             |
 
 
 Approzium is configured through environment variables.
