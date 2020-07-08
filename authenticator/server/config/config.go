@@ -15,7 +15,7 @@ type Config struct {
 	GRPCPort int
 
 	LogLevel       string
-	LogFormat      string // Also supports "json".
+	LogFormat      string
 	LogRaw         bool
 	VaultTokenPath string
 	ConfigFilePath string
