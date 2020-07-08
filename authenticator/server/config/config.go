@@ -36,7 +36,7 @@ func ParseConfig() (Config, error) {
 	if config.ConfigFilePath == "" {
 		return config, nil
 	}
-	viper.SetConfigName("approzium_config")
+	viper.SetConfigName("approzium.config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(config.ConfigFilePath)
 	err = viper.ReadInConfig() // Find and read the config file
