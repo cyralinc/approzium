@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // Config is an object for storing configuration variables set through
@@ -27,27 +27,27 @@ type Config struct {
 func ParseConfig() (Config, error) {
 	var config Config
 	setConfigDefaults()
-    setConfigFlags()
+	setConfigFlags()
 	setConfigEnvVars()
 	err := viper.Unmarshal(&config)
 	if err != nil {
 		return Config{}, err
 	}
-    if config.ConfigFilePath == "" {
-        return config, nil
-    }
-    viper.SetConfigName("approzium_config")
-    viper.SetConfigType("yaml")
-    viper.AddConfigPath(config.ConfigFilePath)
-    err = viper.ReadInConfig() // Find and read the config file
-    if err != nil { // Handle errors reading the config file
-        return Config{}, err
-    }
+	if config.ConfigFilePath == "" {
+		return config, nil
+	}
+	viper.SetConfigName("approzium_config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(config.ConfigFilePath)
+	err = viper.ReadInConfig() // Find and read the config file
+	if err != nil {            // Handle errors reading the config file
+		return Config{}, err
+	}
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		return Config{}, err
 	}
-    return config, nil
+	return config, nil
 }
 
 func setConfigEnvVars() {
@@ -72,15 +72,15 @@ func setConfigDefaults() {
 }
 
 func setConfigFlags() {
-    pflag.String("host", "", "")
-    pflag.String("httpport", "", "")
-    pflag.String("grpcport", "", "")
-    pflag.String("loglevel", "", "")
-    pflag.String("logformat", "", "")
-    pflag.String("vaulttokenpath", "", "")
-    pflag.String("config", "", "")
+	pflag.String("host", "", "")
+	pflag.String("httpport", "", "")
+	pflag.String("grpcport", "", "")
+	pflag.String("loglevel", "", "")
+	pflag.String("logformat", "", "")
+	pflag.String("vaulttokenpath", "", "")
+	pflag.String("config", "", "")
 
-    pflag.Parse()
-    viper.BindPFlags(pflag.CommandLine)
-    viper.BindPFlag("configfilepath", pflag.Lookup("config"))
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+	viper.BindPFlag("configfilepath", pflag.Lookup("config"))
 }
