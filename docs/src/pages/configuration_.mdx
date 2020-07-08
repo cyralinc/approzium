@@ -7,6 +7,14 @@ route: /configuration
 # Configuration
 
 XXX: update this to include config file capability
+
+| Name, shorthand | Environment variable | Default | Description                                 |
+|-----------------|----------------------|---------|---------------------------------------------|
+| --host          | APPROZIUM_HOST       |         |                                             |
+| --http_port     | APPROZIUM_HTTP_PORT  | 6000    | Port for HTTP(S) API endpoints              |
+| --grpc_port     | APPROZIUM_GRPC_PORT  | 6001    | Port for authenticator endpoint for clients |
+
+
 Approzium is configured through environment variables.
 
 - `APPROZIUM_HOST`: Defaults to `"127.0.0.1"`.
