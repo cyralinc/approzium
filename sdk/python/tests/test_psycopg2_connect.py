@@ -8,9 +8,6 @@ import approzium
 from approzium.psycopg2 import connect
 from approzium.psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 
-auth = approzium.AuthClient(
-    "authenticator:6001", iam_role=environ.get("TEST_ASSUMABLE_ARN")
-)
 # use Psycopg2 defined test environment variables
 connopts = {
     "user": environ["PSYCOPG2_TESTDB_USER"],
@@ -34,10 +31,11 @@ def wait(conn):
             raise psycopg2.OperationalError("poll() returned %s" % state)
 
 
+@pytest.mark.parametrize("auth", pytest.authclients)
 @pytest.mark.parametrize("dbhost", ["dbmd5", "dbsha256"])
 @pytest.mark.parametrize("sslmode", ["require", "disable"])
 @pytest.mark.parametrize("async_", [1, 0])
-def test_connect(dbhost, sslmode, async_):
+def test_connect(auth, dbhost, sslmode, async_):
     conn = connect(
         **connopts, host=dbhost, sslmode=sslmode, async_=async_, authenticator=auth
     )
@@ -50,11 +48,12 @@ def test_connect(dbhost, sslmode, async_):
     assert cur.fetchone() == (1,)
 
 
+@pytest.mark.parametrize("auth", pytest.authclients)
 @pytest.mark.parametrize("dbhost", ["dbmd5", "dbsha256"])
 @pytest.mark.parametrize("sslmode", ["require", "disable"])
 @pytest.mark.parametrize("async_", [1, 0])
 @pytest.mark.parametrize("Pool", [ThreadedConnectionPool, SimpleConnectionPool])
-def test_pool(dbhost, sslmode, async_, Pool):
+def test_pool(auth, dbhost, sslmode, async_, Pool):
     approzium.default_auth_client = auth
     conns = Pool(1, 5, "", **connopts, host=dbhost, sslmode=sslmode, async_=async_,)
     conn = conns.getconn()
