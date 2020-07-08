@@ -31,7 +31,8 @@ func ParseConfig() (Config, error) {
 		return Config{}, err
 	}
 	if config.ConfigFilePath == "" {
-		// default config file path is config.yml in current working directory
+		// if not config file path is provided and confif.yml exists in the current
+        // directory, then use it
 		if _, err := os.Stat("config.yml"); err == nil {
 			config.ConfigFilePath = "config.yml"
 		}
