@@ -72,16 +72,16 @@ func setConfigDefaults() {
 }
 
 func setConfigFlags() {
-    if pflag.Lookup("host") == nil {
-        // avoid redefining flags because it leads to panic
-        pflag.String("host", "", "")
-        pflag.String("httpport", "", "")
-        pflag.String("grpcport", "", "")
-        pflag.String("loglevel", "", "")
-        pflag.String("logformat", "", "")
-        pflag.String("vaulttokenpath", "", "")
-        pflag.String("config", "", "")
-    }
+	if pflag.Lookup("host") == nil {
+		// avoid redefining flags because it leads to panic
+		pflag.String("host", "", "")
+		pflag.String("httpport", "", "")
+		pflag.String("grpcport", "", "")
+		pflag.String("loglevel", "", "")
+		pflag.String("logformat", "", "")
+		pflag.String("vaulttokenpath", "", "")
+		pflag.String("config", "", "")
+	}
 
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
