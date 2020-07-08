@@ -43,6 +43,7 @@ To spin up an end-to-end development environment based in Docker:
 - In another window, `$ make dev`. This will start a shell in the development environment.
 - You now have a full development and testing environment!
 - For example, to use our Python SDK to create an Approzium connection to a Postgres server:
+    * Create an Approzium path in the test Vault backend: `$ make enable-vault-path`
     * Give your AWS-identity access to the test server: `$ make seed-vault-addr ADDR=dbmd5:5432`
     * Create a connection: `$ cd sdk/python/examples && poetry run python3 psycopg2_connect.py`.
 
