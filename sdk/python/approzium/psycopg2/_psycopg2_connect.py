@@ -103,6 +103,10 @@ def connect(dsn=None, cursor_factory=None, authenticator=None, **kwargs):
         >>> auth = approzium.AuthClient("myauthenticator.com:6001")
         >>> con = connect("host=DB.com dbname=mydb", authenticator=auth)  # no password!
         >>> # use the connection just like any other Psycopg2 connection
+
+    .. warning::
+        Currently, only `psycopg2` with dynamically linked `libpq` is
+        supported. Thus, `psycopg2-binary` is not supported.
     """
     is_sync = True
     if kwargs.get("async", False):
