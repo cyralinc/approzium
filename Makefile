@@ -12,7 +12,7 @@ dev-env: dc-build
 dc-build: ssl/rootCA.key
 	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
 test: # dc-build
-	make run-in-docker CMD=""
+	make run-in-docker CMD="make run-testsuite"
 
 # PARAMETERS USED FOR TESTS
 TEST_DBADDRS=dbmd5:5432 dbsha256:5432 dbmysqlsha1:3306
