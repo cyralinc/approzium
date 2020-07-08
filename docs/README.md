@@ -1,21 +1,45 @@
+<<<<<<< HEAD
 # Approzium Docs
 This is the code for [approzium.org](https://approzium.org) which documents the [Approzium](https://github.com/cyralinc/approzium) project.
+=======
+# Website
+>>>>>>> init docasaurus
 
+This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
-## Development
+### Installation
 
+<<<<<<< HEAD
 Clone this repo
 ```sh
 git clone https://github.com/cyralinc/approzium-docs
 cd approzium-docs
+=======
+>>>>>>> init docasaurus
+```
+$ yarn
 ```
 
-Run the site in development mode (hot-reloading)
+### Local Development
+
 ```
-make website-dev
+$ yarn start
 ```
 
-Build and serve a deployment version of the site
+This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+
+### Build
+
 ```
-make website-build
+$ yarn build
 ```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+### Deployment
+
+```
+$ GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
