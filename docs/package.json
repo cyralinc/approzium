@@ -15,9 +15,8 @@
     "url": "https://github.com/approzium/approzium.git"
   },
   "scripts": {
-    "pydocs": "make python-docs",
     "dev": "gatsby develop",
-    "build": "npm run pydocs && gatsby build",
+    "build": "gatsby build",
     "serve": "gatsby serve",
     "deploy": "gatsby build && gh-pages -d public"
   },
