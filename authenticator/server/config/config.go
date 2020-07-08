@@ -15,7 +15,7 @@ type Config struct {
 	HTTPPort int    `yaml:"http_port" env:"APPROZIUM_HTTP_PORT" env-default:"6000"`
 	GRPCPort int    `yaml:"grpc_port" env:"APPROZIUM_GRPC_PORT" env-default:"6001"`
 
-	LogLevel  string `default:"info" yaml:"log_level" env:"APPROZIUM_LOG_LEVEL" env-default:"info"`
+	LogLevel  string `yaml:"log_level" env:"APPROZIUM_LOG_LEVEL" env-default:"info"`
 	LogFormat string `yaml:"log_format" env:"APPROZIUM_LOG_FORMAT" env-default:"text"` // Also supports "json".
 	LogRaw    bool   `yaml:"log_raw" env:"APPROZIUM_LOG_RAW" env-default:"false"`
 
