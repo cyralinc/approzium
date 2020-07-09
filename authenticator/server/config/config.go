@@ -31,6 +31,17 @@ type Config struct {
 // ParseConfig returns the parsed config. A pointer is not returned
 // because after first parse, the config is immutable.
 func ParseConfig() (Config, error) {
+	config, err := parse()
+	if err != nil {
+		return Config{}, err
+	}
+	if err := verify(config); err != nil {
+		return Config{}, nil
+	}
+	return config, nil
+}
+
+func parse() (Config, error) {
 	var config Config
 	setConfigDefaults()
 	setConfigFlags()
@@ -52,9 +63,6 @@ func ParseConfig() (Config, error) {
 		return Config{}, err
 	}
 	if err := viper.Unmarshal(&config); err != nil {
-		return Config{}, err
-	}
-	if err := verify(config); err != nil {
 		return Config{}, err
 	}
 	return config, nil
