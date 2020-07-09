@@ -2,7 +2,6 @@ import logging
 import select
 import struct
 import os
-import warnings
 from ctypes import (
     CDLL,
     c_char_p,
