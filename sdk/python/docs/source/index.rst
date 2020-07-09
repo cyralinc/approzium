@@ -41,8 +41,8 @@ Contents
     :caption: Other Links
 
     Approzium General Documentation <https://approzium.org>
-    Github <https://github.com/approzium/approzium>
-    Slack (#help-and-questions) <https://github.com/approzium/approzium#support>
+    Github <https://github.com/cyralinc/approzium>
+    Slack (#help-and-questions) <https://github.com/cyralinc/approzium#support>
 
 
 Indices and tables

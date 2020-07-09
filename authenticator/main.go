@@ -8,8 +8,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/approzium/approzium/authenticator/server"
-	"github.com/approzium/approzium/authenticator/server/config"
+	"github.com/cyralinc/approzium/authenticator/server"
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 )
 

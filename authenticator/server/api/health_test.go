@@ -6,9 +6,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/approzium/approzium/authenticator/server/config"
-	pb "github.com/approzium/approzium/authenticator/server/protos"
-	testtools "github.com/approzium/approzium/authenticator/server/testing"
+	"github.com/cyralinc/approzium/authenticator/server/config"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
+	testtools "github.com/cyralinc/approzium/authenticator/server/testing"
 	"google.golang.org/grpc"
 )
 

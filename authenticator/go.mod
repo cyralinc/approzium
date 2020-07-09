@@ -1,4 +1,4 @@
-module github.com/approzium/approzium/authenticator
+module github.com/cyralinc/approzium/authenticator
 
 go 1.13
 

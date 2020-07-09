@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/approzium/approzium/authenticator/server/config"
-	protos "github.com/approzium/approzium/authenticator/server/protos"
+	"github.com/cyralinc/approzium/authenticator/server/config"
+	protos "github.com/cyralinc/approzium/authenticator/server/protos"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"strings"
 
-	pb "github.com/approzium/approzium/authenticator/server/protos"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
 	log "github.com/sirupsen/logrus"
 )
 
