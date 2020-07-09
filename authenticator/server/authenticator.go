@@ -104,7 +104,6 @@ func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.
 		logger.Infof("grpc starting on https://%s", serviceAddress)
 	}
 	pb.RegisterAuthenticatorServer(grpcServer, authenticatorServer)
-	pb.RegisterHealthServer(grpcServer, newHealthServer())
 	go func() {
 		logger.Fatal(grpcServer.Serve(lis))
 	}()
