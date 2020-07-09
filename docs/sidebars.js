@@ -1,6 +1,22 @@
 module.exports = {
-  someSidebar: {
-    Docusaurus: ['doc1', 'doc2', 'doc3'],
-    Features: ['mdx'],
-  },
+  someSidebar: [
+    'overview',
+    'quickstart',
+    'architecture',
+    'configuration',
+    'observability',
+    'compatibility',
+    {
+      'Client Libraries': [
+        {
+          type: 'link',
+          label: 'Python',
+          href: 'https://www.psycopg.org'
+        }
+      ]
+    },
+    {
+      Docusaurus: ['doc1', 'mdx'],
+    },
+  ],
 };
