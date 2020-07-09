@@ -36,7 +36,7 @@ func ParseConfig() (Config, error) {
 		return Config{}, err
 	}
 	if err := verify(config); err != nil {
-		return Config{}, nil
+		return Config{}, err
 	}
 	return config, nil
 }
