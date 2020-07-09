@@ -1,7 +1,7 @@
 import logging
+import os
 import select
 import struct
-import os
 from ctypes import (
     CDLL,
     c_char_p,
