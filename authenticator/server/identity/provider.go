@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/approzium/approzium/authenticator/server/metrics"
-	pb "github.com/approzium/approzium/authenticator/server/protos"
+	"github.com/cyralinc/approzium/authenticator/server/metrics"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/metric"
 	"go.opencensus.io/metric/metricdata"

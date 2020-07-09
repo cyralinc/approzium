@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"contrib.go.opencensus.io/exporter/prometheus"
-	"github.com/approzium/approzium/authenticator/server/config"
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 )
 

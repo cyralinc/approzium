@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	pb "github.com/approzium/approzium/authenticator/server/protos"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
 )
 
 func newHealthServer() pb.HealthServer {

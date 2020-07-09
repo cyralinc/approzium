@@ -3,7 +3,7 @@ package credmgrs
 import (
 	"errors"
 
-	"github.com/approzium/approzium/authenticator/server/metrics"
+	"github.com/cyralinc/approzium/authenticator/server/metrics"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/metric"
 	"go.opencensus.io/metric/metricdata"

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	pb "github.com/approzium/approzium/authenticator/server/protos"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
 	"github.com/getlantern/deepcopy"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
