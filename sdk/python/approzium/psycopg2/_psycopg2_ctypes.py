@@ -1,6 +1,7 @@
 import logging
 import select
 import struct
+import os
 import warnings
 from ctypes import (
     CDLL,
@@ -100,10 +101,7 @@ def read_msg(pgconn):
             return msg
         else:
             fd = pgconn.fileno()
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", ResourceWarning)
-                sock = fromfd(fd)
-                return sock.recv(n)
+            return os.read(fd, n)
 
     select.select([pgconn.fileno()], [], [])
     msg_type = read_bytes(1)
@@ -123,10 +121,7 @@ def write_msg(pgconn, msg):
         if n != len(msg):
             raise ValueError("could not send response")
     else:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", ResourceWarning)
-            sock = fromfd(pgconn.fileno(), keep_fd=True)
-            sock.sendall(msg)
+        os.write(pgconn.fileno(), msg)
     logger.debug(f"sent: {msg}")
 
 
