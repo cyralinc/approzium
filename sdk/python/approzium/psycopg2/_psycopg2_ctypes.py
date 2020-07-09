@@ -16,8 +16,6 @@ from ctypes import (
 from ctypes.util import find_library
 from sys import getsizeof
 
-from .._socketfromfd import fromfd
-
 logger = logging.getLogger(__name__)
 
 libpq = cdll.LoadLibrary(find_library("pq"))
