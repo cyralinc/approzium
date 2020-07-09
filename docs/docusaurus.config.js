@@ -77,6 +77,9 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
     },
   },
+  plugins: [
+    '@docusaurus/plugin-ideal-image',
+  ],
   presets: [
     [
       '@docusaurus/preset-classic',
