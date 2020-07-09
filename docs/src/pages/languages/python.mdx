@@ -7,16 +7,26 @@ edit: false
 
 # Python SDK
 
-Our Python SDK is designed to easily integrate into existing the database drivers workflow. All you have to do is use the `connect` method it provides. For example, if you are using Psycopg2, all you have to do to adopt Approzium into your client code base is:
+Our Python SDK is designed to easily integrate into existing the database drivers workflow. All you have to do is use
+the `connect` method it provides. For example, if you are using Psycopg2, all you have to do to adopt Approzium into
+your client code base is:
 
 ```diff
 -from psycopg2 import connect
 +from approzium.psycopg2 import connect
-+from approzium import AuthClient
++from approzium import AuthClient, TLSConfig
 
 -conn = connect(password=verySecurePassword", ...)
-+conn = connect(authenticator=AuthClient("authenticator:6001") ...)
++conn = connect(authenticator=AuthClient(
+    "authenticator:6001", TLSConfig(
+        trusted_certs="path/to/approzium.cert",
+        client_cert="path/to/client.pem",
+        client_key="path/to/client.key"
+    ), ...
+)
 ```
+
+## How Approzium Knows Who's Calling
 
 Our Python SDK is designed to pull identity from your local environment. It currently supports:
 
@@ -26,6 +36,21 @@ Our Python SDK is designed to pull identity from your local environment. It curr
 
 It uses the well-known `boto3` library for pulling identity, and thus its behavior for parsing identity
 is exactly the same.
+
+## The TLS Configuration
+
+Our `TLSConfig` takes several parameters:
+
+- `disable_tls`: Defaults to `False`, which causes `https` to be used. Setting to `True` causes `http` to be used,
+    sending all communication in plain text. `True` is **not recommended in production environments**.
+- `trusted_certs`: The acceptable certificate(s) that may be presented by the Approzium authenticator, if known.
+- `client_cert`: The certificate the client holds proving its own identity.
+- `client_key`: The private key the client holds proving its identity, to be used for decrypting communication.
+
+To generate self-signed certificates, see [this guide](https://itnext.io/practical-guide-to-securing-grpc-connections-with-go-and-tls-part-1-f63058e9d6d1)
+with particular attention to the `openssl` commands used. Self-signed certificates are better than no certificates,
+but gaining certificates from a widely known [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority)
+is better than being your own.
 
 ## Examples
 

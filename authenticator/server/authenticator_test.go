@@ -390,13 +390,15 @@ func TestMetrics(t *testing.T) {
 	if !testtools.ShouldRunAcceptanceTests() {
 		t.Skip("Skipping because acceptance tests are off")
 	}
+
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
 	// Start the API, which includes an endpoint for Prometheus to mine metrics.
 	config := config.Config{
-		Host:     "127.0.0.1",
-		HTTPPort: 6000,
+		Host:       "127.0.0.1",
+		HTTPPort:   6000,
+		DisableTLS: true,
 	}
 	_ = api.Start(testtools.TestLogger(), config)
 

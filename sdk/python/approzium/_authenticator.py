@@ -28,16 +28,55 @@ class AuthClient(object):
 
     :param server_address: address (host:port) at which an authenticator
         service is listening.
-
     :type server_address: str
+
+    :param disable_tls: defaults to False. When False, https is used and a
+        client_cert and client_key proving the client's identity must be
+        provided. When True, http is used and no other TLS options must be
+        set.
+    :type disable_tls: bool, optional
+
+    :param trusted_certs: the path to one or many identity certificates that
+        the Approzium authenticator may present.
+    :type trusted_certs: str, optional
+
+    :param client_cert: the path to this client's identity certificate.
+        Required when disable_tls is False.
+    :type client_cert: str, optional
+
+    :param client_key: the path to the private key this client used to obtain
+        its identity certificate. Required when disable_tls is False.
+    :type client_key: str, optional
+
     :param iam_role: if an IAM role Amazon resource number (ARN) is provided,
         it will be assumed and its identity will be used for authentication.
         Otherwise, the default ``boto3`` session will be used as the identity.
     :type iam_role: str, optional
     """
 
-    def __init__(self, server_address, iam_role=None):
+    def __init__(
+        self,
+        server_address,
+        disable_tls=False,
+        trusted_certs=None,
+        client_cert=None,
+        client_key=None,
+        iam_role=None,
+    ):
         self.server_address = server_address
+
+        if not disable_tls:
+            if client_cert is None or client_key is None:
+                raise ValueError(
+                    "if tls is not disabled, client_cert and client_key are required"
+                )
+
+        self.tls_config = TLSConfig(
+            disable_tls=disable_tls,
+            trusted_certs=trusted_certs,
+            client_cert=client_cert,
+            client_key=client_key,
+        )
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
@@ -92,9 +131,21 @@ class AuthClient(object):
 
     def _execute_request(self, request, getmethodname, dbhost, dbport, dbuser):
         # The presigned GetCallerIdentity call expires every 15 minutes.
+        print("executing request")  # TODO strip me
         self._update_gci_if_needed()
 
-        channel = grpc.insecure_channel(self.server_address)
+        if self.tls_config.disable_tls:
+            print("no TLS")  # TODO strip me
+            channel = grpc.insecure_channel(self.server_address)
+        else:
+            print("TLS")  # TODO strip me
+            credentials = grpc.ssl_channel_credentials(
+                root_certificates=_read_file(self.tls_config.trusted_certs),
+                certificate_chain=_read_file(self.tls_config.client_cert),
+                private_key=_read_file(self.tls_config.client_key),
+            )
+            channel = grpc.secure_channel(self.server_address, credentials)
+
         stub = authenticator_pb2_grpc.AuthenticatorStub(channel)
         # authentication info
         aws_identity = authenticator_pb2.AWSIdentity(
@@ -166,3 +217,42 @@ class AuthClient(object):
             credentials = obtain_credentials(response)
             self.signed_gci = obtain_signed_get_caller_identity(credentials)
             self.signed_gci_last_updated = datetime.utcnow()
+
+
+class TLSConfig(object):
+    """This class represents the TLS config to be used while communicating
+    with Approzium. Its fields are further described here:
+    https://grpc.github.io/grpc/python/grpc.html#create-client-credentials
+
+    :param disable_tls: insecure, not recommended in production. Disables the
+        use of TLS for communication between the client and Approzium's
+        authentication server. If set to true, connection information will
+        be sent in plain text, creating a vulnerability to man-in-the-middle
+        attacks. Defaults to False.
+    :type disable_tls: bool, optional
+
+    :param trusted_certs: the path to the root certificate(s) that must have
+        issued the identity certificate used by Approzium's authentication
+        server.
+    :type trusted_certs: str, optional
+
+    :param client_cert: this client's certificate, used for proving its
+        identity
+    :type client_cert: str, optional
+
+    :param client_key: this client's key, used for proving its identity
+    :type client_key: str, optional
+    """
+
+    def __init__(
+        self, disable_tls=False, trusted_certs=None, client_cert=None, client_key=None
+    ):
+        self.disable_tls = disable_tls
+        self.trusted_certs = trusted_certs
+        self.client_cert = client_cert
+        self.client_key = client_key
+
+
+def _read_file(path_to_file):
+    with open(path_to_file, "rb") as f:
+        return f.read()

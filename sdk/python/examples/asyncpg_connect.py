@@ -1,10 +1,17 @@
 import asyncio
+from os import environ
 
-from approzium import Authenticator
+from approzium import AuthClient
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = Authenticator("authenticator:6001")
+auth = AuthClient(
+    "authenticator:6001",
+    trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
+    client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
+    client_key=environ.get("TEST_CERT_DIR") + "/client.key",
+    disable_tls=environ.get("APPROZIUM_DISABLE_TLS"),
+)
 
 
 async def run():

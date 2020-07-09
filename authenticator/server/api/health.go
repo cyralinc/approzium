@@ -34,7 +34,7 @@ func (h *healthChecker) ServeHTTP(wr http.ResponseWriter, _ *http.Request) {
 	// It's fine to use an insecure connection here because we're
 	// executing an unauthenticated health check that will return
 	// nothing but a status code.
-	conn, err := grpc.Dial(grpcServerAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(grpcServerAddress, grpc.WithInsecure()) // TODO would this work if TLS?
 	if err != nil {
 		h.logger.Warnf("unable to dial grpc due to %s", err)
 		wr.WriteHeader(503)

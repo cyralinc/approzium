@@ -9,6 +9,7 @@ func TestParseConfig(t *testing.T) {
 	os.Unsetenv("APPROZIUM_HOST")
 	os.Unsetenv("APPROZIUM_HTTP_PORT")
 	os.Unsetenv("APPROZIUM_LOG_LEVEL")
+	os.Setenv("APPROZIUM_DISABLE_TLS", "true")
 	config, err := ParseConfig()
 	if err != nil {
 		t.Fatal(err)
@@ -26,6 +27,7 @@ func TestParseConfig(t *testing.T) {
 	os.Setenv("APPROZIUM_HOST", "0.0.0.0")
 	os.Setenv("APPROZIUM_HTTP_PORT", "6001")
 	os.Setenv("APPROZIUM_LOG_LEVEL", "debug")
+	os.Setenv("APPROZIUM_DISABLE_TLS", "true")
 	config, err = ParseConfig()
 	if err != nil {
 		t.Fatal(err)
@@ -38,5 +40,8 @@ func TestParseConfig(t *testing.T) {
 	}
 	if config.LogLevel != "debug" {
 		t.Fatalf("expected %s, received %s", "debug", config.LogLevel)
+	}
+	if !config.DisableTLS {
+		t.Fatal("tls should be disabled")
 	}
 }
