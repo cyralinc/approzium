@@ -1,5 +1,3 @@
-from os import environ
-import psycopg2
 import approzium
 import approzium.opentelemetry
 from approzium.psycopg2 import connect
