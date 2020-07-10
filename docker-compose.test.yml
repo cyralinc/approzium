@@ -16,7 +16,8 @@ services:
             - VAULT_TOKEN=root
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
-            - TEST_IAM_ROLE
+            - TEST_ASSUMABLE_ARN
+            - TEST_BASE_ARN
             - PSYCOPG2_TESTDB
             - PSYCOPG2_TESTDB_HOST
             - PSYCOPG2_TESTDB_PORT
@@ -25,4 +26,5 @@ services:
             - authenticator
             - dbmd5
             - dbsha256
+            - dbmysqlsha1
             - vault

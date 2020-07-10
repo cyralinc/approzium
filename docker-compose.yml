@@ -25,6 +25,13 @@ services:
         image: approzium_postgres_ssl
         command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
         environment: *test-variables
+    dbmysqlsha1:
+        image: mysql:5.7
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+            - MYSQL_DATABASE=db
+            - MYSQL_USER=bob
+            - MYSQL_PASSWORD=password
     vault:
         image: "vault:latest"
         environment:

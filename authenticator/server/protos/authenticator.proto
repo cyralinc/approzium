@@ -5,11 +5,13 @@ package approzium.authenticator.protos;
 service Authenticator {
     rpc GetPGMD5Hash(PGMD5HashRequest) returns (PGMD5Response) {}
     rpc GetPGSHA256Hash(PGSHA256HashRequest) returns (PGSHA256Response) {}
+    rpc GetMYSQLSHA1Hash(MYSQLSHA1HashRequest) returns (MYSQLSHA1Response) {}
+    /* can add more here */
 }
 
-enum AuthType {
-    TYPE_NOT_PROVIDED = 0;
-    AWS = 1;
+message AWSIdentity {
+    string signed_get_caller_identity = 1;
+    string claimed_iam_arn = 2;
 }
 
 enum ClientLanguage {
@@ -18,38 +20,44 @@ enum ClientLanguage {
     GO = 2;
 }
 
+message PasswordRequest {
+    ClientLanguage client_language = 1;
+    string dbhost = 2;
+    string dbport = 3;
+    string dbuser = 4;
+    AWSIdentity aws = 5;
+    /* can add more here */
+}
+
 message PGMD5HashRequest {
-    AuthType authtype = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
-    AWSAuth awsauth = 6;
-    bytes salt = 7;
+    PasswordRequest pwd_request = 1;
+    bytes salt = 2;
 }
 
 message PGSHA256HashRequest {
-    AuthType authtype = 1;
-    ClientLanguage client_language = 2;
-    string dbhost = 3;
-    string dbport = 4;
-    string dbuser = 5;
-    AWSAuth awsauth = 6;
-    string salt = 7;
-    uint32 iterations = 8;
-    string authentication_msg = 9;
+    PasswordRequest pwd_request = 1;
+    string salt = 2;
+    uint32 iterations = 3;
+    string authentication_msg = 4;
+}
+
+message MYSQLSHA1HashRequest {
+    PasswordRequest pwd_request = 1;
+    bytes salt = 2;
 }
 
 message PGMD5Response {
     string hash = 1;
+    string requestid = 2;
 }
 
 message PGSHA256Response {
     string cproof = 1;
     string sproof = 2;
+    string requestid = 3;
 }
 
-message AWSAuth {
-    string signed_get_caller_identity = 1;
-    string claimed_iam_arn = 2;
+message MYSQLSHA1Response {
+    bytes hash = 1;
+    string requestid = 2;
 }

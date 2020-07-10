@@ -12,7 +12,7 @@ import (
 const secretsFileLocation = "testing/secrets.yaml"
 
 // newLocalFileCreds is for dev purposes: read credentials from a local file.
-func newLocalFileCreds() (CredentialManager, error) {
+func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
 	creds := make(map[DBKey]string)
 	type secrets []struct {
 		Dbhost   string `yaml:"dbhost"`
@@ -37,7 +37,7 @@ func newLocalFileCreds() (CredentialManager, error) {
 			DBUser: replaceEnvVars(cred.Dbuser),
 		}
 		creds[key] = cred.Password
-		log.Debugf("added dev credential for host %s", cred.Dbhost)
+		logger.Debugf("added dev credential for host %s", cred.Dbhost)
 	}
 	return &localFileCredMgr{creds: creds}, nil
 }
@@ -50,7 +50,7 @@ func (l *localFileCredMgr) Name() string {
 	return "local file (dev only)"
 }
 
-func (l *localFileCredMgr) Password(identity DBKey) (string, error) {
+func (l *localFileCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) {
 	creds, ok := l.creds[identity]
 	if !ok {
 		return "", ErrNotFound

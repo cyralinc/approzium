@@ -19,7 +19,7 @@ from .._socketfromfd import fromfd
 
 logger = logging.getLogger(__name__)
 
-libpq = cdll.LoadLibrary("libpq.so.5")
+libpq = cdll.LoadLibrary(find_library("pq"))
 libssl = cdll.LoadLibrary(find_library("ssl"))
 
 

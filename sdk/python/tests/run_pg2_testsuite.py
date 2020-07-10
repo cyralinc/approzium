@@ -11,6 +11,7 @@ from unittest import SkipTest
 
 import pg2_testsuite  # noqa: E402 F401
 import psycopg2
+
 from approzium import Authenticator, set_default_authenticator
 
 # once get hash is mocked, import connect method
@@ -20,12 +21,12 @@ sys.path.append(abspath("pg2_testsuite"))
 
 
 try:
-    test_iam_role = os.environ["TEST_IAM_ROLE"]
+    test_iam_role = os.environ["TEST_ASSUMABLE_ARN"]
 except KeyError:
-    print("Please set env var 'TEST_IAM_ROLE' to a valid value")
+    print("Please set env var 'TEST_ASSUMABLE_ARN' to a valid value")
     sys.exit(1)
 
-auth = Authenticator("authenticator:6000", test_iam_role)
+auth = Authenticator("authenticator:6001", test_iam_role)
 set_default_authenticator(auth)
 
 # replace connect method
