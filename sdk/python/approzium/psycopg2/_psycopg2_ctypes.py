@@ -52,7 +52,7 @@ def ssl_supported():
 
 def possible_library_files(name):
     return ['lib%s.dylib' % name, '%s.dylib' % name,
-            '%s.framework/%s' % (name, name)]
+            '%s.framework/%s' % (name, name), 'lib%s.so' % name]
 
 
 def setup_ssl():
