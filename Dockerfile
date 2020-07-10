@@ -30,7 +30,7 @@ RUN pip3 install poetry tox
 WORKDIR /usr/src/approzium/sdk/python
 COPY sdk/python .
 RUN poetry run pip install -U pip setuptools
-RUN poetry install --extras "sqllibs"
+RUN poetry install --extras "sqllibs tracing"
 # Build Authenticator Go Binary
 WORKDIR /usr/src/approzium/authenticator
 COPY authenticator/ .
