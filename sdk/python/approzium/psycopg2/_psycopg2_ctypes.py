@@ -1,5 +1,6 @@
 import logging
 import os
+from os import path
 import select
 import struct
 import subprocess
@@ -40,19 +41,39 @@ libpq_PQsetnonblocking.argtypes = [c_void_p, c_int]
 libpq_PQsetnonblocking.restype = c_int
 
 
-def ssl_supported():
-    def stdout(command):
-        return subprocess.run(command, capture_output=True).stdout
+def stdout(command):
+    return subprocess.run(command, capture_output=True).stdout.decode('utf-8')
 
+
+def ssl_supported():
     out = stdout(["pg_config", "--configure"])
-    return b"--with-openssl" in out
+    return "--with-openssl" in out
+
+
+def possible_library_files(name):
+    return ['lib%s.dylib' % name, '%s.dylib' % name,
+            '%s.framework/%s' % (name, name)]
 
 
 def setup_ssl():
-    global libssl
+    sslpath = ''
+    # try to find OpenSSL path in `pg_config`'s LDFLAGS
+    out = stdout(["pg_config", "--ldflags"])
+    for lib in out.split(' '):
+        if 'openssl' in lib:
+            ssldir = lib.split('-L')[-1]
+            # directory path is found, so search for actual file
+            for filename in possible_library_files('ssl'):
+                possible_sslpath = path.join(ssldir, filename)
+                if path.exists(possible_sslpath):
+                    sslpath = possible_sslpath
+                    break
+    # if none is found, use the SSL library that the system's dynamic linker finds
+    if not sslpath:
+        sslpath = find_library("ssl")
     global libssl_SSL_read
     global libssl_SSL_write
-    libssl = cdll.LoadLibrary(find_library("ssl"))
+    libssl = cdll.LoadLibrary(sslpath)
     libssl_SSL_read = libssl.SSL_read
     libssl_SSL_read.argtypes = [c_void_p, c_char_p, c_int]
     libssl_SSL_read.restype = c_int
@@ -106,17 +127,8 @@ def read_msg(pgconn):
             c_buffer = create_string_buffer(bytes(buffer), n)
             ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
             nread = -1
-            libc = CDLL(find_library("c"))
-            stdout = c_void_p.in_dll(libc, "__stdoutp")
-            f = libssl.ERR_print_errors_fp
-            f.argtypes = [c_void_p]
             while nread == -1:
                 nread = libssl_SSL_read(ssl_obj, c_buffer, n)
-                import pdb
-
-                pdb.set_trace()
-                if nread == -1:
-                    f(stdout)
 
             msg = bytes(c_buffer.raw[:nread])
             return msg
