@@ -1,6 +1,5 @@
 import logging
 import os
-from os import path
 import select
 import struct
 import subprocess
@@ -15,6 +14,7 @@ from ctypes import (
     string_at,
 )
 from ctypes.util import find_library
+from os import path
 from sys import getsizeof
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ libpq_PQsetnonblocking.restype = c_int
 
 
 def stdout(command):
-    return subprocess.run(command, capture_output=True).stdout.decode('utf-8')
+    return subprocess.run(command, capture_output=True).stdout.decode("utf-8")
 
 
 def ssl_supported():
@@ -51,19 +51,19 @@ def ssl_supported():
 
 
 def possible_library_files(name):
-    return ['lib%s.dylib' % name, '%s.dylib' % name,
-            '%s.framework/%s' % (name, name), 'lib%s.so' % name]
+    return ["lib%s.dylib" % name, "%s.dylib" % name, "%s.framework/%s" % (name, name),
+            "lib%s.so" % name]
 
 
 def setup_ssl():
-    sslpath = ''
+    sslpath = ""
     # try to find OpenSSL path in `pg_config`'s LDFLAGS
     out = stdout(["pg_config", "--ldflags"])
-    for lib in out.split(' '):
-        if 'openssl' in lib:
-            ssldir = lib.split('-L')[-1]
+    for lib in out.split(" "):
+        if "openssl" in lib:
+            ssldir = lib.split("-L")[-1]
             # directory path is found, so search for actual file
-            for filename in possible_library_files('ssl'):
+            for filename in possible_library_files("ssl"):
                 possible_sslpath = path.join(ssldir, filename)
                 if path.exists(possible_sslpath):
                     sslpath = possible_sslpath
