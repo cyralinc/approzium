@@ -2,6 +2,7 @@ import logging
 import os
 import select
 import struct
+import subprocess
 from ctypes import (
     CDLL,
     c_char_p,
@@ -18,7 +19,8 @@ from sys import getsizeof
 logger = logging.getLogger(__name__)
 
 libpq = cdll.LoadLibrary(find_library("pq"))
-libssl = cdll.LoadLibrary(find_library("ssl"))
+
+
 
 
 # setup ctypes functions
@@ -39,13 +41,26 @@ libpq_PQsetnonblocking = libpq.PQsetnonblocking
 libpq_PQsetnonblocking.argtypes = [c_void_p, c_int]
 libpq_PQsetnonblocking.restype = c_int
 
-libssl_SSL_read = libssl.SSL_read
-libssl_SSL_read.argtypes = [c_void_p, c_char_p, c_int]
-libssl_SSL_read.restype = c_int
 
-libssl_SSL_write = libssl.SSL_write
-libssl_SSL_write.argtypes = [c_void_p, c_char_p, c_int]
-libssl_SSL_write.restype = c_int
+def ssl_supported():
+    def stdout(command):
+        return subprocess.run(command, capture_output=True).stdout
+    out = stdout(['pg_config', '--configure'])
+    return b'--with-openssl' in out
+
+
+def setup_ssl():
+    global libssl
+    global libssl_SSL_read
+    global libssl_SSL_write
+    libssl = cdll.LoadLibrary(find_library("ssl"))
+    libssl_SSL_read = libssl.SSL_read
+    libssl_SSL_read.argtypes = [c_void_p, c_char_p, c_int]
+    libssl_SSL_read.restype = c_int
+
+    libssl_SSL_write = libssl.SSL_write
+    libssl_SSL_write.argtypes = [c_void_p, c_char_p, c_int]
+    libssl_SSL_write.restype = c_int
 
 
 def set_connection_sync(pgconn):
@@ -92,8 +107,16 @@ def read_msg(pgconn):
             c_buffer = create_string_buffer(bytes(buffer), n)
             ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
             nread = -1
+            libc = CDLL(find_library("c"))
+            stdout = c_void_p.in_dll(libc, '__stdoutp')
+            f = libssl.ERR_print_errors_fp
+            f.argtypes = [c_void_p]
             while nread == -1:
                 nread = libssl_SSL_read(ssl_obj, c_buffer, n)
+                import pdb; pdb.set_trace()
+                if nread == -1:
+                    f(stdout)
+
             msg = bytes(c_buffer.raw[:nread])
             return msg
         else:
@@ -131,3 +154,7 @@ def set_debug(conn):
 def ensure_compatible_ssl(conn):
     if conn.info.ssl_attribute("library") != "OpenSSL":
         raise Exception("Unsupported SSL library")
+
+
+if ssl_supported():
+    setup_ssl()
