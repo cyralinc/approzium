@@ -1,8 +1,5 @@
-approzium package
-*****************
-
-Module contents
----------------
+AuthClient
+----------
 
 .. automodule:: approzium
    :members:
@@ -10,8 +7,8 @@ Module contents
    :show-inheritance:
 
 
-approzium.psycopg2 subpackage
------------------------------
+approzium.psycopg2
+------------------
 
 .. automodule:: approzium.psycopg2
    :members:
@@ -23,8 +20,8 @@ approzium.psycopg2 subpackage
    :undoc-members:
    :show-inheritance:
 
-approzium.asyncpg subpackage
-----------------------------
+approzium.asyncpg
+-----------------
 
 .. automodule:: approzium.asyncpg
    :members:
@@ -32,6 +29,20 @@ approzium.asyncpg subpackage
    :show-inheritance:
 
 .. automodule:: approzium.asyncpg.pool
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+approzium.mysql.connector
+-------------------------
+
+
+.. automodule:: approzium.mysql.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: approzium.mysql.connector.pooling
    :members:
    :undoc-members:
    :show-inheritance:

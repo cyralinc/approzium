@@ -1,12 +1,12 @@
 # Approzium Docs
-This is the code for [approzium.org](https://approzium.org) which documents the [Approzium](https://github.com/approzium/approzium) project.
+This is the code for [approzium.org](https://approzium.org) which documents the [Approzium](https://github.com/cyralinc/approzium) project.
 
 
 ## Development
 
 Clone this repo
 ```sh
-git clone https://github.com/approzium/approzium-docs
+git clone https://github.com/cyralinc/approzium-docs
 cd approzium-docs
 ```
 

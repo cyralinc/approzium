@@ -1,25 +1,33 @@
 package server
 
 import (
+	"context"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
 
-	pb "github.com/approzium/approzium/authenticator/server/protos"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/cyralinc/approzium/authenticator/server/api"
+	"github.com/cyralinc/approzium/authenticator/server/config"
+	pb "github.com/cyralinc/approzium/authenticator/server/protos"
+	testtools "github.com/cyralinc/approzium/authenticator/server/testing"
 	"github.com/google/gofuzz"
 	vault "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"
 )
 
-const envVarTestRole = "TEST_IAM_ROLE"
-
-var testEnv = &env{}
+var (
+	testEnv      = &testtools.AwsEnv{}
+	testLogEntry = func() *log.Entry {
+		logEntry := log.WithFields(log.Fields{"test": "logger"})
+		logEntry.Level = log.FatalLevel
+		return logEntry
+	}()
+	testCtx = context.WithValue(context.Background(), ctxLogger, testLogEntry)
+)
 
 // TestAuthenticator_GetPGMD5Hash issues real STS GetCallerIdentity because at the
 // time of writing there were no documented limits. Hitting the real API will allow
@@ -32,19 +40,20 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New(Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbmd5",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
+	resp, err := authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmd5",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
 		},
 		Salt: []byte{1, 2, 3, 4},
 	})
@@ -56,15 +65,16 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 	}
 
 	// Now use a bad claimed arn and make sure we fail.
-	resp, err = authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+	resp, err = authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "foo",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
 		},
 		Salt: []byte{1, 2, 3, 4},
 	})
@@ -84,19 +94,20 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := New(Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, err := authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "dbsha256",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           testEnv.ClaimedArn(),
+	resp, err := authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbsha256",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
 		},
 		Salt:              "1234",
 		Iterations:        0,
@@ -113,15 +124,16 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 	}
 
 	// Now use a bad claimed arn and make sure we fail.
-	resp, err = authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-		Authtype:       pb.AuthType_AWS,
-		ClientLanguage: pb.ClientLanguage_GO,
-		Dbhost:         "foo",
-		Dbport:         "5432",
-		Dbuser:         "bob",
-		Awsauth: &pb.AWSAuth{
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+	resp, err = authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "foo",
+			Dbport:         "5432",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
 		},
 		Salt:              "1234",
 		Iterations:        0,
@@ -132,64 +144,58 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 	}
 }
 
-func TestVerifyService(t *testing.T) {
+// TestAuthenticator_GetPGSHA256Hash issues real STS GetCallerIdentity because at the
+// time of writing there were no documented limits. Hitting the real API will allow
+// us to catch if it changes.
+func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
 	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
 	if err != nil {
 		t.Fatal(err)
 	}
-	testCases := []struct {
-		TestName                string
-		SignedGetCallerIdentity string
-		ExpectedArn             string
-		ExpectErr               bool
-	}{
-		{
-			TestName:                "Sunny path, regular arn",
-			SignedGetCallerIdentity: signedGetCallerIdentity,
-			ExpectedArn:             testEnv.ClaimedArn(),
-			ExpectErr:               false,
-		},
-		{
-			TestName:                "Empty values",
-			SignedGetCallerIdentity: "",
-			ExpectErr:               true,
-		},
-		{
-			TestName:                "Malicious base URL injected",
-			SignedGetCallerIdentity: strings.ReplaceAll(signedGetCallerIdentity, "sts", "somewhere-else"),
-			ExpectErr:               true,
-		},
-		{
-			TestName:                "Different call than GetCallerIdentity",
-			SignedGetCallerIdentity: strings.ReplaceAll(signedGetCallerIdentity, "GetCallerIdentity", "GetSessionToken"),
-			ExpectErr:               true,
-		},
-	}
-	for _, testCase := range testCases {
-		t.Run(testCase.TestName, func(t *testing.T) {
-			verifiedARN, err := getAwsIdentity(testCase.SignedGetCallerIdentity, pb.ClientLanguage_GO)
-			if testCase.ExpectErr {
-				if err == nil {
-					t.Fatal("expected err")
-				} else {
-					// We expected an error and received it, so we've succeeded
-					// and there's nothing else to do here.
-					return
-				}
-			}
-			if err != nil {
-				t.Fatal(err)
-			}
 
-			// We don't expect an error. Let's make sure we got the expected response.
-			match, err := arnsMatch(testCase.ExpectedArn, verifiedARN)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if !match {
-				t.Fatalf("expected %s but received %s", testCase.ExpectedArn, verifiedARN)
-			}
-		})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := authenticator.GetMYSQLSHA1Hash(testCtx, &pb.MYSQLSHA1HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmysql",
+			Dbport:         "3306",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           testEnv.ClaimedArn(),
+			},
+		},
+		Salt: make([]byte, 20),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := []byte{0x7, 0x20, 0x87, 0xd1, 0x6f, 0xdf, 0xab, 0xc5, 0x5b, 0x16, 0x44, 0xbb, 0x90, 0x42, 0x5, 0xc6, 0xd, 0x50, 0x5f, 0xcf}
+	if !reflect.DeepEqual(resp.Hash, expected) {
+		t.Fatalf("expected %#v but received %#v", expected, resp.Hash)
+	}
+
+	// Now use a bad claimed arn and make sure we fail.
+	resp, err = authenticator.GetMYSQLSHA1Hash(testCtx, &pb.MYSQLSHA1HashRequest{
+		PwdRequest: &pb.PasswordRequest{
+			ClientLanguage: pb.ClientLanguage_GO,
+			Dbhost:         "dbmysql",
+			Dbport:         "3306",
+			Dbuser:         "bob",
+			Aws: &pb.AWSIdentity{
+				SignedGetCallerIdentity: signedGetCallerIdentity,
+				ClaimedIamArn:           "arn:partition:service:region:account-id:arn-thats-not-mine",
+			},
+		},
+		Salt: make([]byte, 20),
+	})
+	if err == nil {
+		t.Fatal("using a claimed arn that doesn't belong to me should fail")
 	}
 }
 
@@ -197,7 +203,7 @@ func TestToDatabaseARN(t *testing.T) {
 	// Make sure role session names get stripped for assumed roles because
 	// users won't be planting creds in databases with session names, since
 	// they change all the time.
-	result, err := toDatabaseARN("arn:aws:sts::account-id:assumed-role/role-name/role-session-name")
+	result, err := toDatabaseARN(testLogEntry, "arn:aws:sts::account-id:assumed-role/role-name/role-session-name")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,7 +212,7 @@ func TestToDatabaseARN(t *testing.T) {
 	}
 
 	// Leave other arns alone.
-	result, err = toDatabaseARN("arn:aws:sts::123456789012:federated-user/my-federated-user-name")
+	result, err = toDatabaseARN(testLogEntry, "arn:aws:sts::123456789012:federated-user/my-federated-user-name")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -268,11 +274,10 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := New(Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	authenticator.LogRequestCount()
 
 	// Try to create a race.
 	start := make(chan interface{})
@@ -282,15 +287,16 @@ func TestNoRaces(t *testing.T) {
 			<-start
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
-			authenticator.GetPGSHA256Hash(nil, &pb.PGSHA256HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbsha256",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           claimedARN,
+			authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
+				PwdRequest: &pb.PasswordRequest{
+					ClientLanguage: pb.ClientLanguage_GO,
+					Dbhost:         "dbsha256",
+					Dbport:         "5432",
+					Dbuser:         "bob",
+					Aws: &pb.AWSIdentity{
+						SignedGetCallerIdentity: signedGetCallerIdentity,
+						ClaimedIamArn:           claimedARN,
+					},
 				},
 				Salt:              "1234",
 				Iterations:        0,
@@ -302,15 +308,16 @@ func TestNoRaces(t *testing.T) {
 			<-start
 			// We don't care about the response, we just want to hit as much
 			// of the authenticator's code as possible.
-			authenticator.GetPGMD5Hash(nil, &pb.PGMD5HashRequest{
-				Authtype:       pb.AuthType_AWS,
-				ClientLanguage: pb.ClientLanguage_GO,
-				Dbhost:         "dbmd5",
-				Dbport:         "5432",
-				Dbuser:         "bob",
-				Awsauth: &pb.AWSAuth{
-					SignedGetCallerIdentity: signedGetCallerIdentity,
-					ClaimedIamArn:           testEnv.ClaimedArn(),
+			authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
+				PwdRequest: &pb.PasswordRequest{
+					ClientLanguage: pb.ClientLanguage_GO,
+					Dbhost:         "dbmd5",
+					Dbport:         "5432",
+					Dbuser:         "bob",
+					Aws: &pb.AWSIdentity{
+						SignedGetCallerIdentity: signedGetCallerIdentity,
+						ClaimedIamArn:           testEnv.ClaimedArn(),
+					},
 				},
 				Salt: []byte{1, 2, 3, 4},
 			})
@@ -336,27 +343,32 @@ func TestNoRaces(t *testing.T) {
 // methods to ensure a panic isn't caused by random values. If
 // a panic is produced, the test will fail.
 func TestFuzzAuthenticator(t *testing.T) {
+	if !testtools.ShouldRunAcceptanceTests() {
+		t.Skip("Skipping because acceptance tests are off")
+	}
+
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
-	// This test generates a lot of error logs, so quiet them to
-	// avoid them drowning out other tests.
-	log.SetLevel(log.FatalLevel)
-
-	authenticator, err := New(Config{})
+	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	fuzzer := fuzz.New()
+
 	for i := 0; i < 1000; i++ {
 		req1 := &pb.PGSHA256HashRequest{}
 		fuzzer.Fuzz(req1)
-		authenticator.GetPGSHA256Hash(nil, req1)
+		authenticator.GetPGSHA256Hash(context.Background(), req1)
 
 		req2 := &pb.PGMD5HashRequest{}
 		fuzzer.Fuzz(req2)
-		authenticator.GetPGMD5Hash(nil, req2)
+		authenticator.GetPGMD5Hash(context.Background(), req2)
+
+		req3 := &pb.MYSQLSHA1HashRequest{}
+		fuzzer.Fuzz(req3)
+		authenticator.GetMYSQLSHA1Hash(context.Background(), req3)
 	}
 }
 
@@ -374,44 +386,53 @@ func TestFuzzXorBytes(t *testing.T) {
 	}
 }
 
-// This allows us to only get the signedGetCallerIdentity string once, but
-// to reuse it throughout tests through the testEnv variable, reducing load
-// on AWS.
-type env struct {
-	signedGetCallerIdentity string
+func TestMetrics(t *testing.T) {
+	if !testtools.ShouldRunAcceptanceTests() {
+		t.Skip("Skipping because acceptance tests are off")
+	}
+	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
+	_ = os.Setenv(vault.EnvVaultAddress, "")
+
+	// Start the API, which includes an endpoint for Prometheus to mine metrics.
+	config := config.Config{
+		Host:     "127.0.0.1",
+		HTTPPort: 6000,
+	}
+	_ = api.Start(testtools.TestLogger(), config)
+
+	// Make some calls to increment the metrics.
+	svr, err := buildServer(testtools.TestLogger(), config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	svr.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{})
+
+	// See what we get for metrics.
+	resp, err := http.Get("http://localhost:6000/v1/metrics/prometheus")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200 but received %d", resp.StatusCode)
+	}
+
+	actualResponse, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedResponse, err := ioutil.ReadFile("testing/prometheus.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if clean(expectedResponse) != clean(actualResponse) {
+		t.Fatalf("expected %s but received %s", expectedResponse, actualResponse)
+	}
 }
 
-func (e *env) ClaimedArn() string {
-	return os.Getenv(envVarTestRole)
-}
-
-func (e *env) SignedGetCallerIdentity(t *testing.T) (string, error) {
-
-	if os.Getenv(envVarTestRole) == "" {
-		t.Fatalf("skipping because %s is unset", envVarTestRole)
-	}
-
-	// If it's cached, return it.
-	if e.signedGetCallerIdentity != "" {
-		return e.signedGetCallerIdentity, nil
-	}
-
-	// If it's uncached, get it, cache it, and return it.
-	sess, err := session.NewSession()
-	if err != nil {
-		return "", err
-	}
-	creds := stscreds.NewCredentials(sess, os.Getenv(envVarTestRole))
-
-	// Create service client value configured for credentials
-	// from assumed role.
-	svc := sts.New(sess, &aws.Config{Credentials: creds})
-
-	req, _ := svc.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
-	signedGetCallerIdentity, err := req.Presign(time.Minute * 15)
-	if err != nil {
-		return "", err
-	}
-	e.signedGetCallerIdentity = signedGetCallerIdentity
-	return e.signedGetCallerIdentity, nil
+func clean(b []byte) string {
+	cleaned := strings.ReplaceAll(string(b), " ", "")
+	cleaned = strings.ReplaceAll(cleaned, "\n", "")
+	return cleaned
 }

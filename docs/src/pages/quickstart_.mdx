@@ -11,7 +11,7 @@ This guide will show you how to:
 - Connect to a Postgres database through the Approzium Python SDK.
 
 ## Deploying the Authenticator
-Get the Authenticator binary [here](https://github.com/approzium/approzium/tree/develop/authenticator), then run it with
+Get the Authenticator binary [here](https://github.com/cyralinc/approzium/tree/develop/authenticator), then run it with
 the environment variables `VAULT_ADDR` and `VAULT_TOKEN` set. These are example values, in real life we'd expect Vault to
 be run elsewhere.
 ```shell
@@ -64,7 +64,7 @@ from approzium import AuthClient
 from approzium.psycopg2 import connect
 
 # create an Authenticator client
-auth = AuthClient('authenticator:6000')
+auth = AuthClient('authenticator:6001')
 
 # connect using Approzium's connect method without providing a password
 conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydb", authenticator=auth)
@@ -73,20 +73,3 @@ conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydb", authenticator=auth)
 cur = conn.cursor()
 cur.execute('SELECT 1')
 ```
-
-## Configuration
-
-Approzium is configured through environment variables.
-
-- `APPROZIUM_HOST`: Defaults to `"127.0.0.1"`.
-- `APPROZIUM_PORT`: Defaults to `"6000"`.
-- `APPROZIUM_LOG_LEVEL`: Defaults to `"info"`. Supported selections are `"trace"`, `"debug"`,
-    `"info"`, `"warn"`, `"error"`, `"fatal"`, and `"panic"`. Upper case may be used.
-- `APPROZIUM_VAULT_TOKEN_PATH`: Optional, if set it will cause the latest Vault token to always
-    be pulled from the given file. See more on using this option
-    [here](https://learn.hashicorp.com/vault/identity-access-management/vault-agent-aws).
-
-Approzium supports Vault as for storing credentials. To use Vault, at a minimum, the `VAULT_ADDR`
-must be set. Either the `VAULT_TOKEN` or `APPROZIUM_VAULT_TOKEN_PATH` must be set, with the `VAULT_TOKEN`
-taking precedence. Additional Vault configuration is supported, as described
-[here](https://www.vaultproject.io/docs/commands#environment-variables).

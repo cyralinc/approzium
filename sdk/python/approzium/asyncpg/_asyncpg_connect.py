@@ -1,9 +1,10 @@
 import logging
 
-import approzium
 import asyncpg
 from asyncpg.connect_utils import _ConnectionParameters
 from asyncpg.protocol import Protocol
+
+import approzium
 
 from .._postgres import PGAuthClient, construct_msg, parse_msg
 
@@ -115,7 +116,7 @@ async def connect(*args, authenticator=None, **kwargs):
         >>> import approzium
         >>> import asyncio
         >>> from approzium.asyncpg import connect
-        >>> auth = approzium.AuthClient("myauthenticator.com:6000")
+        >>> auth = approzium.AuthClient("myauthenticator.com:6001")
         >>> async def run():
         ...     con = await connect(user='postgres', authenticator=auth)
         ...     # use the connection just like any other Asyncpg connection

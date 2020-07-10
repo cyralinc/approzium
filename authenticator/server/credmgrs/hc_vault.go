@@ -7,6 +7,7 @@ import (
 	"os"
 
 	vault "github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
 
 // In Vault, a mount path is the path where a secrets engine has been
@@ -42,7 +43,7 @@ func (h *hcVaultCredMgr) Name() string {
 	return "HashiCorp Vault"
 }
 
-func (h *hcVaultCredMgr) Password(identity DBKey) (string, error) {
+func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) {
 	client, err := h.vaultClient()
 	if err != nil {
 		return "", err

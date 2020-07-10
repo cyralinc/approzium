@@ -1,0 +1,39 @@
+# HELP approzium_total_aws_request_milliseconds Total AWS request milliseconds
+# TYPE approzium_total_aws_request_milliseconds gauge
+approzium_total_aws_request_milliseconds 0
+# HELP approzium_total_error_responses Total number of error responses
+# TYPE approzium_total_error_responses counter
+approzium_total_error_responses 1
+# HELP approzium_total_identity_matching_attempts Total checks of whether the identity a caller claims matches their actual identity
+# TYPE approzium_total_identity_matching_attempts counter
+approzium_total_identity_matching_attempts 0
+# HELP approzium_total_identity_matching_failures Total calls where caller claimed an identity that was not their actual identity
+# TYPE approzium_total_identity_matching_failures counter
+approzium_total_identity_matching_failures 0
+# HELP approzium_total_identity_verification_attempts Total attempts to verify caller identity
+# TYPE approzium_total_identity_verification_attempts counter
+approzium_total_identity_verification_attempts 0
+# HELP approzium_total_identity_verification_failures Total failures to verify caller identity
+# TYPE approzium_total_identity_verification_failures counter
+approzium_total_identity_verification_failures 0
+# HELP approzium_total_password_request_milliseconds Total password retrieval milliseconds
+# TYPE approzium_total_password_request_milliseconds gauge
+approzium_total_password_request_milliseconds 0
+# HELP approzium_total_password_retrieval_attempts The number of times a caller has requested a password from the database to authenticate
+# TYPE approzium_total_password_retrieval_attempts counter
+approzium_total_password_retrieval_attempts 0
+# HELP approzium_total_password_retrieval_failures The number of times a caller has failed to retrieve a password for any reason
+# TYPE approzium_total_password_retrieval_failures counter
+approzium_total_password_retrieval_failures 0
+# HELP approzium_total_password_retrieval_unauthorized The number of times a caller has been unauthorized to retrieve a password
+# TYPE approzium_total_password_retrieval_unauthorized counter
+approzium_total_password_retrieval_unauthorized 0
+# HELP approzium_total_request_milliseconds Total request milliseconds
+# TYPE approzium_total_request_milliseconds gauge
+approzium_total_request_milliseconds 0
+# HELP approzium_total_requests Total number of requests
+# TYPE approzium_total_requests counter
+approzium_total_requests 1
+# HELP approzium_total_responses Total number of responses
+# TYPE approzium_total_responses counter
+approzium_total_responses 1
