@@ -15,8 +15,5 @@ module.exports = {
         }
       ]
     },
-    {
-      Docusaurus: ['doc1', 'mdx'],
-    },
   ],
 };
