@@ -25,6 +25,6 @@ def instrument():
 
 def uninstrument():
     if original_DatabaseApiIntegration is None:
-        raise Exception('Opentelemetry is not currently instrumented')
+        raise Exception('Opentelemetry is not currently instrumented by Approzium')
     opentelemetry.ext.dbapi.DatabaseApiIntegration = \
     original_DatabaseApiIntegration
