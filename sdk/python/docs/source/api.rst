@@ -46,3 +46,12 @@ approzium.mysql.connector
    :members:
    :undoc-members:
    :show-inheritance:
+
+Opentelemetry Integration
+------------------------
+
+
+.. automodule:: approzium.opentelemetry
+   :members:
+   :undoc-members:
+   :show-inheritance:
