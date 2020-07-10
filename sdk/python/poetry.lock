@@ -63,10 +63,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.14.16"
+version = "1.14.20"
 
 [package.dependencies]
-botocore = ">=1.17.16,<1.18.0"
+botocore = ">=1.17.20,<1.18.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -76,7 +76,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.17.16"
+version = "1.17.20"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -225,20 +225,21 @@ test = ["opentelemetry-test (0.10b0)"]
 
 [[package]]
 category = "main"
-description = "Instrumentation Tools & Auto Instrumentation for OpenTelemetry Python"
-name = "opentelemetry-instrumentation"
+description = "Jaeger Exporter for OpenTelemetry"
+name = "opentelemetry-ext-jaeger"
 optional = true
 python-versions = ">=3.4"
 version = "0.10b0"
 
 [package.dependencies]
 opentelemetry-api = "0.10b0"
-wrapt = ">=1.0.0,<2.0.0"
+opentelemetry-sdk = "0.10b0"
+thrift = ">=0.10.0"
 
 [[package]]
 category = "main"
 description = "OpenTelemetry psycopg2 integration"
-name = "opentelemetry.ext.psycopg2"
+name = "opentelemetry-ext-psycopg2"
 optional = true
 python-versions = ">=3.4"
 version = "0.10b0"
@@ -252,6 +253,29 @@ wrapt = ">=1.0.0,<2.0.0"
 
 [package.extras]
 test = ["opentelemetry-test (0.10b0)"]
+
+[[package]]
+category = "main"
+description = "Instrumentation Tools & Auto Instrumentation for OpenTelemetry Python"
+name = "opentelemetry-instrumentation"
+optional = true
+python-versions = ">=3.4"
+version = "0.10b0"
+
+[package.dependencies]
+opentelemetry-api = "0.10b0"
+wrapt = ">=1.0.0,<2.0.0"
+
+[[package]]
+category = "main"
+description = "OpenTelemetry Python SDK"
+name = "opentelemetry-sdk"
+optional = true
+python-versions = ">=3.4"
+version = "0.10b0"
+
+[package.dependencies]
+opentelemetry-api = "0.10b0"
 
 [[package]]
 category = "dev"
@@ -437,6 +461,22 @@ version = "1.6.0"
 
 [[package]]
 category = "main"
+description = "Python bindings for the Apache Thrift RPC system"
+name = "thrift"
+optional = true
+python-versions = "*"
+version = "0.13.0"
+
+[package.dependencies]
+six = ">=1.7.2"
+
+[package.extras]
+all = ["tornado (>=4.0)", "twisted"]
+tornado = ["tornado (>=4.0)"]
+twisted = ["twisted"]
+
+[[package]]
+category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 marker = "python_version != \"3.4\""
 name = "urllib3"
@@ -480,9 +520,10 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [extras]
 sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python"]
+tracing = ["opentelemetry-ext-psycopg2", "opentelemetry-ext-jaeger"]
 
 [metadata]
-content-hash = "d61b38021bf64697c721d94da41c139edfa157c52884ba4eb0c091e6eb9eb8ab"
+content-hash = "8fc69ad11862f62a3d557a2d741652a3e1517e7cd9faa14575efb7987f36088c"
 python-versions = "^3.5"
 
 [metadata.files]
@@ -526,12 +567,12 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.14.16-py2.py3-none-any.whl", hash = "sha256:c2a223f4b48782e8b160b2130265e2a66081df111f630a5a384d6909e29a5aa9"},
-    {file = "boto3-1.14.16.tar.gz", hash = "sha256:ce5a4ab6af9e993d1864209cbbb6f4812f65fbc57ad6b95e5967d8bf38b1dcfb"},
+    {file = "boto3-1.14.20-py2.py3-none-any.whl", hash = "sha256:f7aa33b382cc9e73ef7f590b885e72732ad2bd9628c5e312c9aeb8ba011c6820"},
+    {file = "boto3-1.14.20.tar.gz", hash = "sha256:e6ab26155b2f83798218106580ab2b3cd47691e25aba912e0351502eda8d86e0"},
 ]
 botocore = [
-    {file = "botocore-1.17.16-py2.py3-none-any.whl", hash = "sha256:99d995ef99cf77458a661f3fc64e0c3a4ce77ca30facfdf0472f44b2953dd856"},
-    {file = "botocore-1.17.16.tar.gz", hash = "sha256:fe0c4f7cd6b67eff3b7cb8dff6709a65d6fca10b7b7449a493b2036915e98b4c"},
+    {file = "botocore-1.17.20-py2.py3-none-any.whl", hash = "sha256:e7fee600092b51ca8016c541d5c50a8b39179d5c184ec3fd430400d99ba0c55a"},
+    {file = "botocore-1.17.20.tar.gz", hash = "sha256:d1bf8c2085719221683edf54913c6155c68705f26ab4a72c45e4de5176a8cf7b"},
 ]
 colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
@@ -670,13 +711,21 @@ opentelemetry-ext-dbapi = [
     {file = "opentelemetry-ext-dbapi-0.10b0.tar.gz", hash = "sha256:afb0d7ef241d3015f1f2ef08deef86f91243cfff841c88a7cb8f014f719fefd8"},
     {file = "opentelemetry_ext_dbapi-0.10b0-py3-none-any.whl", hash = "sha256:642b2dc1c9c7ce61f6415412295bc5b150b4e665f671a0d7ece513b3592cfd94"},
 ]
+opentelemetry-ext-jaeger = [
+    {file = "opentelemetry-ext-jaeger-0.10b0.tar.gz", hash = "sha256:fa6a57f34fb3961d51df8ed931766623ad7c4efe161a3785b383c7781a98af8c"},
+    {file = "opentelemetry_ext_jaeger-0.10b0-py3-none-any.whl", hash = "sha256:f7aa7d6da51a60818a524aabd0d937ebbc0cfd5ad0370c218cb6745d68329274"},
+]
+opentelemetry-ext-psycopg2 = [
+    {file = "opentelemetry-ext-psycopg2-0.10b0.tar.gz", hash = "sha256:8fb752e6f836190b32166c13233aad2d19c7f0db06910ef33ff35ac472fe63c8"},
+    {file = "opentelemetry_ext_psycopg2-0.10b0-py3-none-any.whl", hash = "sha256:7115434cdce168ebede8d711786ff691340630e773afde8d57ae18bac7a95e6f"},
+]
 opentelemetry-instrumentation = [
     {file = "opentelemetry-instrumentation-0.10b0.tar.gz", hash = "sha256:78c4d84c06e3681fd35320dc2c2448d3b9ae4db53e2ef673c27499b95a555ca7"},
     {file = "opentelemetry_instrumentation-0.10b0-py3-none-any.whl", hash = "sha256:5667b0a2f7abc39d4db98f99d5ceb755559a16a8f789a8ec6c91159f4bfab1d3"},
 ]
-"opentelemetry.ext.psycopg2" = [
-    {file = "opentelemetry-ext-psycopg2-0.10b0.tar.gz", hash = "sha256:8fb752e6f836190b32166c13233aad2d19c7f0db06910ef33ff35ac472fe63c8"},
-    {file = "opentelemetry_ext_psycopg2-0.10b0-py3-none-any.whl", hash = "sha256:7115434cdce168ebede8d711786ff691340630e773afde8d57ae18bac7a95e6f"},
+opentelemetry-sdk = [
+    {file = "opentelemetry-sdk-0.10b0.tar.gz", hash = "sha256:324860504ed3ff6a33434baa31336f8da14e84fde3d5e84c4ba30a3b57712726"},
+    {file = "opentelemetry_sdk-0.10b0-py3-none-any.whl", hash = "sha256:4560cfb990bb39040018fdffb6fbca6a135d4f70f46654be7f46bc8733fd919d"},
 ]
 packaging = [
     {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
@@ -792,6 +841,9 @@ six = [
 tblib = [
     {file = "tblib-1.6.0-py2.py3-none-any.whl", hash = "sha256:e222f44485d45ed13fada73b57775e2ff9bd8af62160120bbb6679f5ad80315b"},
     {file = "tblib-1.6.0.tar.gz", hash = "sha256:229bee3754cb5d98b4837dd5c4405e80cfab57cb9f93220410ad367f8b352344"},
+]
+thrift = [
+    {file = "thrift-0.13.0.tar.gz", hash = "sha256:9af1c86bf73433afc6010ed376a6c6aca2b54099cc0d61895f640870a9ae7d89"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
