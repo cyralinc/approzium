@@ -3,6 +3,7 @@ module.exports = {
     'overview',
     'quickstart',
     'architecture',
+    'examples',
     'security-model',
     'configuration',
     'observability',
