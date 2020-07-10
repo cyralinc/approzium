@@ -128,4 +128,5 @@ async def connect(*args, authenticator=None, **kwargs):
     conn = await asyncpg.connect(
         *args, **kwargs, connection_class=construct_approzium_connection(authenticator)
     )
+    conn.authenticator = authenticator
     return conn
