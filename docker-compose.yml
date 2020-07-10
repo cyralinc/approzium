@@ -8,6 +8,10 @@ x-test-variables: &test-variables
     POSTGRES_USER: 'bob'
     POSTGRES_DB: 'db'
 services:
+    jaeger:
+        image: jaegertracing/all-in-one
+        ports:
+            - "127.0.0.1:16686:16686"
     dbsha256:
         build: ssl
         image: approzium_postgres_ssl
