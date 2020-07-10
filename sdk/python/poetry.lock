@@ -3,7 +3,7 @@ category = "main"
 description = "Asyncio support for PEP-567 contextvars backport."
 marker = "python_version < \"3.7\" and python_version >= \"3.5\""
 name = "aiocontextvars"
-optional = true
+optional = false
 python-versions = ">=3.5"
 version = "0.2.2"
 
@@ -101,7 +101,7 @@ category = "main"
 description = "PEP 567 Backport"
 marker = "python_version < \"3.7\" and python_version >= \"3.5\""
 name = "contextvars"
-optional = true
+optional = false
 python-versions = "*"
 version = "2.4"
 
@@ -144,7 +144,7 @@ category = "main"
 description = "Immutable Collections"
 marker = "python_version < \"3.7\" and python_version >= \"3.5\""
 name = "immutables"
-optional = true
+optional = false
 python-versions = ">=3.5"
 version = "0.14"
 
@@ -198,7 +198,7 @@ dns-srv = ["dnspython (>=1.16.0)"]
 category = "main"
 description = "OpenTelemetry Python API"
 name = "opentelemetry-api"
-optional = true
+optional = false
 python-versions = ">=3.4"
 version = "0.10b0"
 
@@ -211,7 +211,7 @@ version = "*"
 category = "main"
 description = "OpenTelemetry Database API integration"
 name = "opentelemetry-ext-dbapi"
-optional = true
+optional = false
 python-versions = ">=3.4"
 version = "0.10b0"
 
@@ -240,7 +240,7 @@ thrift = ">=0.10.0"
 category = "main"
 description = "OpenTelemetry psycopg2 integration"
 name = "opentelemetry-ext-psycopg2"
-optional = true
+optional = false
 python-versions = ">=3.4"
 version = "0.10b0"
 
@@ -258,7 +258,7 @@ test = ["opentelemetry-test (0.10b0)"]
 category = "main"
 description = "Instrumentation Tools & Auto Instrumentation for OpenTelemetry Python"
 name = "opentelemetry-instrumentation"
-optional = true
+optional = false
 python-versions = ">=3.4"
 version = "0.10b0"
 
@@ -341,7 +341,7 @@ version = "2.8.5"
 category = "main"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
 name = "psycopg2-binary"
-optional = true
+optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "2.8.5"
 
@@ -501,7 +501,7 @@ version = "0.2.5"
 category = "main"
 description = "Module for decorators, wrappers and monkey patching."
 name = "wrapt"
-optional = true
+optional = false
 python-versions = "*"
 version = "1.12.1"
 
@@ -523,7 +523,7 @@ sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python"]
 tracing = ["opentelemetry-ext-psycopg2", "opentelemetry-ext-jaeger"]
 
 [metadata]
-content-hash = "8fc69ad11862f62a3d557a2d741652a3e1517e7cd9faa14575efb7987f36088c"
+content-hash = "95b7d5295642f0c0c85fb319914a2e4d365b302065286d58b70c7c30b73949db"
 python-versions = "^3.5"
 
 [metadata.files]
