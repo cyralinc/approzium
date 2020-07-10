@@ -21,8 +21,8 @@ approzium.default_auth_client = approzium.AuthClient('authenticator:6001')
 conn = connect("host=1.2.3.4 user=user1")  # Look ma, no password!
 ```
 
-You can get started with Approzium [here](/quickstart).
+You can get started with Approzium [here](quickstart).
 
-Learn how it works by checking out the [architecture](/architecture).
+Learn how it works by checking out the [architecture](architecture).
 
 We hope you like it! 🤗
