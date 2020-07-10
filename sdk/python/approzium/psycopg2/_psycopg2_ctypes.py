@@ -21,8 +21,6 @@ logger = logging.getLogger(__name__)
 libpq = cdll.LoadLibrary(find_library("pq"))
 
 
-
-
 # setup ctypes functions
 # necessary to avoid segfaults when using multiple Python threads
 libpq_PQstatus = libpq.PQstatus
@@ -45,8 +43,9 @@ libpq_PQsetnonblocking.restype = c_int
 def ssl_supported():
     def stdout(command):
         return subprocess.run(command, capture_output=True).stdout
-    out = stdout(['pg_config', '--configure'])
-    return b'--with-openssl' in out
+
+    out = stdout(["pg_config", "--configure"])
+    return b"--with-openssl" in out
 
 
 def setup_ssl():
@@ -108,12 +107,14 @@ def read_msg(pgconn):
             ssl_obj = libpq_PQgetssl(pgconn.pgconn_ptr)
             nread = -1
             libc = CDLL(find_library("c"))
-            stdout = c_void_p.in_dll(libc, '__stdoutp')
+            stdout = c_void_p.in_dll(libc, "__stdoutp")
             f = libssl.ERR_print_errors_fp
             f.argtypes = [c_void_p]
             while nread == -1:
                 nread = libssl_SSL_read(ssl_obj, c_buffer, n)
-                import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
                 if nread == -1:
                     f(stdout)
 
