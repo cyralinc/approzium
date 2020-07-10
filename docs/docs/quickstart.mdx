@@ -64,7 +64,7 @@ from approzium.psycopg2 import connect
 auth = AuthClient('authenticator:6001')
 
 # connect using Approzium's connect method without providing a password
-conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydb", authenticator=auth)
+conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydbhost", authenticator=auth)
 
 # use the connection as you typically would. very cool!
 cur = conn.cursor()
