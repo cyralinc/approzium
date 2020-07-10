@@ -11,7 +11,7 @@ module.exports = {
         {
           type: 'link',
           label: 'Python',
-          href: 'https://www.psycopg.org'
+          href: 'https://approzium.readthedocs.io/en/latest/'
         }
       ]
     },
