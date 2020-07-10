@@ -8,7 +8,7 @@ import approzium
 import approzium.opentelemetry
 from approzium.psycopg2 import connect
 
-auth = approzium.AuthClient("authenticator:6000")
+auth = approzium.AuthClient("authenticator:6001")
 approzium.default_auth_client = auth
 
 trace.set_tracer_provider(TracerProvider())

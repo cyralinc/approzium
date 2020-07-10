@@ -3,7 +3,7 @@ from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = approzium.AuthClient("authenticator:6001")
-conn = connect(user="bob", authenticator=auth, host="dbmysql", use_pure=True)
+conn = connect(user="bob", authenticator=auth, host="dbmysqlsha1", use_pure=True)
 print("Connection Established")
 
 cur = conn.cursor()
@@ -12,7 +12,8 @@ result = next(cur)
 print(result)
 
 cnxpool = MySQLConnectionPool(
-    pool_name="mypool", pool_size=3, user="bob", host="dbmysql", authenticator=auth
+    pool_name="mypool", pool_size=3, user="bob", host="dbmysqlsha1",
+    authenticator=auth, use_pure=True
 )
 print("Connection Pool Established")
 conn = cnxpool.get_connection()
