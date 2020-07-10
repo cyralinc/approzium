@@ -26,13 +26,13 @@ trace.get_tracer_provider().add_span_processor(
 
 tracer = trace.get_tracer(__name__)
 
-# approzium.opentelemetry.instrument()
+approzium.opentelemetry.instrument()
 Psycopg2Instrumentor().instrument()
 
-cnx = approzium.psycopg2.connect("host=dbmd5 dbname=db user=bob")
+cnx = connect("host=dbmd5 dbname=db user=bob")
 cursor = cnx.cursor()
-with tracer.start_as_current_span("bar"):
-    with tracer.start_as_current_span("baz"):
+with tracer.start_as_current_span("foo"):
+    with tracer.start_as_current_span("bar"):
         print('Hello world!')
         cursor.execute("SELECT 1")
 cursor.close()
