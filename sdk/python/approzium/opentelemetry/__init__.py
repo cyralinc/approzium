@@ -4,6 +4,7 @@ from opentelemetry.ext.dbapi import DatabaseApiIntegration
 
 original_DatabaseApiIntegration = None
 
+
 class ApproziumDatabaseApiIntegration(DatabaseApiIntegration):
     def get_connection_attributes(self, connection):
         super().get_connection_attributes(connection)
@@ -12,7 +13,6 @@ class ApproziumDatabaseApiIntegration(DatabaseApiIntegration):
             self.add_approzium_span_attributes(connection)
 
     def add_approzium_span_attributes(self, connection):
-        authenticator = connection.authenticator
         for key, value in connection.authenticator.attribution_info.items():
             self.span_attributes['approzium.' + key] = value
 
@@ -26,5 +26,4 @@ def instrument():
 def uninstrument():
     if original_DatabaseApiIntegration is None:
         raise Exception('Opentelemetry is not currently instrumented by Approzium')
-    opentelemetry.ext.dbapi.DatabaseApiIntegration = \
-    original_DatabaseApiIntegration
+    opentelemetry.ext.dbapi.DatabaseApiIntegration = original_DatabaseApiIntegration
