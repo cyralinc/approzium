@@ -1,5 +1,3 @@
-from os import environ
-
 from approzium import AuthClient
 from approzium.psycopg2 import connect
 from approzium.psycopg2.pool import ThreadedConnectionPool

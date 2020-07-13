@@ -61,13 +61,14 @@ class AuthClient(object):
                 )
             if tls_config.client_cert is None or tls_config.client_key is None:
                 raise ValueError(
-                    "if tls is not disabled, client_cert and client_key must be provided"
+                    "if tls is not disabled, "
+                    "client_cert and client_key must be provided"
                 )
 
         self.tls_config = TLSConfig(
-            trusted_certs=trusted_certs,
-            client_cert=client_cert,
-            client_key=client_key,
+            trusted_certs=tls_config.trusted_certs,
+            client_cert=tls_config.client_cert,
+            client_key=tls_config.client_key,
         )
         self.authenticated = False
         self._counter = count(1)

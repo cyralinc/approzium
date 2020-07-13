@@ -1,5 +1,4 @@
 import asyncio
-from os import environ
 
 from approzium import AuthClient
 from approzium.asyncpg import connect

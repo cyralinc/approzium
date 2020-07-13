@@ -1,5 +1,3 @@
-from os import environ
-
 from approzium import AuthClient
 from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
