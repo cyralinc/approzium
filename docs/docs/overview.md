@@ -22,7 +22,7 @@ import os
 # read into local memory before being sent to the database
 db_password = os.environ['DATABASE_PASSWORD'] 
 
-conn = connect(host=1.2.3.4 user='user1' password=db_password)
+conn = connect(host='1.2.3.4' user='user1' password=db_password)
 ```
 
 Whether database credentials are stored in the application code itself (as in this example), or in a secrets manager such as Hashicorp Vault, allowing applications direct access to credentials exposes them to leaks through inadvertent application logging, application compromise, or theft of secrets manager API keys.
