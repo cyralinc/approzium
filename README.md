@@ -1,6 +1,7 @@
 # approzium
 
-[![Build Status](https://github.com/approzium/approzium/workflows/.github/workflows/main.yml/badge.svg)]()
+![test](https://github.com/cyralinc/approzium/workflows/test/badge.svg)
+![lint](https://github.com/cyralinc/approzium/workflows/lint/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://approzium.readthedocs.io/?badge=latest)
 
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
@@ -32,20 +33,26 @@ soon as we can!
 
 We welcome community contributions!
 
-We use `docker-compose.yml` to quickly and easily provide you with a development environment that mimics real life. Please check it out for helpful hints on how to reach one container from another. To run the end-to-end test, from our home directory:
-- Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
-- Run `make test`. That's it!
+We use `docker-compose.yml` to quickly and easily provide you with a development environment that mimics real life.
+To spin up an end-to-end development environment based in Docker:
 
-To drop into a Bash shell into the development environment, run `make dev`. This will automatically run everything you need in order to test and debug your code.
-- Ensure you have the latest authenticator binary: `$ cd authenticator && GOOS=linux GOARCH=amd64 go build && cd ..`.
+- Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
 - In your local environment, run `$ aws configure` and add an access key and secret.
-  - Make sure the access key and secret you configure can assume at least one role.
-- Run `$ make dc-build`.
-- In one window, `$ docker-compose up`.
-- In another window, `$ make dev`.
-- Export an environment variable for the role you're testing with: `$ export TEST_IAM_ROLE=arn:aws:iam::123456789012:role/AssumableRole`.
-- To use our Python SDK to shoot a request at the authenticator, run
-  `$ PGHOST=dbmd5 PGUSER=bob PGDATABASE=db python3 sdk/python/examples/pg2_client.py`.
+- Run `$ make dc-build`. This will build the authenticator and development Docker images.
+- Run `$ docker-compose up`. This will run the authenticator with a Vault backend and will run test database servers (Postgres and MySQL).
+- In another window, `$ make dev`. This will start a shell in the development environment.
+- You now have a full development and testing environment!
+- For example, to use our Python SDK to create an Approzium connection to a Postgres server:
+    * Create an Approzium path in the test Vault backend: `$ make enable-vault-path`
+    * Give your AWS-identity access to the test server: `$ make seed-vault-addr ADDR=dbmd5:5432`
+    * Create a connection: `$ cd sdk/python/examples && poetry run python3 psycopg2_connect.py`.
+
+### Testing
+
+Our end-to-end tests take a few minutes to run. Please run them once locally before you submit a PR.
+
+To run the end-to-end test, from our home directory:
+- Run `make test`. That's it!
 
 ## Credits
 

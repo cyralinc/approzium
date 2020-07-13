@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 )
 
-const envVarTestRole = "TEST_IAM_ROLE"
+const envVarTestRole = "TEST_ASSUMABLE_ARN"
 
 // This allows us to only get the signedGetCallerIdentity string once, but
 // to reuse it throughout tests through the testEnv variable, reducing load

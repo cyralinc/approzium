@@ -1,0 +1,6 @@
+# host: 127.0.0.0
+# httpport: 6000
+# grpcport: 6001
+# loglevel: info
+# logformat: text
+# lograw: false
