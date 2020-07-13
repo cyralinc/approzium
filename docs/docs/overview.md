@@ -15,8 +15,14 @@ Additionally, Approzium addresses common security vulnerabilities in how applica
 
 ```python
 from psycopg2 import connect
+import os
 
-conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword")
+# whether the database password is read as an environment 
+# variable or retrieved from a secrets manager, it is ultimately
+# read into local memory before being sent to the database
+db_password = os.environ['DATABASE_PASSWORD'] 
+
+conn = connect(host=1.2.3.4 user='user1' password=db_password)
 ```
 
 Whether database credentials are stored in the application code itself (as in this example), or in a secrets manager such as Hashicorp Vault, allowing applications direct access to credentials exposes them to leaks through inadvertent application logging, application compromise, or theft of secrets manager API keys.
@@ -28,7 +34,7 @@ import approzium
 from approzium.psycopg2 import connect
 
 approzium.default_auth_client = approzium.AuthClient('authenticator:6001')
-conn = connect("host=1.2.3.4 user=user1")  # Look ma, no password!
+conn = connect(host='1.2.3.4' user='user1')  # Look ma, no password!
 ```
 
 With the _password_ attribute removed from the `connect()` API, applications no longer need to know the actual database credentials in order to connect to them while administrators can still retain control over which applications are allowed access through the use of IAM roles.
