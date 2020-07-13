@@ -1,0 +1,30 @@
+name: test
+on:
+  push:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run docker-compose build
+        run: make dc-build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Run Go tests
+        run: make run-in-docker CMD="make run-gotests"
+        env:
+          TEST_ASSUMABLE_ARN: ${{ secrets.TEST_ASSUMABLE_ARN }}
+
+      - name: Run Python tests
+        run: make run-in-docker CMD="make run-pythontests"
+        env:
+          TEST_ASSUMABLE_ARN: ${{ secrets.TEST_ASSUMABLE_ARN }}

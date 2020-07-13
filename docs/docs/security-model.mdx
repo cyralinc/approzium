@@ -1,0 +1,26 @@
+---
+title: Security Model
+---
+
+Approzium’s security model aims to **prevent**, **attribute**, and **observe** database credential leaks. Also, as a security-oriented application, all features are secure by default.
+
+Please note, Approzium is under active development. As such, some of the features discussed are still brewing. However, this Security Model describes our direction and tenants. We appreciate your patience!
+
+## Prevention
+Applications are poor at keeping secrets. An application that’s starting up may log its configuration, including a database username and password, or return it as part of an error response. Many companies use logging solutions that propagate logs in near-real-time, so a leaked password configured to expire in 15 minutes may still be viewed and used in 5 or less. 
+
+Approzium gives **zero trust to the client**. Clients using the Approzium SDK never receive the database password, nor is the password ever in the client’s memory. This makes it impossible for a client to leak database credentials.
+
+## Attribution
+Many applications use the same username and password across multiple instances. This makes it difficult to attribute a particular query to a particular instance. If a data exfiltration is occurring, who is exfiltrating it?
+
+The Approzium SDK exposes client-side identity information for logging by pulling it directly from the client’s enclosing environment. Server-side, Approzium logs the actual identity of all callers along with request IDs. This makes it possible to tie clients to their local (unverified) identities, clients to the calls they make, and calls to their actual (verified) identities.
+
+By supporting tracing, this concept of identity can be extended end-to-end.
+
+## Observation
+It’s good to prevent data breaches, but if one is in progress, you need to know so you can intervene.
+
+Metrics are a forethought with Approzium. Approzium emits normal application metrics, but it also emits metrics on events that may indicate concerning activity. Metrics can be used to view failed authentication attempts, error responses, and claimed identities that don’t match actual identities. 
+
+Exposing this information allows you to alert on suspicious activity. Your database authentication attempts are no longer opaque, they are easily viewable.
