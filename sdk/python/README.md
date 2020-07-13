@@ -1,1 +1,0 @@
-# Approzium SDK for Python
