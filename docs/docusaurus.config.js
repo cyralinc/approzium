@@ -27,6 +27,12 @@ module.exports = {
         },
       ],
     },
+    algolia: {
+      apiKey: '8ce076a38f6bf25b30877ca2251ec1e4',
+      indexName: 'prod_APPROZIUM_DOCS',
+      appId: '51LSIHDN1A', // Optional, if you run the DocSearch crawler on your own
+      algoliaOptions: {}, // Optional, if provided by Algolia
+    },
     footer: {
       style: 'light',
       copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
