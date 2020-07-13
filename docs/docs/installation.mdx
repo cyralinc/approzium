@@ -1,0 +1,47 @@
+---
+title: Installation
+---
+
+## Client SDKs
+
+- Python: `pip3 install approzium`
+
+## Authentication server binaries
+
+- Our binaries are posted with [our releases](https://github.com/cyralinc/approzium/releases).
+
+## Running the server binary
+
+### Linux
+
+Please replace `linux/amd64` with the correct version of Linux for your environment.
+
+```
+curl https://github.com/cyralinc/approzium/archive/linux/amd64/approzium
+chmod +x approzium
+./approzium
+```
+
+### Mac
+
+Please replace `darwin/amd64` with the correct version of Mac for your environment.
+
+```
+curl https://github.com/cyralinc/approzium/archive/darwin/amd64/approzium
+chmod +x approzium
+./approzium
+```
+
+### Windows
+
+Please replace `windows/amd64` with the correct version of Windows for your environment.
+
+```
+$url = "https://github.com/cyralinc/approzium/archive/windows/amd64/approzium.exe"
+$outpath = "$PSScriptRoot/approzium.exe"
+Invoke-WebRequest -Uri $url -OutFile $outpath
+$wc = New-Object System.Net.WebClient
+$wc.DownloadFile($url, $outpath)
+$args = @("Comma","Separated","Arguments")
+Start-Process -Filepath "$PSScriptRoot/approzium.exe" -ArgumentList $args
+```
