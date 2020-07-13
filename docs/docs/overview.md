@@ -35,7 +35,7 @@ With the _password_ attribute removed from the `connect()` API, applications no 
 
 Approzium integrates with popular secrets managers such as Hashicorp Vault and AWS Secrets Manager for the storage of database credentials, and uses OpenTelemetry to make it easy to integrate with a wide variety of observability products, such as Prometheus/Grafana, ELK, Datadog and New Relic.
 
-Approzium was developed by the engineering team at Cyral and is available under the Apache 2.0 license, free for anyone to use and develop.
+Approzium is developed by the engineering team at Cyral and is available under the Apache 2.0 license, free for anyone to use and develop.
 
 ## Overview 
 Approzium comprises two components that are deployed independently -- an SDK that runs as part of the application code, and a standalone service called the Authenticator with which the SDK interacts on behalf of the application. A single Authenticator instance can support multiple applications, which may be set up optionally as an auto scaling group for load balancing purposes.
