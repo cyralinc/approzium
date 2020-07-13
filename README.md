@@ -18,7 +18,7 @@ do stay tuned for more identity platforms, databases, and SDK languages.
 
 ## Docs
 
-See https://approzium.org/ for a Quick Start, or elaboration on the architecture and API.
+See https://approzium.com/ for a Quick Start, or elaboration on the architecture and API.
 
 ## Support
 
