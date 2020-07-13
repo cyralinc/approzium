@@ -41,3 +41,17 @@ a[href^="https://approzium.readthedocs.io/"]::after {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
   padding-right: 13px;
 }
+
+a {
+  font-weight: 600;
+}
+
+code {
+  background-color: transparent;
+  border: 1px solid var(--ifm-font-color-base);
+  border-radius: .2rem;
+  font-size: .9rem;
+  padding: .2rem;
+  margin: .2rem;
+  box-shadow: 1px 1px 0px var(--ifm-color-emphasis-500);
+}
