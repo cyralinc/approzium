@@ -14,14 +14,14 @@ DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 cd "$DIR"
 
 # Set build tags
-BUILD_TAGS="${BUILD_TAGS:-"approzium"}"
+BUILD_TAGS="${BUILD_TAGS:-"authenticator"}"
 
 # Get the git commit
 GIT_COMMIT="$(git rev-parse HEAD)"
 GIT_DIRTY="$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)"
 
 # If its dev mode, only build for ourself
-if [ "${APPROZIUM_DEV_BUILD}x" != "x" ] && [ "${XC_OSARCH}x" == "x" ]; then
+if [ "${AUTHENTICATOR_DEV_BUILD}x" != "x" ] && [ "${XC_OSARCH}x" == "x" ]; then
     XC_OS=$(${GO_CMD} env GOOS)
     XC_ARCH=$(${GO_CMD} env GOARCH)
     XC_OSARCH=$(${GO_CMD} env GOOS)/$(${GO_CMD} env GOARCH)
@@ -55,7 +55,7 @@ gox \
     -osarch="${XC_OSARCH}" \
     -gcflags "${GCFLAGS}" \
     -ldflags "${LD_FLAGS}-X github.com/cyralinc/approzium/sdk/version.GitCommit='${GIT_COMMIT}${GIT_DIRTY}'" \
-    -output "pkg/{{.OS}}_{{.Arch}}/approzium" \
+    -output "pkg/{{.OS}}_{{.Arch}}/authenticator" \
     ${GOX_PARALLEL_BUILDS+-parallel="${GOX_PARALLEL_BUILDS}"} \
     -tags="${BUILD_TAGS}" \
     -gocmd="${GO_CMD}" \
@@ -73,7 +73,7 @@ for F in $(find ${DEV_PLATFORM} -mindepth 1 -maxdepth 1 -type f); do
     cp ${F} ${MAIN_GOPATH}/bin/
 done
 
-if [ "${APPROZIUM_DEV_BUILD}x" = "x" ]; then
+if [ "${AUTHENTICATOR_DEV_BUILD}x" = "x" ]; then
     # Zip and copy to the dist dir
     echo "==> Packaging..."
     for PLATFORM in $(find ./pkg -mindepth 1 -maxdepth 1 -type d); do
