@@ -17,9 +17,10 @@ title: Installation
 Please replace `linux/amd64` with the correct version of Linux for your environment.
 
 ```
-curl https://github.com/cyralinc/approzium/archive/linux/amd64/approzium
-chmod +x approzium
-./approzium
+curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/linux_amd64.zip
+unzip linux_amd64.zip
+chmod +x authenticator
+./authenticator
 ```
 
 ### Mac
@@ -27,9 +28,10 @@ chmod +x approzium
 Please replace `darwin/amd64` with the correct version of Mac for your environment.
 
 ```
-curl https://github.com/cyralinc/approzium/archive/darwin/amd64/approzium
-chmod +x approzium
-./approzium
+curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/darwin_amd64.zip
+unzip darwin_amd64.zip
+chmod +x authenticator
+./authenticator
 ```
 
 ### Windows
@@ -37,11 +39,12 @@ chmod +x approzium
 Please replace `windows/amd64` with the correct version of Windows for your environment.
 
 ```
-$url = "https://github.com/cyralinc/approzium/archive/windows/amd64/approzium.exe"
-$outpath = "$PSScriptRoot/approzium.exe"
+$url = "https://github.com/cyralinc/approzium/releases/download/v0.1.0/windows_amd64.zip"
+$outpath = "$PSScriptRoot/windows_amd64.zip"
 Invoke-WebRequest -Uri $url -OutFile $outpath
 $wc = New-Object System.Net.WebClient
 $wc.DownloadFile($url, $outpath)
 $args = @("Comma","Separated","Arguments")
-Start-Process -Filepath "$PSScriptRoot/approzium.exe" -ArgumentList $args
+Expand-Archive -LiteralPath $outpath -DestinationPath C:\ $PSScriptRoot
+Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
 ```
