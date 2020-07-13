@@ -46,19 +46,13 @@ class AuthClient(object):
     """
 
     def __init__(
-        self,
-        server_address,
-        disable_tls=False,
-        tls_config=None,
-        iam_role=None,
+        self, server_address, disable_tls=False, tls_config=None, iam_role=None,
     ):
         self.server_address = server_address
 
         if not disable_tls:
             if tls_config is None:
-                raise ValueError(
-                    "if tls is not disabled, tls config must be provided"
-                )
+                raise ValueError("if tls is not disabled, tls config must be provided")
             if tls_config.client_cert is None or tls_config.client_key is None:
                 raise ValueError(
                     "if tls is not disabled, "
@@ -230,9 +224,7 @@ class TLSConfig(object):
     :type client_key: str, optional
     """
 
-    def __init__(
-        self, trusted_certs=None, client_cert=None, client_key=None
-    ):
+    def __init__(self, trusted_certs=None, client_cert=None, client_key=None):
         self.trusted_certs = trusted_certs
         self.client_cert = client_cert
         self.client_key = client_key
