@@ -7,9 +7,19 @@ import Image from '@theme/IdealImage';
 The Approzium platform consists of a number of different components:
 
 * **application** - Cloud application that needs access to a database. It is running on a platform that provides cloud IAM services.
-* **database** - the database that the service wants to connect to.
+* **Database** - the database that the service wants to connect to.
 * **IAM Service** - IAM service provided by the cloud platform the service is using. It handles requests such as verifying the service's identity. For example, in AWS, this is called the [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
-* **Approzium authenticator** - Approzium service that interfaces with the Approzium SDK and with the secrets manager. This service verifies the service's identity, retrieves the credentials from the secrets manager, and calculates the authentication challenge response.
+* **Approzium Authenticator** - Approzium service that interfaces with the Approzium SDK and with the secrets manager. This service verifies the service's identity, retrieves the credentials from the secrets manager, and calculates the authentication challenge response.
 
 Here is the connection sequence for Approzium:
 <Image img={require('./images/architecture-diagram.png')} />
+
+1. The SDK initiates connection to the database server. The initial startup sequence differs for difference database backends. Generally includes the name of about the database user being connected to. and negotiating the authentication method.
+2. The database server responds with an authentication challenge. Typically, the challenge includes some randomized data that is used by the client to calculate the correct response hash.
+3. The SDK determines the service's identity through the IAM service. This request is only done once in the lifetime of the process. The result is the specific cloud identity assigned to the application.
+4. The SDK sends a request to the Approzium Authenticator service. This request includes the claimed IAM identity of the application, the proof of that identity (for AWS, this is a signed [GetCallerIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html) request) the database information (including host, port, and database user).
+5. The Approzium Authenticator verifies the service's identity. This is done by connecting to the IAM service and checking the proof provided by the application.
+6. The Approzium Authenticator obtains the cleartext password for the requested database server from the Secrets Manager.
+7. The Approzium Authenticator uses the cleartext password and the authentication challenge data to calculate the correct authentication response hash. This hash is sent to the SDK.
+8. The Approzium SDK simply forwards the authentication response hash to the database. 
+9. After that, the connection is successfully established!
