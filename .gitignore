@@ -210,3 +210,8 @@ vendor/
 
 # Test resources
 .srl
+
+# Binaries
+
+authenticator/bin
+authenticator/pkg
