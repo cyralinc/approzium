@@ -5,6 +5,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
+import InfoModal from './components/InfoModal'
 
 function Home() {
   const context = useDocusaurusContext();
@@ -35,6 +36,7 @@ function Home() {
         </div>
       </header>
       <main>
+        <InfoModal />
       </main>
     </Layout>
   );
