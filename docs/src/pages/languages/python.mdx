@@ -35,13 +35,11 @@ is exactly the same.
 
 ## The TLS Configuration
 
-```diff
--from psycopg2 import connect
-+from approzium.psycopg2 import connect
-+from approzium import AuthClient, TLSConfig
+```
+from approzium.psycopg2 import connect
+from approzium import AuthClient, TLSConfig
 
--conn = connect(password=verySecurePassword", ...)
-+conn = connect(authenticator=AuthClient(
+conn = connect(authenticator=AuthClient(
     "authenticator:6001", TLSConfig(
         trusted_certs="path/to/approzium.cert",
         client_cert="path/to/client.pem",
