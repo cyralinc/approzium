@@ -17,8 +17,8 @@ module.exports = {
         {
           to: 'docs/',
           activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
+          label: 'Documentation',
+          position: 'right',
         },
         {
           href: 'https://github.com/approzium/approzium',
