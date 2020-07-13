@@ -15,7 +15,7 @@ def determine_authclients():
     pytest.authclients = []
     base_aws_auth = approzium.AuthClient(
         "authenticator:6001",
-        tlsconfig=approzium.TLSConfig(
+        tls_config=approzium.TLSConfig(
             trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
             client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
             client_key=environ.get("TEST_CERT_DIR") + "/client.key",
