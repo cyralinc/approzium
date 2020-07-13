@@ -11,7 +11,7 @@ module.exports = {
       title: 'Approzium',
       logo: {
         alt: 'Approzium Logo',
-        src: 'img/emoji-finger-of-god.png',
+        src: 'img/apzm-icon.png',
       },
       links: [
         {
