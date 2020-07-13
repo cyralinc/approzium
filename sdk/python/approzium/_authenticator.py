@@ -59,6 +59,7 @@ class AuthClient(object):
                     "client_cert and client_key must be provided"
                 )
 
+        self.disable_tls = disable_tls
         self.tls_config = TLSConfig(
             trusted_certs=tls_config.trusted_certs,
             client_cert=tls_config.client_cert,
