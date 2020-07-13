@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "approzium"
-version = "0.1.0"
+version = "0.1.1"
 description = "Approzium SDK provides Approzium database authentiation for Python"
 authors = ["Cyral <security@cyral.org>"]
 homepage = "https://github.com/cyralinc/approzium"
@@ -21,7 +21,7 @@ mysql-connector-python = { version = "^8.0.20", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"
-pytest-parallel = "^0.1.1"
+pytest-parallel = "^0.1.0"
 pytest-asyncio = "^0.14.0"
 
 [tool.poetry.extras]
