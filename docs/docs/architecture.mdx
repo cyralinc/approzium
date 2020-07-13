@@ -14,6 +14,8 @@ The Approzium platform consists of a number of different components:
 Here is the connection sequence for Approzium:
 <Image img={require('./images/architecture-diagram.png')} />
 
+
+
 1. The SDK initiates connection to the database server. The initial startup sequence differs for difference database backends. Generally includes the name of about the database user being connected to. and negotiating the authentication method.
 2. The database server responds with an authentication challenge. Typically, the challenge includes some randomized data that is used by the client to calculate the correct response hash.
 3. The SDK determines the service's identity through the IAM service. This request is only done once in the lifetime of the process. The result is the specific cloud identity assigned to the application.
