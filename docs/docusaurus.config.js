@@ -1,11 +1,11 @@
 module.exports = {
-  title: 'My Site',
+  title: 'Approzium',
   tagline: 'The tagline of my site',
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://approzium.com',
   baseUrl: '/',
-  favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  favicon: 'img/apzm-icon.png',
+  organizationName: 'cyralinc',
+  projectName: 'approzium',
   themeConfig: {
     navbar: {
       title: 'Approzium',
