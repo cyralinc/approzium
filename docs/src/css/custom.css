@@ -52,6 +52,6 @@ code {
   border-radius: .2rem;
   font-size: .9rem;
   padding: .2rem;
-  margin: .2rem;
+  margin: .1rem;
   box-shadow: 1px 1px 0px var(--ifm-color-emphasis-500);
 }
