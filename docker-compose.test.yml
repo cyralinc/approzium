@@ -1,0 +1,34 @@
+# Defines environment for running the testsuite
+version: '3.5'
+services:
+    tests:
+        build:
+            context: ./
+            target: dev
+        volumes:
+            - .:/usr/src/approzium
+            - ~/.aws/:/root/.aws/:ro
+        working_dir: /usr/src/approzium/
+        command: make run-testsuite
+        environment:
+            - APPROZIUM_HOST=0.0.0.0
+            - APPROZIUM_DISABLE_TLS=false
+            - APPROZIUM_PATH_TO_TLS_CERT=/app/approzium.pem
+            - APPROZIUM_PATH_TO_TLS_KEY=/app/approzium.key
+            - TEST_CERT_DIR=/usr/src/approzium/authenticator/server/testing
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+            - TEST_ASSUMABLE_ARN
+            - TEST_BASE_ARN
+            - PSYCOPG2_TESTDB
+            - PSYCOPG2_TESTDB_HOST
+            - PSYCOPG2_TESTDB_PORT
+            - PSYCOPG2_TESTDB_USER=bob
+        depends_on:
+            - authenticator
+            - dbmd5
+            - dbsha256
+            - dbmysqlsha1
+            - vault
