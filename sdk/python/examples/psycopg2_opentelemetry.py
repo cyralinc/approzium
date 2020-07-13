@@ -1,3 +1,6 @@
+"""This is an example that shows Approzium Opentelemetry integration. It also
+integrates with a Jaeger service to export and view generated traces.
+"""
 from opentelemetry import trace
 from opentelemetry.ext import jaeger
 from opentelemetry.ext.psycopg2 import Psycopg2Instrumentor
