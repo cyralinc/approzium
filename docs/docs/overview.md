@@ -16,6 +16,9 @@ Additionally, Approzium addresses common security vulnerabilities in how applica
 ```python
 from psycopg2 import connect
 
+# In your environment, the password may be pulled from any place, S3, a config 
+# file, HashiCorp Vault, or wherever. But wherever it originates, it can be
+# leaked by your client application because it's in memory.
 conn = connect("host=1.2.3.4 user=user1 password=verySecurePassword")
 ```
 
