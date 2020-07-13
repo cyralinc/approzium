@@ -6,10 +6,8 @@ from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = AuthClient(
     "authenticator:6001",
-    trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
-    client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
-    client_key=environ.get("TEST_CERT_DIR") + "/client.key",
-    disable_tls=environ.get("APPROZIUM_DISABLE_TLS"),
+    # This is insecure, see https://approzium.org/configuration for proper use.
+    disable_tls=True,
 )
 conn = connect(user="bob", authenticator=auth, host="dbmysql", use_pure=True)
 print("Connection Established")

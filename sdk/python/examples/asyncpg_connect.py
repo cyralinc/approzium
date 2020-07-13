@@ -7,10 +7,8 @@ from approzium.asyncpg.pool import create_pool
 
 auth = AuthClient(
     "authenticator:6001",
-    trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
-    client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
-    client_key=environ.get("TEST_CERT_DIR") + "/client.key",
-    disable_tls=environ.get("APPROZIUM_DISABLE_TLS"),
+    # This is insecure, see https://approzium.org/configuration for proper use.
+    disable_tls=True,
 )
 
 

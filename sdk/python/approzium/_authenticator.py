@@ -36,17 +36,8 @@ class AuthClient(object):
         set.
     :type disable_tls: bool, optional
 
-    :param trusted_certs: the path to one or many identity certificates that
-        the Approzium authenticator may present.
-    :type trusted_certs: str, optional
-
-    :param client_cert: the path to this client's identity certificate.
-        Required when disable_tls is False.
-    :type client_cert: str, optional
-
-    :param client_key: the path to the private key this client used to obtain
-        its identity certificate. Required when disable_tls is False.
-    :type client_key: str, optional
+    :param tls_config: the TLS config to use for encrypted communication.
+    :type tls_config: TLSConfig, optional
 
     :param iam_role: if an IAM role Amazon resource number (ARN) is provided,
         it will be assumed and its identity will be used for authentication.
@@ -58,21 +49,22 @@ class AuthClient(object):
         self,
         server_address,
         disable_tls=False,
-        trusted_certs=None,
-        client_cert=None,
-        client_key=None,
+        tls_config=None,
         iam_role=None,
     ):
         self.server_address = server_address
 
         if not disable_tls:
-            if client_cert is None or client_key is None:
+            if tls_config is None:
                 raise ValueError(
-                    "if tls is not disabled, client_cert and client_key are required"
+                    "if tls is not disabled, tls config must be provided"
+                )
+            if tls_config.client_cert is None or tls_config.client_key is None:
+                raise ValueError(
+                    "if tls is not disabled, client_cert and client_key must be provided"
                 )
 
         self.tls_config = TLSConfig(
-            disable_tls=disable_tls,
             trusted_certs=trusted_certs,
             client_cert=client_cert,
             client_key=client_key,
@@ -131,14 +123,11 @@ class AuthClient(object):
 
     def _execute_request(self, request, getmethodname, dbhost, dbport, dbuser):
         # The presigned GetCallerIdentity call expires every 15 minutes.
-        print("executing request")  # TODO strip me
         self._update_gci_if_needed()
 
-        if self.tls_config.disable_tls:
-            print("no TLS")  # TODO strip me
+        if self.disable_tls:
             channel = grpc.insecure_channel(self.server_address)
         else:
-            print("TLS")  # TODO strip me
             credentials = grpc.ssl_channel_credentials(
                 root_certificates=_read_file(self.tls_config.trusted_certs),
                 certificate_chain=_read_file(self.tls_config.client_cert),
@@ -224,30 +213,25 @@ class TLSConfig(object):
     with Approzium. Its fields are further described here:
     https://grpc.github.io/grpc/python/grpc.html#create-client-credentials
 
-    :param disable_tls: insecure, not recommended in production. Disables the
-        use of TLS for communication between the client and Approzium's
-        authentication server. If set to true, connection information will
-        be sent in plain text, creating a vulnerability to man-in-the-middle
-        attacks. Defaults to False.
-    :type disable_tls: bool, optional
-
     :param trusted_certs: the path to the root certificate(s) that must have
         issued the identity certificate used by Approzium's authentication
         server.
     :type trusted_certs: str, optional
 
     :param client_cert: this client's certificate, used for proving its
-        identity
+        identity, and used by the caller to encrypt communication with
+        its public key
     :type client_cert: str, optional
 
-    :param client_key: this client's key, used for proving its identity
+    :param client_key: this client's key, used for decrypting incoming
+        communication that was encrypted by callers using the client_cert's
+        public key
     :type client_key: str, optional
     """
 
     def __init__(
-        self, disable_tls=False, trusted_certs=None, client_cert=None, client_key=None
+        self, trusted_certs=None, client_cert=None, client_key=None
     ):
-        self.disable_tls = disable_tls
         self.trusted_certs = trusted_certs
         self.client_cert = client_cert
         self.client_key = client_key
