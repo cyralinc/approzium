@@ -18,11 +18,7 @@ your client code base is:
 
 -conn = connect(password=verySecurePassword", ...)
 +conn = connect(authenticator=AuthClient(
-    "authenticator:6001", TLSConfig(
-        trusted_certs="path/to/approzium.cert",
-        client_cert="path/to/client.pem",
-        client_key="path/to/client.key"
-    ), ...
+    "authenticator:6001", disable_tls=True, ...
 )
 ```
 
@@ -38,6 +34,21 @@ It uses the well-known `boto3` library for pulling identity, and thus its behavi
 is exactly the same.
 
 ## The TLS Configuration
+
+```diff
+-from psycopg2 import connect
++from approzium.psycopg2 import connect
++from approzium import AuthClient, TLSConfig
+
+-conn = connect(password=verySecurePassword", ...)
++conn = connect(authenticator=AuthClient(
+    "authenticator:6001", TLSConfig(
+        trusted_certs="path/to/approzium.cert",
+        client_cert="path/to/client.pem",
+        client_key="path/to/client.key"
+    ), ...
+)
+```
 
 Our `TLSConfig` takes several parameters:
 
