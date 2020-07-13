@@ -4,9 +4,11 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "approzium"
-version = "0.1.1"
+version = "0.1.0"
 description = "Approzium SDK provides Approzium database authentiation for Python"
-authors = ["Cyral <us@cyral.org>"]
+authors = ["Cyral <security@cyral.org>"]
+homepage = "https://github.com/cyralinc/approzium"
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.5"
