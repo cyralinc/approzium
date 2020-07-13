@@ -47,13 +47,12 @@ a {
 }
 
 code {
-  background-color: transparent;
   border: 1px solid var(--ifm-font-color-base);
+  color: var(--ifm-font-color-base);
   border-radius: .2rem;
   font-size: .9rem;
-  padding: .2rem;
-  margin: .1rem;
-  box-shadow: 1px 1px 0px var(--ifm-color-emphasis-500);
+  padding: .15rem;
+  margin: .05rem;
 }
 
 .pagination-nav__link {
