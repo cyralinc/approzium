@@ -4,5 +4,12 @@ title: Architecture
 
 import Image from '@theme/IdealImage';
 
+The Approzium platform consists of a number of different components:
+
+* **service** - Cloud service/app that needs access to a database. It is running on a platform that provides cloud IAM services.
+* **database** - the database that the service wants to connect to.
+* **IAM Credentials Manager** - IAM service provided by the cloud platform the service is using. It handles requests such as verifying the service's identity. In AWS, this is the [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
+* **authenticator** - Approzium service that interfaces with the SDK and with the secrets manager. This service verifies the service's identity, retrieves the credentials from the secrets manager, and calculates the authentication challenge response.
+
 Here is the connection sequence for Approzium:
 <Image img={require('./images/architecture-diagram.png')} />
