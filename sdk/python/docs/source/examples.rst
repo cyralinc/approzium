@@ -5,16 +5,16 @@ Postgres Examples
 
 Example of creating a Psycopg2 single connection and a connection pool
 
-:file:`psycopg2.py`:
+:file:`psycopg2_connect.py`:
 
-.. literalinclude:: ../../examples/psycopg2.py
+.. literalinclude:: ../../examples/psycopg2_connect.py
     :language: python
 
 Example of creating a Asyncpg single connection and a connection pool
 
-:file:`asyncpg.py`:
+:file:`asyncpg_connect.py`:
 
-.. literalinclude:: ../../examples/asyncpg.py
+.. literalinclude:: ../../examples/asyncpg_connect.py
     :language: python
 
 
@@ -23,7 +23,7 @@ MySQL Examples
 
 Example of creating a MySQL Connector single connection and a connection pool
 
-:file:`mysql_connector.py`:
+:file:`mysql_connector_connect.py`:
 
-.. literalinclude:: ../../examples/mysql_connector.py
+.. literalinclude:: ../../examples/mysql_connector_connect.py
     :language: python
