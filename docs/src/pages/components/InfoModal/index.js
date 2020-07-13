@@ -68,7 +68,7 @@ function InfoModal() {
         </div>
         <p className={styles.description}>{selectedInfo.description}</p>
       </div>
-      <CodeBlock className={'python'} metastring={selectedInfo.codeHighlight}>
+      <CodeBlock className={'python'} metastring={selectedInfo.codeHighlight} landingPage={true}>
         {codeSample}
       </CodeBlock>
     </div>
