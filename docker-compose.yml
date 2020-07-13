@@ -37,7 +37,7 @@ services:
     authenticator:
         build:
             context: ./
-            target: build
+            target: authenticator-dev
         environment:
             - APPROZIUM_HOST=0.0.0.0
             - APPROZIUM_DISABLE_TLS=true
