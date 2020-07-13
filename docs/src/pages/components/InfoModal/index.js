@@ -53,14 +53,14 @@ function InfoModal() {
         <div className={styles.selectorContainer}>
           <button
             className={clsx(styles.selector, styles.leftSelector, {
-              [styles.selected]: selectedCategory == 'observability',
+              [styles.notSelected]: selectedCategory == 'security',
             })}
             onClick={selectObservability}>
             Observability
           </button>
           <button
             className={clsx(styles.selector, {
-              [styles.selected]: selectedCategory == 'security',
+              [styles.notSelected]: selectedCategory == 'observability',
             })}
             onClick={selectSecurity}>
             Security
