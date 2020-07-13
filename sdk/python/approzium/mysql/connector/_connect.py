@@ -40,6 +40,7 @@ class ApproziumMySQLConnection(MySQLConnection):
             host = self.server_host
             port = self.server_port
             self._protocol._auth_response = _auth_response
+            self.authenticator = self._password
 
         return super(ApproziumMySQLConnection, self)._do_auth(*args, **kwargs)
 
