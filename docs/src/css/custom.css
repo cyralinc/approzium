@@ -55,3 +55,7 @@ code {
   margin: .1rem;
   box-shadow: 1px 1px 0px var(--ifm-color-emphasis-500);
 }
+
+.pagination-nav__link {
+  border-color: var(--ifm-font-color-base);
+}
