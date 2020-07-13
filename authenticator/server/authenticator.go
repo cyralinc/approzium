@@ -33,6 +33,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
@@ -52,19 +53,17 @@ var maxIterations = uint32(15000 * 10)
 // an error is returned from either, terminating the application. Both servers
 // respond to CTRL+C shutdowns.
 func Start(logger *log.Logger, config config.Config) error {
-	apiErrChan := api.Start(logger, config)
-
+	if err := api.Start(logger, config); err != nil {
+		return err
+	}
 	svr, err := buildServer(logger, config)
 	if err != nil {
 		return err
 	}
-	grpcErrChan := startGrpc(logger, config, svr)
-
-	select {
-	case err = <-apiErrChan:
-	case err = <-grpcErrChan:
+	if err := startGrpc(logger, config, svr); err != nil {
+		return err
 	}
-	return err
+	return nil
 }
 
 func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {
@@ -85,27 +84,30 @@ func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServ
 	return svr, nil
 }
 
-func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.AuthenticatorServer) <-chan error {
-	errChan := make(chan error)
-
+func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.AuthenticatorServer) error {
 	serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.GRPCPort)
 	lis, err := net.Listen("tcp", serviceAddress)
 	if err != nil {
-		errChan <- err
-		return errChan
+		return err
 	}
 
-	logger.Infof("grpc listening for requests on %s", serviceAddress)
-
-	grpcServer := grpc.NewServer()
-	pb.RegisterAuthenticatorServer(grpcServer, authenticatorServer)
-	pb.RegisterHealthServer(grpcServer, newHealthServer())
-	go func() {
-		if err := grpcServer.Serve(lis); err != nil {
-			errChan <- err
+	var grpcServer *grpc.Server
+	if config.DisableTLS {
+		grpcServer = grpc.NewServer()
+		logger.Infof("grpc starting on http://%s", serviceAddress)
+	} else {
+		creds, err := credentials.NewServerTLSFromFile(config.PathToTLSCert, config.PathToTLSKey)
+		if err != nil {
+			return err
 		}
+		grpcServer = grpc.NewServer(grpc.Creds(creds))
+		logger.Infof("grpc starting on https://%s", serviceAddress)
+	}
+	pb.RegisterAuthenticatorServer(grpcServer, authenticatorServer)
+	go func() {
+		logger.Fatal(grpcServer.Serve(lis))
 	}()
-	return errChan
+	return nil
 }
 
 func newAuthenticator(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {

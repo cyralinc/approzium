@@ -1,6 +1,6 @@
 import logging
 
-from ._authenticator import AuthClient
+from ._authenticator import AuthClient, TLSConfig
 
 default_auth_client = None
 """
@@ -16,4 +16,4 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-__all__ = ["default_auth_client", "AuthClient"]
+__all__ = ["default_auth_client", "AuthClient", "TLSConfig"]

@@ -1,17 +1,14 @@
 ---
-name: Quickstart
-edit: false
-route: /quickstart
+title: Quickstart
 ---
 
-# Quickstart
 This guide will show you how to:
 - Deploy the Authenticator.
 - Store database credentials in Vault to be retrieved by the Authenticator.
 - Connect to a Postgres database through the Approzium Python SDK.
 
 ## Deploying the Authenticator
-Get the Authenticator binary [here](https://github.com/cyralinc/approzium/tree/develop/authenticator), then run it with
+Get the Authenticator binary [here](https://github.com/approzium/approzium/tree/develop/authenticator), then run it with
 the environment variables `VAULT_ADDR` and `VAULT_TOKEN` set. These are example values, in real life we'd expect Vault to
 be run elsewhere.
 ```shell
@@ -58,16 +55,17 @@ Install the SDK in your client.
 pip3 install approzium
 ```
 
-Connect to your database as follows.
+Connect to your database as follows. (Note: TLS should **not** be disabled in production environments,
+see [our Python guide](/languages-python) for how to configure them.)
 ```python
 from approzium import AuthClient
 from approzium.psycopg2 import connect
 
 # create an Authenticator client
-auth = AuthClient('authenticator:6001')
+auth = AuthClient('authenticator:6001', disable_tls=True)
 
 # connect using Approzium's connect method without providing a password
-conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydb", authenticator=auth)
+conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydbhost", authenticator=auth)
 
 # use the connection as you typically would. very cool!
 cur = conn.cursor()

@@ -145,6 +145,7 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
 	} else {
 		logger.Info("selected local file as credential manager")
+		logger.Warn("local file credential manager should not be used in production")
 		return credMgr, err
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
