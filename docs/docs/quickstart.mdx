@@ -55,13 +55,14 @@ Install the SDK in your client.
 pip3 install approzium
 ```
 
-Connect to your database as follows.
+Connect to your database as follows. (Note: TLS should **not** be disabled in production environments,
+see [our Python guide](/languages-python) for how to configure them.)
 ```python
 from approzium import AuthClient
 from approzium.psycopg2 import connect
 
 # create an Authenticator client
-auth = AuthClient('authenticator:6001')
+auth = AuthClient('authenticator:6001', disable_tls=True)
 
 # connect using Approzium's connect method without providing a password
 conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydbhost", authenticator=auth)
