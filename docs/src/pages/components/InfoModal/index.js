@@ -7,11 +7,11 @@ import styles from './styles.module.css'
 const info = {
   'observability': {
     description: 'Approzium provides rich execution context derived from cloud infrastructure metadata services, thus eliminating blind spots in the diagnosis and tracing of complex performance problems within autoscaled microservice environments.',
-    codeHighlight: '{7-9}',
+    codeHighlight: '{15-22}',
   },
   'security': {
     description: 'Approzium enables applications to connect to databases without requiring access to credentials, thus preventing leaks through inadvertent application logging, application compromise, or theft of secrets manager API keys.',
-    codeHighlight: '{15-22}',
+    codeHighlight: '{7-9}',
   }
 }
 

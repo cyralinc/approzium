@@ -18,13 +18,13 @@
 
 .selector {
     background-color: transparent;
-    border: none;
     width: 100%;
     font-family: var(--ifm-font-family-base);
     font-weight: 500;
     font-size: 1.5rem;
     color: var(--ifm-font-color-base);
     padding: 1rem 0px;
+    border-bottom: solid 1px var(--ifm-font-color-base);
 }
 
 .selector:focus {
@@ -41,7 +41,7 @@
 }
 
 .selected {
-    border-bottom: solid 1px var(--ifm-font-color-base);
+    border: none;
     font-weight: 600;
 }
 
