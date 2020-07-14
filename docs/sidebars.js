@@ -5,8 +5,9 @@ module.exports = {
     'architecture',
     'examples',
     'security-model',
-    'configuration',
     'observability',
+    'installation',
+    'configuration',
     'compatibility',
     {
       'Client Libraries': [
