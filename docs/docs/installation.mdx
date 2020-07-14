@@ -48,3 +48,8 @@ $args = @("Comma","Separated","Arguments")
 Expand-Archive -LiteralPath $outpath -DestinationPath C:\ $PSScriptRoot
 Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
 ```
+
+## Docker
+```
+docker run approzium/authenticator:latest
+```
