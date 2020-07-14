@@ -11,11 +11,7 @@ Approzium currently runs on AWS as it uses the Security Token Service (STS) to a
 - Microsoft Azure
 
 ## Databases
-Approzium currently supports MySQL and PostgreSQL. These databases may be self-hosted, or a managed service such as AWS RDS and AWS Aurora. We plan to support the following databases.
-- MariaDB
-- Galera
-- MaxScale
-- Vitess
+Approzium currently supports MySQL, MariaDB, Galera, MaxScale, Vitess, and PostgreSQL. These databases may be self-hosted, or a managed service such as AWS RDS and AWS Aurora. We plan to support the following databases.
 
 Let us know if you would like to see support for any other self-hosted databases and DBaaS platforms.
 
@@ -38,9 +34,3 @@ Secrets managers are used to store database credentials. Approzium currently wor
 
 ## Authenticator
 Authenticator currently runs as a single instance of a docker container or one of the supported architecture specific binaries. We’re working on a high availability (HA) deployment model involving AWS auto scaling groups (ASG) that can be spun up using a choice of Terraform script or CloudFormation template. For Kubernetes deployments, support for Helm 3 charts is being added.
-
-Approzium eliminates blind spots in the diagnosis and tracing of complex performance problems within autoscaled microservices running on modern orchestration frameworks such as Kubernetes and AWS ECS (Elastic Container Service). For example, all instances of an autoscaled microservice look alike from a database’s perspective. This makes it harder to attribute performance issues resulting from misbehaving queries, buggy service code and faulty cloud VMs to a specific microservice instance.
-
-By providing richer execution context about each microservice instance, such as the service’s IAM role info, the EC2 instance id and hostname where it’s running, or its container/task id in dockerized environments, Approzium allows DevOps teams to quickly trace and resolve performance issues. This context is added to the existing logs, metrics and traces already being emitted by the microservice.
-
-Approzium integrates with popular secrets managers such as Hashicorp Vault and AWS Secrets Manager for the storage of database credentials, and uses OpenTelemetry to make it easy to integrate with a wide variety of observability products, such as Prometheus/Grafana, ELK, Datadog and New Relic.
