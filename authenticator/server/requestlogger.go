@@ -15,6 +15,7 @@ import (
 
 const (
 	ctxLogger     = "logger"
+	ctxRequestId  = "request_id"
 	redactedValue = "********"
 )
 
@@ -30,6 +31,18 @@ func getRequestLogger(ctx context.Context) *log.Entry {
 		return &log.Entry{}
 	}
 	return logger
+}
+
+func getRequestId(ctx context.Context) string {
+	rawRequestId := ctx.Value(ctxRequestId)
+	if rawRequestId == nil {
+		return ""
+	}
+	requestId, ok := rawRequestId.(string)
+	if !ok {
+		return ""
+	}
+	return requestId
 }
 
 func newRequestLogger(logger *log.Logger, logRaw bool, wrapped pb.AuthenticatorServer) pb.AuthenticatorServer {
@@ -68,7 +81,7 @@ func (l *requestLogger) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashReque
 	}
 	l.logSanitizedRequest(requestLogger, sanitized)
 
-	resp, respErr := l.wrapped.GetPGMD5Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
+	resp, respErr := l.wrapped.GetPGMD5Hash(addContext(ctx, requestId, requestLogger), req)
 
 	if resp == nil {
 		resp = &pb.PGMD5Response{}
@@ -93,7 +106,7 @@ func (l *requestLogger) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	}
 	l.logSanitizedRequest(requestLogger, sanitized)
 
-	resp, respErr := l.wrapped.GetPGSHA256Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
+	resp, respErr := l.wrapped.GetPGSHA256Hash(addContext(ctx, requestId, requestLogger), req)
 
 	if resp == nil {
 		resp = &pb.PGSHA256Response{}
@@ -118,7 +131,7 @@ func (l *requestLogger) GetMYSQLSHA1Hash(ctx context.Context, req *pb.MYSQLSHA1H
 	}
 	l.logSanitizedRequest(requestLogger, sanitized)
 
-	resp, respErr := l.wrapped.GetMYSQLSHA1Hash(context.WithValue(ctx, ctxLogger, requestLogger), req)
+	resp, respErr := l.wrapped.GetMYSQLSHA1Hash(addContext(ctx, requestId, requestLogger), req)
 
 	if resp == nil {
 		resp = &pb.MYSQLSHA1Response{}
@@ -183,6 +196,12 @@ func (l *requestLogger) buildContextualLogger() (string, *log.Entry, error) {
 		"request_id": requestId,
 	})
 	return requestId, requestLogger, nil
+}
+
+func addContext(ctx context.Context, requestId string, requestLogger *log.Entry) context.Context {
+	ctx = context.WithValue(ctx, ctxLogger, requestLogger)
+	ctx = context.WithValue(ctx, ctxRequestId, requestId)
+	return ctx
 }
 
 func toMap(obj interface{}) (map[string]interface{}, error) {

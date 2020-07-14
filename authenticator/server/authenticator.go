@@ -71,13 +71,18 @@ func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServ
 	// 	- First, a layer that captures request metrics.
 	//	- Next, a layer that adds a request ID, creates a request logger, and logs
 	//		all inbound and outbound requests.
-	//	- Lastly, this layer, the authenticator, that handles logic.
+	//  - Next, a layer that traces calls.
+	//  - Lastly, this layer, the authenticator, that handles logic.
 	authenticator, err := newAuthenticator(logger, config)
 	if err != nil {
 		return nil, err
 	}
-
-	svr, err := newRequestMetrics(newRequestLogger(logger, config.LogRaw, authenticator))
+	tracedAuthenticator, err := newRequestTracer(authenticator)
+	if err != nil {
+		return nil, err
+	}
+	tracedLoggedAuthenticator := newRequestLogger(logger, config.LogRaw, tracedAuthenticator)
+	svr, err := newRequestMetrics(tracedLoggedAuthenticator)
 	if err != nil {
 		return nil, err
 	}
