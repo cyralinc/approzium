@@ -2,6 +2,8 @@ package config
 
 import (
 	"errors"
+	"os"
+
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -26,17 +28,34 @@ type Config struct {
 
 	VaultTokenPath string
 	ConfigFilePath string
+
+	// Special flags
+	devMode bool
+	Version bool
 }
 
-// ParseConfig returns the parsed config. A pointer is not returned
+// Parse returns the parsed config. A pointer is not returned
 // because after first parse, the config is immutable.
-func ParseConfig() (Config, error) {
+func Parse() (Config, error) {
 	config, err := parse()
 	if err != nil {
 		return Config{}, err
 	}
 	if err := verify(config); err != nil {
 		return Config{}, err
+	}
+	if config.devMode {
+		// dev mode uses the file back-end
+		os.Unsetenv("VAULT_ADDR")
+		config = Config{
+			Host:       "127.0.0.1",
+			HTTPPort:   6000,
+			GRPCPort:   6001,
+			DisableTLS: true,
+			LogLevel:   "debug",
+			LogFormat:  "text",
+			LogRaw:     false,
+		}
 	}
 	return config, nil
 }
@@ -150,6 +169,9 @@ func setConfigFlags() {
 
 		pflag.String("vaulttokenpath", "", "")
 		pflag.String("config", "", "")
+
+		pflag.Bool("dev", false, "whether to run the authenticator in dev mode")
+		pflag.Bool("version", false, "output the current authenticator version")
 	}
 
 	pflag.Parse()
