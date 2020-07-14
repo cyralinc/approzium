@@ -58,3 +58,9 @@ code {
 .pagination-nav__link {
   border-color: var(--ifm-font-color-base);
 }
+
+.algolia-autocomplete .algolia-docsearch-footer {
+  width: 0px;
+  height: 0px;
+  visibility: hidden;
+}
