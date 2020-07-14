@@ -4,7 +4,7 @@ dev:
 	go build && go install
 
 test:
-	go test -v -race -p 1 ./...
+	go test -v -race ./...
 
 server:
 	go build .

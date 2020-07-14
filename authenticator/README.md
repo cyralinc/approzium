@@ -11,7 +11,7 @@ the password.
 We love contributions. To easily develop, in the `authenticator` folder, run `$ make dev`. Then, run the authenticator.
 
 ```
-$ authenticator -dev
+$ authenticator --dev
 ```
 
 It will start the authenticator up on your `localhost` without TLS. Check that it's up by hitting its API.
