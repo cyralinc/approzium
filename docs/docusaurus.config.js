@@ -3,7 +3,7 @@ module.exports = {
   tagline: 'The tagline of my site',
   url: 'https://approzium.com',
   baseUrl: '/',
-  favicon: 'img/apzm-icon.png',
+  favicon: 'img/apzm-icon.svg',
   organizationName: 'cyralinc',
   projectName: 'approzium',
   themeConfig: {
@@ -11,7 +11,7 @@ module.exports = {
       title: 'Approzium',
       logo: {
         alt: 'Approzium Logo',
-        src: 'img/apzm-icon.png',
+        src: 'img/apzm-icon.svg',
       },
       links: [
         {
