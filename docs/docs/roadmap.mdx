@@ -3,23 +3,34 @@ title: Roadmap
 edit: false
 ---
 
-## Integrations
-- Secrets Engines
-  - AWS Secrets Manager
-  - Kubernetes Secrets
-- Databases
-  - PG SDKs
-    - [lib/pq](https://godoc.org/github.com/lib/pq) (Go)
-    - [asyncpg](https://magicstack.github.io/asyncpg/current/) (Python) **P1**
-    - [JDBC](https://jdbc.postgresql.org/) (Java)
-  - MySQL SDKs
-    - python **P1**
-- SDK Features  
-  - tracing **P0**
-    - OpenTelemetry (OpenTracing) 
+The following is only a selection of some of the major features we plan to implement in the near future. To get a more complete overview of planned features and current work, see the [Approzium issue tracker](https://github.com/cyralinc/approzium/issues).
+
+## Cloud Platforms
+Approzium currently runs on AWS as it uses the Security Token Service (STS) to authenticate applications. We plan to support the following cloud platforms soon.
+- Google Cloud Platform
+- Microsoft Azure
+
+## Databases
+Approzium currently supports MySQL, MariaDB, Galera, MaxScale, Vitess, and PostgreSQL. These databases may be self-hosted, or a managed service such as AWS RDS and AWS Aurora. We plan to support the following databases.
+
+Let us know if you would like to see support for any other self-hosted databases and DBaaS platforms.
+
+## SDKs
+Approzium currently supports Python applications. We plan to add other SDKs for the following programming languages in upcoming releases.
+- NodeJS/TypeScript
+- Golang
+- Java
+- Ruby
+
+## OpenTelemetry
+Both the SDK as well as the Authenticator service will support OpenTelemetry for generating logs, metrics and traces for enhanced observability. This will enable seamless support for tools such as ELK, Prometheus, Datadog and New Relic.
+
+## Secrets Managers
+Secrets managers are used to store database credentials. Approzium currently works with Hashicorp Vault. We plan to add support for the following secrets managers in the future.
+- AWS Secrets Manager
+- Google Cloud Secret Manager
+- Azure Key Vault
+- Kubernetes Secrets
 
 ## Authenticator
-- fluentd/filebeat to push connection request logs to Elastic/Datadog/SIEM **P0**
-- publish OpenTelemetry (OpenCensus) metrics **P0**
-  - connection counter (tags: userID, ip)
-- high availability deployment
+Authenticator currently runs as a single instance of a docker container or one of the supported architecture specific binaries. We’re working on a high availability (HA) deployment model involving AWS auto scaling groups (ASG) that can be spun up using a choice of Terraform script or CloudFormation template. For Kubernetes deployments, support for Helm 3 charts is being added.
