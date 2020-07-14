@@ -52,7 +52,7 @@ The Authenticator also computes responses to database challenges on behalf of ap
 ## Next Steps
 - You can get started with Approzium [here](quickstart).
 - Learn how Approzium works by checking out the [architecture](architecture).
-- Read about how Approzium promotes [observability](observability) and [security](security-model).
+- Learn more about Approzium's approach to [observability](observability) and [security](security-model).
 - Visit our [GitHub](https://github.com/cyralinc/approzium) to download and play with it. PRs welcome!
 - Join our [Slack](https://join.slack.com/t/approzium/shared_invite/zt-fg9bdcfa-H9YFnlg3XeosKyMIYadmcg) for help and announcements.
 
