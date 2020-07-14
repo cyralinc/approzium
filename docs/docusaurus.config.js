@@ -3,7 +3,7 @@ module.exports = {
   tagline: 'The tagline of my site',
   url: 'https://approzium.com',
   baseUrl: '/',
-  favicon: 'img/apzm-icon.png',
+  favicon: 'img/apzm-icon.svg',
   organizationName: 'cyralinc',
   projectName: 'approzium',
   themeConfig: {
@@ -11,7 +11,7 @@ module.exports = {
       title: 'Approzium',
       logo: {
         alt: 'Approzium Logo',
-        src: 'img/apzm-icon.png',
+        src: 'img/apzm-icon.svg',
       },
       links: [
         {
@@ -26,6 +26,12 @@ module.exports = {
           position: 'right',
         },
       ],
+    },
+    algolia: {
+      apiKey: '8ce076a38f6bf25b30877ca2251ec1e4',
+      indexName: 'prod_APPROZIUM_DOCS',
+      appId: '51LSIHDN1A', // Optional, if you run the DocSearch crawler on your own
+      algoliaOptions: {}, // Optional, if provided by Algolia
     },
     footer: {
       style: 'light',
