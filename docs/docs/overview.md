@@ -13,7 +13,6 @@ Additionally, Approzium addresses common security vulnerabilities in how applica
 
 ```python
 from psycopg2 import connect
-import os
 
 # In your environment, the password may be pulled from any place, S3, a config 
 # file, HashiCorp Vault, or wherever. But wherever it originates, it can be
