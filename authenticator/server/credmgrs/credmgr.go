@@ -2,7 +2,7 @@ package credmgrs
 
 import (
 	"errors"
-    "fmt"
+	"fmt"
 
 	"github.com/cyralinc/approzium/authenticator/server/metrics"
 	log "github.com/sirupsen/logrus"
@@ -160,7 +160,7 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
 }
 
-func passwordFromSecret(secret map[string]interface {}, identity DBKey) (string, error) {
+func passwordFromSecret(secret map[string]interface{}, identity DBKey) (string, error) {
 	// Please see tests for examples of the kind of secret data we'd expect
 	// here.
 	userData := secret[identity.DBUser]
@@ -204,5 +204,3 @@ func passwordFromSecret(secret map[string]interface {}, identity DBKey) (string,
 	}
 	return password, nil
 }
-
-

@@ -61,11 +61,11 @@ func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) 
 		return "", fmt.Errorf("no response body data returned from Vault")
 	}
 
-    password, err := passwordFromSecret(secret.Data, identity)
+	password, err := passwordFromSecret(secret.Data, identity)
 	if err != nil {
 		return "", err
 	}
-    return password, nil
+	return password, nil
 }
 
 // vaultClient retrieves a client using either the environmental VAULT_TOKEN,
