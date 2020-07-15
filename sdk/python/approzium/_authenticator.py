@@ -58,14 +58,13 @@ class AuthClient(object):
                     "if tls is not disabled, "
                     "client_cert and client_key must be provided"
                 )
-
-        self.disable_tls = disable_tls
-        if not disable_tls:
             self.tls_config = TLSConfig(
                 trusted_certs=tls_config.trusted_certs,
                 client_cert=tls_config.client_cert,
                 client_key=tls_config.client_key,
             )
+
+        self.disable_tls = disable_tls
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
