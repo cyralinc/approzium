@@ -2,6 +2,7 @@ package credmgrs
 
 import (
 	"errors"
+    "fmt"
 
 	"github.com/cyralinc/approzium/authenticator/server/metrics"
 	log "github.com/sirupsen/logrus"
@@ -140,6 +141,14 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 		return credMgr, nil
 	}
 
+	credMgr, err = newAWSSecretManagerCreds()
+	if err != nil {
+		logger.Debugf("didn't select AWS Secrets Manager as credential manager due to err: %s", err)
+	} else {
+		logger.Info("selected AWS Secrets Manager as credential manager")
+		return credMgr, nil
+	}
+
 	credMgr, err = newLocalFileCreds(logger)
 	if err != nil {
 		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
@@ -150,3 +159,50 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
 }
+
+func passwordFromSecret(secret map[string]interface {}, identity DBKey) (string, error) {
+	// Please see tests for examples of the kind of secret data we'd expect
+	// here.
+	userData := secret[identity.DBUser]
+	userDataMap, ok := userData.(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
+	}
+
+	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
+	iamArnsRaw, ok := userDataMap["iam_arns"]
+	if !ok {
+		return "", fmt.Errorf("iam_arns not found in %s", userDataMap)
+	}
+	iamArns, ok := iamArnsRaw.([]interface{})
+	if !ok {
+		return "", fmt.Errorf("could not convert %s to array, type is %T", iamArnsRaw, iamArnsRaw)
+	}
+	authorized := false
+	for _, iamArnRaw := range iamArns {
+		iamArn, ok := iamArnRaw.(string)
+		if !ok {
+			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamArnRaw, iamArnRaw)
+		}
+		if iamArn == identity.IAMArn {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return "", ErrNotAuthorized
+	}
+
+	// Verification passed. OK to return the password.
+	passwordRaw, ok := userDataMap["password"]
+	if !ok {
+		return "", fmt.Errorf("password not found in %s", userDataMap)
+	}
+	password, ok := passwordRaw.(string)
+	if !ok {
+		return "", fmt.Errorf("could not convert %s to string, type is %T", passwordRaw, passwordRaw)
+	}
+	return password, nil
+}
+
+

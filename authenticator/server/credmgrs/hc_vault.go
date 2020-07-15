@@ -61,48 +61,11 @@ func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) 
 		return "", fmt.Errorf("no response body data returned from Vault")
 	}
 
-	// Please see tests for examples of the kind of secret data we'd expect
-	// here.
-	userData := secret.Data[identity.DBUser]
-	userDataMap, ok := userData.(map[string]interface{})
-	if !ok {
-		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
+    password, err := passwordFromSecret(secret.Data, identity)
+	if err != nil {
+		return "", err
 	}
-
-	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
-	iamArnsRaw, ok := userDataMap["iam_arns"]
-	if !ok {
-		return "", fmt.Errorf("iam_arns not found in %s", userDataMap)
-	}
-	iamArns, ok := iamArnsRaw.([]interface{})
-	if !ok {
-		return "", fmt.Errorf("could not convert %s to array, type is %T", iamArnsRaw, iamArnsRaw)
-	}
-	authorized := false
-	for _, iamArnRaw := range iamArns {
-		iamArn, ok := iamArnRaw.(string)
-		if !ok {
-			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamArnRaw, iamArnRaw)
-		}
-		if iamArn == identity.IAMArn {
-			authorized = true
-			break
-		}
-	}
-	if !authorized {
-		return "", ErrNotAuthorized
-	}
-
-	// Verification passed. OK to return the password.
-	passwordRaw, ok := userDataMap["password"]
-	if !ok {
-		return "", fmt.Errorf("password not found in %s", userDataMap)
-	}
-	password, ok := passwordRaw.(string)
-	if !ok {
-		return "", fmt.Errorf("could not convert %s to string, type is %T", passwordRaw, passwordRaw)
-	}
-	return password, nil
+    return password, nil
 }
 
 // vaultClient retrieves a client using either the environmental VAULT_TOKEN,
