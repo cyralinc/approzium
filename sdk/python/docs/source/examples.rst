@@ -27,3 +27,10 @@ Example of creating a MySQL Connector single connection and a connection pool
 
 .. literalinclude:: ../../examples/mysql_connector_connect.py
     :language: python
+
+Example of creating a PyMySQL single connection:
+
+:file:`pymysql_connect.py`:
+
+.. literalinclude:: ../../examples/pymysql_connect.py
+    :language: python

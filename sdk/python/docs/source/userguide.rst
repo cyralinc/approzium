@@ -28,10 +28,13 @@ The following database driver libraries are supported:
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | MySQL      | `MySQL Connector`_ | `Native password authentication`_                        | Currently, only the pure Python implementation is supported |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
+      | MySQL      | PyMySQL_           | Same as above                                            |                                                             |
+      +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
 
 .. _Psycopg2: https://github.com/psycopg/psycopg2
 .. _Asyncpg: https://github.com/MagicStack/asyncpg
 .. _MySQL Connector: https://dev.mysql.com/doc/connector-python/en/
+.. _PyMySQL: https://github.com/PyMySQL/PyMySQL
 .. _Native password authentication: https://dev.mysql.com/doc/refman/8.0/en/native-pluggable-authentication.html
 
 

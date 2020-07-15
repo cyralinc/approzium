@@ -46,3 +46,12 @@ approzium.mysql.connector
    :members:
    :undoc-members:
    :show-inheritance:
+
+approzium.pymysql
+-------------------------
+
+
+.. automodule:: approzium.pymysql
+   :members:
+   :undoc-members:
+   :show-inheritance:
