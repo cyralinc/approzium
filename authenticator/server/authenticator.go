@@ -51,22 +51,23 @@ var maxIterations = uint32(15000 * 10)
 
 // Start begins a GRPC server, and an API server. It hangs indefinitely until
 // an error is returned from either, terminating the application. Both servers
-// respond to CTRL+C shutdowns.
-func Start(logger *log.Logger, config config.Config) error {
+// respond to CTRL+C shutdowns. The returned graceful shutdown closer must be
+// called at application end.
+func Start(logger *log.Logger, config config.Config) (io.Closer, error) {
 	if err := api.Start(logger, config); err != nil {
-		return err
+		return nil, err
 	}
-	svr, err := buildServer(logger, config)
+	svr, gracefulShutdown, err := buildServer(logger, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err := startGrpc(logger, config, svr); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return gracefulShutdown, nil
 }
 
-func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {
+func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, io.Closer, error) {
 	// Calls pass through the following layers during handling.
 	// 	- First, a layer that captures request metrics.
 	//	- Next, a layer that adds a request ID, creates a request logger, and logs
@@ -75,18 +76,18 @@ func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServ
 	//  - Lastly, this layer, the authenticator, that handles logic.
 	authenticator, err := newAuthenticator(logger, config)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	tracedAuthenticator, err := newRequestTracer(authenticator)
+	tracedAuthenticator, gracefulShutdown, err := newRequestTracer(logger, authenticator)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	tracedLoggedAuthenticator := newRequestLogger(logger, config.LogRaw, tracedAuthenticator)
 	svr, err := newRequestMetrics(tracedLoggedAuthenticator)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return svr, nil
+	return svr, gracefulShutdown, nil
 }
 
 func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.AuthenticatorServer) error {

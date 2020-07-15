@@ -40,10 +40,15 @@ func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	authenticator, gracefulShutdown, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 	resp, err := authenticator.GetPGMD5Hash(testCtx, &pb.PGMD5HashRequest{
 		PwdRequest: &pb.PasswordRequest{
 			ClientLanguage: pb.ClientLanguage_GO,
@@ -94,10 +99,15 @@ func TestAuthenticator_GetPGSHA256Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	authenticator, gracefulShutdown, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 	resp, err := authenticator.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{
 		PwdRequest: &pb.PasswordRequest{
 			ClientLanguage: pb.ClientLanguage_GO,
@@ -155,10 +165,15 @@ func TestAuthenticator_GetMYSQLSHA1Hash(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	authenticator, gracefulShutdown, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 	resp, err := authenticator.GetMYSQLSHA1Hash(testCtx, &pb.MYSQLSHA1HashRequest{
 		PwdRequest: &pb.PasswordRequest{
 			ClientLanguage: pb.ClientLanguage_GO,
@@ -274,10 +289,15 @@ func TestNoRaces(t *testing.T) {
 	claimedARN := testEnv.ClaimedArn()
 
 	// Create and start the authenticator as we normally would.
-	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	authenticator, gracefulShutdown, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	// Try to create a race.
 	start := make(chan interface{})
@@ -350,10 +370,15 @@ func TestFuzzAuthenticator(t *testing.T) {
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 
-	authenticator, err := buildServer(testtools.TestLogger(), config.Config{})
+	authenticator, gracefulShutdown, err := buildServer(testtools.TestLogger(), config.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	fuzzer := fuzz.New()
 
@@ -403,10 +428,15 @@ func TestMetrics(t *testing.T) {
 	_ = api.Start(testtools.TestLogger(), config)
 
 	// Make some calls to increment the metrics.
-	svr, err := buildServer(testtools.TestLogger(), config)
+	svr, gracefulShutdown, err := buildServer(testtools.TestLogger(), config)
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer func() {
+		if err := gracefulShutdown.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
 	svr.GetPGSHA256Hash(testCtx, &pb.PGSHA256HashRequest{})
 
 	// See what we get for metrics.

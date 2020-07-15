@@ -19,32 +19,6 @@ const (
 	redactedValue = "********"
 )
 
-// getRequestLogger gets a logger that includes the request ID
-// with every line, and a trace ID if it was sent.
-func getRequestLogger(ctx context.Context) *log.Entry {
-	rawLogger := ctx.Value(ctxLogger)
-	if rawLogger == nil {
-		return &log.Entry{}
-	}
-	logger, ok := rawLogger.(*log.Entry)
-	if !ok {
-		return &log.Entry{}
-	}
-	return logger
-}
-
-func getRequestId(ctx context.Context) string {
-	rawRequestId := ctx.Value(ctxRequestId)
-	if rawRequestId == nil {
-		return ""
-	}
-	requestId, ok := rawRequestId.(string)
-	if !ok {
-		return ""
-	}
-	return requestId
-}
-
 func newRequestLogger(logger *log.Logger, logRaw bool, wrapped pb.AuthenticatorServer) pb.AuthenticatorServer {
 	return &requestLogger{
 		logger:  logger,

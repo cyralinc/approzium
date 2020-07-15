@@ -33,10 +33,16 @@ func main() {
 		return
 	}
 
-	if err := server.Start(logger, c); err != nil {
+	gracefulShutdown, err := server.Start(logger, c)
+	if err != nil {
 		logger.Errorf("authenticator ended due to %s", err)
 		return
 	}
+	defer func(){
+		if err := gracefulShutdown.Close(); err != nil {
+			logger.Error(err)
+		}
+	}()
 	logger.Info("all ports up and ready to serve traffic")
 
 	// Wait for a shutdown signal.
