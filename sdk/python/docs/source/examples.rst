@@ -27,3 +27,19 @@ Example of creating a MySQL Connector single connection and a connection pool
 
 .. literalinclude:: ../../examples/mysql_connector_connect.py
     :language: python
+
+
+Opentelemetry Integration Examples
+----------------------------------
+
+:file:`psycopg2_opentelemetry.py`:
+
+.. literalinclude:: ../../examples/psycopg2_opentelemetry.py
+    :language: python
+
+If you are not using Opentelemetry, you can obtain the same attribution info manually:
+
+:file:`psycopg2_attribution_info.py`:
+
+.. literalinclude:: ../../examples/psycopg2_attribution_info.py
+    :language: python
