@@ -56,5 +56,5 @@ def is_ec2():
 def attribution_info():
     if not is_ec2():
         return {}
-    attrs = ["public_hostname"]
-    return {attr: getattr(ec2_metadata, attr) for attr in attrs}
+    attrs = ["public_hostname", "public_ipv4", "instance_id"]
+    return {'ec2'+attr: getattr(ec2_metadata, attr) for attr in attrs}
