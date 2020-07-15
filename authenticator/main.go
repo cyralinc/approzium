@@ -38,7 +38,7 @@ func main() {
 		logger.Errorf("authenticator ended due to %s", err)
 		return
 	}
-	defer func(){
+	defer func() {
 		if err := gracefulShutdown.Close(); err != nil {
 			logger.Error(err)
 		}
