@@ -5,4 +5,4 @@ def connect(*args, **kwargs):
     return ApproziumConnection(*args, **kwargs)
 
 
-__all__ = ['connect']
+__all__ = ["connect"]
