@@ -11,6 +11,7 @@ print(auth.attribution_info)
 #  'iam_arn': 'arn:aws:iam::*******:user/****',
 # 'authenticated': False,
 # 'num_connections': 0
+# ... additional info if available (ex: EC2 instance metadata)
 # }
 approzium.default_auth_client = auth
 dsn = "host=dbmd5 dbname=db user=bob"
@@ -20,4 +21,5 @@ print(auth.attribution_info)
 #  'iam_arn': 'arn:aws:iam::*******:user/****',
 # 'authenticated': True,
 # 'num_connections': 1
+# ...
 # }
