@@ -3,9 +3,7 @@ import struct
 MYSQLNativePassword = "mysql_native_password"
 
 
-def get_auth_resp(
-    authenticator, dbhost, dbport, dbuser, auth_plugin, auth_data
-):
+def get_auth_resp(authenticator, dbhost, dbport, dbuser, auth_plugin, auth_data):
     plugin_auth_response = authenticator._get_mysql_hash(
         dbhost, dbport, dbuser, auth_plugin, auth_data
     )

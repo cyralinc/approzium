@@ -1,6 +1,6 @@
-from contextlib import contextmanager
 import logging
 import struct
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
