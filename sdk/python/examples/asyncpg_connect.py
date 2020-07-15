@@ -4,7 +4,11 @@ from approzium import AuthClient
 from approzium.asyncpg import connect
 from approzium.asyncpg.pool import create_pool
 
-auth = AuthClient("authenticator:6001")
+auth = AuthClient(
+    "authenticator:6001",
+    # This is insecure, see https://approzium.org/configuration for proper use.
+    disable_tls=True,
+)
 
 
 async def run():

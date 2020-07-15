@@ -41,9 +41,10 @@ services:
     authenticator:
         build:
             context: ./
-            target: build
+            target: authenticator-dev
         environment:
             - APPROZIUM_HOST=0.0.0.0
+            - APPROZIUM_DISABLE_TLS=true
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
         depends_on:

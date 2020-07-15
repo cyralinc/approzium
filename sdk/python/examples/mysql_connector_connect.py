@@ -1,9 +1,13 @@
-import approzium
+from approzium import AuthClient
 from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
-auth = approzium.AuthClient("authenticator:6001")
-conn = connect(user="bob", authenticator=auth, host="dbmysqlsha1", use_pure=True)
+auth = AuthClient(
+    "authenticator:6001",
+    # This is insecure, see https://approzium.org/configuration for proper use.
+    disable_tls=True,
+)
+conn = connect(user="bob", authenticator=auth, host="dbmysql", use_pure=True)
 print("Connection Established")
 
 cur = conn.cursor()

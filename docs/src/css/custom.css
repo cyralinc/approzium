@@ -1,0 +1,66 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+:root {
+  --ifm-color-primary: #3b56a7;
+  --ifm-color-primary-dark: #354d96;
+  --ifm-color-primary-darker: #32498e;
+  --ifm-color-primary-darkest: #293c75;
+  --ifm-color-primary-light: #415fb8;
+  --ifm-color-primary-lighter: #4664be;
+  --ifm-color-primary-lightest: #5f79c7;
+  --ifm-code-font-size: 95%;
+  --ifm-font-family-base: 'Titillium Web', sans-serif;
+  --ifm-footer-background-color: var(--ifm-background-color);
+}
+
+:root[data-theme='dark'] {
+  --ifm-color-primary: var(--ifm-color-primary-lightest)
+}
+
+html[data-theme='dark'] {
+  --ifm-background-color: #242526;
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(72, 77, 91);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+a[href^="https://approzium.readthedocs.io/"]::after {
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+  padding-right: 13px;
+}
+
+a {
+  font-weight: 600;
+}
+
+code {
+  border: 1px solid var(--ifm-font-color-base);
+  color: var(--ifm-font-color-base);
+  border-radius: .2rem;
+  font-size: .9rem;
+  padding: .15rem;
+  margin: .05rem;
+}
+
+.pagination-nav__link {
+  border-color: var(--ifm-font-color-base);
+}
+
+.algolia-autocomplete .algolia-docsearch-footer {
+  width: 0px;
+  height: 0px;
+  visibility: hidden;
+}

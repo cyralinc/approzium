@@ -1,0 +1,55 @@
+---
+title: Installation
+---
+
+## Client SDKs
+
+- Python: `pip3 install approzium`
+
+## Authentication server binaries
+
+- Our binaries are posted with [our releases](https://github.com/cyralinc/approzium/releases).
+
+## Running the server binary
+
+### Linux
+
+Please replace `linux_amd64.zip` with the correct version of Linux for your environment.
+
+```
+curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/linux_amd64.zip
+unzip linux_amd64.zip
+chmod +x authenticator
+./authenticator
+```
+
+### Mac
+
+Please replace `darwin_amd64.zip` with the correct version of Mac for your environment.
+
+```
+curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/darwin_amd64.zip
+unzip darwin_amd64.zip
+chmod +x authenticator
+./authenticator
+```
+
+### Windows
+
+Please replace `windows_amd64.zip` with the correct version of Windows for your environment.
+
+```
+$url = "https://github.com/cyralinc/approzium/releases/download/v0.1.0/windows_amd64.zip"
+$outpath = "$PSScriptRoot/windows_amd64.zip"
+Invoke-WebRequest -Uri $url -OutFile $outpath
+$wc = New-Object System.Net.WebClient
+$wc.DownloadFile($url, $outpath)
+$args = @("Comma","Separated","Arguments")
+Expand-Archive -LiteralPath $outpath -DestinationPath C:\ $PSScriptRoot
+Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
+```
+
+## Docker
+```
+docker run approzium/authenticator:latest
+```

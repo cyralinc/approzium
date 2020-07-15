@@ -1,22 +1,54 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/cyralinc/approzium/authenticator/server"
 	"github.com/cyralinc/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 )
 
+const currentVersion = "0.1.1"
+
 func main() {
-	c, err := config.ParseConfig()
+	c, err := config.Parse()
 	if err != nil {
 		log.Errorf("couldn't parse config: %s", err)
+		return
 	}
 
+	if c.Version {
+		// Just output the version and be done.
+		fmt.Println("Approzium v" + currentVersion)
+		return
+	}
+
+	logger, err := buildApplicationLogger(c)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	if err := server.Start(logger, c); err != nil {
+		logger.Errorf("authenticator ended due to %s", err)
+		return
+	}
+	logger.Info("all ports up and ready to serve traffic")
+
+	// Wait for a shutdown signal.
+	shutdown := make(chan os.Signal)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+	<-shutdown
+}
+
+func buildApplicationLogger(c config.Config) (*log.Logger, error) {
 	logLevel, err := log.ParseLevel(strings.ToLower(c.LogLevel))
 	if err != nil {
-		log.Errorf("couldn't parse log level: %s", err)
+		return nil, err
 	}
 	logger := log.New()
 	logger.Level = logLevel
@@ -31,10 +63,7 @@ func main() {
 	case "json":
 		logger.SetFormatter(&log.JSONFormatter{})
 	default:
-		logger.Errorf("unsupported log format: %s", c.LogFormat)
+		return nil, fmt.Errorf("unsupported log format: %s", c.LogFormat)
 	}
-
-	if err := server.Start(logger, c); err != nil {
-		logger.Errorf("authenticator ended due to %s", err)
-	}
+	return logger, nil
 }

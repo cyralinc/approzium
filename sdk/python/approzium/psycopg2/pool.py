@@ -25,7 +25,7 @@ class SimpleConnectionPool(_AbstractConnectionPool, psycopg2.pool.SimpleConnecti
 
         >>> import approzium
         >>> from approzium.psycopg2.pool import SimpleConnectionPool
-        >>> auth = approzium.AuthClient("myauthenticator.com:6001")
+        >>> auth = approzium.AuthClient("myauthenticator.com:6001", disable_tls=True)
         >>> pool = SimpleConnectionPool("host=DB.com dbname=mydb", authenticator=auth)
         >>> conn = poll.getconn()
     """
