@@ -5,7 +5,7 @@ from mysql.connector import MySQLConnection
 
 import approzium
 
-from ..._mysql import get_auth_resp
+from ..._mysql import get_auth_resp_msg
 
 
 class ApproziumMySQLConnection(MySQLConnection):
@@ -26,14 +26,14 @@ class ApproziumMySQLConnection(MySQLConnection):
                     client_flags
                     & mysql.connector.constants.ClientFlag.SECURE_CONNECTION
                 )
-                auth_response = get_auth_resp(
+                auth_response = get_auth_resp_msg(
+                    is_secure_connection,
                     authenticator,
                     host,
                     str(port),
                     username,
                     auth_plugin,
                     auth_data,
-                    is_secure_connection,
                 )
                 return auth_response
 
