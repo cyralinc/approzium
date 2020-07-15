@@ -1,4 +1,5 @@
 import pymysql
+
 import approzium
 
 from .._misc import patch
@@ -44,7 +45,9 @@ class ApproziumConnection(pymysql.connections.Connection):
         if authenticator is None:
             authenticator = approzium.default_auth_client
         if authenticator is None:
-            raise TypeError("Auth client not specified and not default auth client is set")
+            raise TypeError(
+                "Auth client not specified and not default auth client is set"
+            )
         self.authenticator = authenticator
         return super(ApproziumConnection, self).__init__(*args, **kwargs)
 
