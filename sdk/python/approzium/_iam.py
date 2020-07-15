@@ -42,7 +42,7 @@ def get_local_arn():
     return response["Arn"]
 
 
-@lru_cache()
+@lru_cache(maxsize=1)
 def is_ec2():
     # AWS docs reference:
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
