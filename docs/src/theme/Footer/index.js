@@ -47,6 +47,7 @@ function Footer() {
   const { footer } = themeConfig;
 
   const { copyright, links = [], logo = {} } = footer || {};
+  console.log(copyright)
   const logoUrl = useBaseUrl(logo.src);
 
   if (!footer) {
@@ -113,11 +114,8 @@ function Footer() {
               </div>
             )}
 
-            <div
-              dangerouslySetInnerHTML={{
-                __html: copyright,
-              }}
-            />
+            <div />
+            Copyright © 2020 <a href='https://cyral.com/'>Cyral, Inc.</a>
           </div>
         )}
       </div>
