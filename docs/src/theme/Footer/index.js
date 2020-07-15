@@ -47,7 +47,6 @@ function Footer() {
   const { footer } = themeConfig;
 
   const { copyright, links = [], logo = {} } = footer || {};
-  console.log(copyright)
   const logoUrl = useBaseUrl(logo.src);
 
   if (!footer) {
