@@ -21,8 +21,13 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://github.com/approzium/approzium',
+          href: 'https://github.com/cyral/approzium',
           label: 'GitHub',
+          position: 'right',
+        },
+        {
+          href: 'https://cyral.com',
+          label: 'Cyral',
           position: 'right',
         },
       ],
