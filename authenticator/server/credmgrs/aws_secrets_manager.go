@@ -37,6 +37,7 @@ func (a *awsSecretsManagerCredMgr) Name() string {
 }
 
 func (a *awsSecretsManagerCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) {
+    // AWS Secrets Manager does not support ":" in their secret names
 	path := mountPath + "/" + identity.DBHost + "@" + identity.DBPort
     input := &secretsmanager.GetSecretValueInput{
 		SecretId:     aws.String(path),
@@ -47,7 +48,7 @@ func (a *awsSecretsManagerCredMgr) Password(_ *log.Entry, identity DBKey) (strin
         return "", err
     }
     if result.SecretString == nil {
-		return "", fmt.Errorf("no secret string returned from Vault")
+		return "", fmt.Errorf("no secret string returned from AWS Secrets Manager")
     }
     secretString := *result.SecretString
     secret := make(map[string]interface{})
