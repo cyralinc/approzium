@@ -4,6 +4,9 @@ import pymysql
 
 
 def _scramble_native_password(context, salt):
+    # use normal method if not Approzium connection
+    if not isinstance(context, dict):
+        return pymysql._auth.scramble_native_password(context, salt)
     return get_auth_resp(
         context['authenticator'],
         context['host'],
