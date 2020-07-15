@@ -60,11 +60,12 @@ class AuthClient(object):
                 )
 
         self.disable_tls = disable_tls
-        self.tls_config = TLSConfig(
-            trusted_certs=tls_config.trusted_certs,
-            client_cert=tls_config.client_cert,
-            client_key=tls_config.client_key,
-        )
+        if not disable_tls:
+            self.tls_config = TLSConfig(
+                trusted_certs=tls_config.trusted_certs,
+                client_cert=tls_config.client_cert,
+                client_key=tls_config.client_key,
+            )
         self.authenticated = False
         self._counter = count(1)
         self.n_conns = 0
