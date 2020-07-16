@@ -230,9 +230,11 @@ export default ({ children, className: languageClassName, metastring, landingPag
 
                   return (
                     <div key={i} {...lineProps}>
-                      {line.map((token, key) => (
-                        <span key={key} {...getTokenProps({ token, key })} />
-                      ))}
+                      {line.map((token, key) => {
+                        const tokenProps = getTokenProps({ token, key })
+                        if (tokenProps.className == "token keyword") tokenProps.style.fontStyle = null
+                        return <span key={key} {...tokenProps} />
+                      })}
                     </div>
                   );
                 })}
