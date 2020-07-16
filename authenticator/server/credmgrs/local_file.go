@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -13,7 +14,7 @@ import (
 const secretsFileLocation = "/authenticator/server/testing/secrets.yaml"
 
 // newLocalFileCreds is for dev purposes: read credentials from a local file.
-func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
+func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, error) {
 	creds := make(map[DBKey]string)
 	type secrets []struct {
 		Dbhost   string `yaml:"dbhost"`
@@ -35,10 +36,10 @@ func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
 	var devCreds secrets
 	yamlFile, err := ioutil.ReadFile(pathToSecrets)
 	if err != nil {
-		return nil, err
+        return &localFileCredMgr{}, err
 	}
 	if err = yaml.Unmarshal(yamlFile, &devCreds); err != nil {
-		return nil, err
+        return &localFileCredMgr{}, err
 	}
 	for _, cred := range devCreds {
 		key := DBKey{
@@ -51,6 +52,7 @@ func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
 		logger.Debugf("added dev credential for host %s", cred.Dbhost)
 	}
 	logger.Info("secrets loaded, please restart authenticator to load edits")
+	logger.Warn("local file credential manager should not be used in production")
 	return &localFileCredMgr{creds: creds}, nil
 }
 

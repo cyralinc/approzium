@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	vault "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,21 +17,21 @@ import (
 // Someday we may wish to make this path configurable.
 const mountPath = "approzium"
 
-func newHashiCorpVaultCreds(tokenPath string) (CredentialManager, error) {
+func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialManager, error) {
 	if addr := os.Getenv(vault.EnvVaultAddress); addr == "" {
-		return nil, errors.New("no vault address detected")
+		return &hcVaultCredMgr{}, errors.New("no vault address detected")
 	}
 	credMgr := &hcVaultCredMgr{
-		tokenPath: tokenPath,
+		tokenPath: config.VaultTokenPath,
 	}
 
 	// Check that we're able to communicate with Vault by doing a test read.
 	client, err := credMgr.vaultClient()
 	if err != nil {
-		return nil, err
+		return &hcVaultCredMgr{}, err
 	}
 	if _, err := client.Logical().Read(mountPath); err != nil {
-		return nil, err
+		return &hcVaultCredMgr{}, err
 	}
 	return credMgr, nil
 }

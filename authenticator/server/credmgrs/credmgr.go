@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	"github.com/cyralinc/approzium/authenticator/server/metrics"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/metric"
@@ -24,8 +25,8 @@ type DBKey struct {
 
 // RetrieveConfigured checks the environment for configured cred
 // providers, and selects the first working configuration.
-func RetrieveConfigured(logger *log.Logger, vaultTokenPath string) (CredentialManager, error) {
-	credMgr, err := selectCredMgr(logger, vaultTokenPath)
+func RetrieveConfigured(logger *log.Logger, config config.Config) (CredentialManager, error) {
+	credMgr, err := selectCredMgr(logger, config)
 	if err != nil {
 		return nil, err
 	}
@@ -132,30 +133,16 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 	return password, err
 }
 
-func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager, error) {
-	credMgr, err := newHashiCorpVaultCreds(vaultTokenPath)
-	if err != nil {
-		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
-	} else {
-		logger.Info("selected HashiCorp Vault as credential manager")
-		return credMgr, nil
-	}
-
-	credMgr, err = newAWSSecretManagerCreds()
-	if err != nil {
-		logger.Debugf("didn't select AWS Secrets Manager as credential manager due to err: %s", err)
-	} else {
-		logger.Info("selected AWS Secrets Manager as credential manager")
-		return credMgr, nil
-	}
-
-	credMgr, err = newLocalFileCreds(logger)
-	if err != nil {
-		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
-	} else {
-		logger.Info("selected local file as credential manager")
-		logger.Warn("local file credential manager should not be used in production")
-		return credMgr, err
+func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
+	credMgrs := []func(*log.Logger, config.Config) (CredentialManager, error){newHashiCorpVaultCreds, newAWSSecretManagerCreds, newLocalFileCreds}
+	for _, credMgrNew := range credMgrs {
+		credMgr, err := credMgrNew(logger, config_)
+		if err != nil {
+			logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
+		} else {
+			logger.Infof("selected %s as credential manager", credMgr.Name())
+			return credMgr, nil
+		}
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
 }
