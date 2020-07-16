@@ -21,7 +21,7 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://github.com/cyral/approzium',
+          href: 'https://github.com/cyralinc/approzium',
           label: 'GitHub',
           position: 'right',
         },
