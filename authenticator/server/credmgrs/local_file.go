@@ -36,10 +36,10 @@ func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, 
 	var devCreds secrets
 	yamlFile, err := ioutil.ReadFile(pathToSecrets)
 	if err != nil {
-        return &localFileCredMgr{}, err
+		return &localFileCredMgr{}, err
 	}
 	if err = yaml.Unmarshal(yamlFile, &devCreds); err != nil {
-        return &localFileCredMgr{}, err
+		return &localFileCredMgr{}, err
 	}
 	for _, cred := range devCreds {
 		key := DBKey{
