@@ -1,9 +1,9 @@
 package testing
 
 import (
+	"fmt"
 	"os"
 	"testing"
-    "fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
