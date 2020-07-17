@@ -134,15 +134,44 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 }
 
 func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
-	credMgrs := []func(*log.Logger, config.Config) (CredentialManager, error){newHashiCorpVaultCreds, newAWSSecretManagerCreds, newLocalFileCreds}
-	for _, credMgrNew := range credMgrs {
-		credMgr, err := credMgrNew(logger, config_)
-		if err != nil {
-			logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
-		} else {
-			logger.Infof("selected %s as credential manager", credMgr.Name())
-			return credMgr, nil
-		}
+    if config_.SecretsManager == "" {
+        return legacySelectCredMgr(logger, config_)
+    }
+	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error) {
+        "vault": newHashiCorpVaultCreds,
+        "aws": newAWSSecretManagerCreds,
+        "local": newLocalFileCreds,
+    }
+    credMgrNew, ok := credMgrs[config_.SecretsManager]
+    if !ok {
+        return nil, fmt.Errorf("Unknown secrets manager option: %s", config_.SecretsManager)
+    }
+    credMgr, err := credMgrNew(logger, config_)
+    if err != nil {
+        logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
+        return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
+    }
+    logger.Infof("using %s as credentials manager", credMgr.Name())
+    return credMgr, nil
+}
+
+func legacySelectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
+    // Legacy behaviour: try vault then local file
+	credMgr, err := newHashiCorpVaultCreds(logger, config_)
+	if err != nil {
+		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
+	} else {
+		logger.Info("selected HashiCorp Vault as credential manager")
+		return credMgr, nil
+	}
+
+	credMgr, err = newLocalFileCreds(logger, config_)
+	if err != nil {
+		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
+	} else {
+		logger.Info("selected local file as credential manager")
+		logger.Warn("local file credential manager should not be used in production")
+		return credMgr, err
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
 }

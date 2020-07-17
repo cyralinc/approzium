@@ -4,3 +4,4 @@
 # loglevel: info
 # logformat: text
 # lograw: false
+# secretsmanager: vault
