@@ -14,7 +14,7 @@ import (
 var (
 	ErrNotAuthorized = errors.New("not authorized")
 	ErrNotFound      = errors.New("not found")
-    options = []string{"vault,", "aws", "local"}
+	options          = []string{"vault,", "aws", "local"}
 )
 
 type DBKey struct {
