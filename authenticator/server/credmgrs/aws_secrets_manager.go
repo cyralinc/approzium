@@ -35,7 +35,7 @@ func (a *awsSecretsManagerCredMgr) Name() string {
 	return "AWS Secrets Manager"
 }
 
-func SecretPath(identity DBKey) (string) {
+func SecretPath(identity DBKey) string {
 	return mountPath + "/" + identity.DBHost + "@" + identity.DBPort
 }
 
