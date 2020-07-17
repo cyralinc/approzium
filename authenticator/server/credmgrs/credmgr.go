@@ -14,6 +14,7 @@ import (
 var (
 	ErrNotAuthorized = errors.New("not authorized")
 	ErrNotFound      = errors.New("not found")
+    options = []string{"vault,", "aws", "local"}
 )
 
 type DBKey struct {
@@ -144,7 +145,7 @@ func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager
     }
     credMgrNew, ok := credMgrs[config_.SecretsManager]
     if !ok {
-        return nil, fmt.Errorf("Unknown secrets manager option: %s", config_.SecretsManager)
+        return nil, fmt.Errorf("Unknown secrets manager option: %s. valid options are %v", config_.SecretsManager, options)
     }
     credMgr, err := credMgrNew(logger, config_)
     if err != nil {
@@ -157,6 +158,7 @@ func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager
 
 func legacySelectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
     // Legacy behaviour: try vault then local file
+    logger.Warnf("Leaving secrets manager option unset is not recommended. Please set to one of valid options %v", options)
 	credMgr, err := newHashiCorpVaultCreds(logger, config_)
 	if err != nil {
 		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
