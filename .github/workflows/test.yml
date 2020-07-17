@@ -2,7 +2,8 @@ name: test
 on:
   push:
     branches: [ '*' ]
-
+env:
+  AWS_REGION: us-east-2  # this is needed for the AWS Secrets Credentials to work.
 jobs:
   test:
     runs-on: ubuntu-latest
