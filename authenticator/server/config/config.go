@@ -26,7 +26,7 @@ type Config struct {
 	LogFormat string
 	LogRaw    bool
 
-    SecretsManager string
+	SecretsManager string
 
 	VaultTokenPath string
 	ConfigFilePath string
@@ -159,7 +159,7 @@ func setConfigDefaults() {
 }
 
 func setConfigFlags() {
-    // avoid redefining flags because it leads to panic
+	// avoid redefining flags because it leads to panic
 	if pflag.Lookup("host") == nil {
 		pflag.String("host", "", "")
 		pflag.String("httpport", "", "")

@@ -135,30 +135,29 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 }
 
 func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
-    if config_.SecretsManager == "" {
-        return legacySelectCredMgr(logger, config_)
-    }
-	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error) {
-        "vault": newHashiCorpVaultCreds,
-        "aws": newAWSSecretManagerCreds,
-        "local": newLocalFileCreds,
-    }
-    credMgrNew, ok := credMgrs[config_.SecretsManager]
-    if !ok {
-        return nil, fmt.Errorf("Unknown secrets manager option: %s. valid options are %v", config_.SecretsManager, options)
-    }
-    credMgr, err := credMgrNew(logger, config_)
-    if err != nil {
-        logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
-        return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
-    }
-    logger.Infof("using %s as credentials manager", credMgr.Name())
-    return credMgr, nil
+	if config_.SecretsManager == "" {
+		return legacySelectCredMgr(logger, config_)
+	}
+	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error){
+		"vault": newHashiCorpVaultCreds,
+		"aws":   newAWSSecretManagerCreds,
+		"local": newLocalFileCreds,
+	}
+	credMgrNew, ok := credMgrs[config_.SecretsManager]
+	if !ok {
+		return nil, fmt.Errorf("Unknown secrets manager option: %s", config_.SecretsManager)
+	}
+	credMgr, err := credMgrNew(logger, config_)
+	if err != nil {
+		logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
+		return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
+	}
+	logger.Infof("using %s as credentials manager", credMgr.Name())
+	return credMgr, nil
 }
 
 func legacySelectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
-    // Legacy behaviour: try vault then local file
-    logger.Warnf("Leaving secrets manager option unset is not recommended. Please set to one of valid options %v", options)
+	// Legacy behaviour: try vault then local file
 	credMgr, err := newHashiCorpVaultCreds(logger, config_)
 	if err != nil {
 		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
