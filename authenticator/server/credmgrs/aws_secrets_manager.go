@@ -35,9 +35,13 @@ func (a *awsSecretsManagerCredMgr) Name() string {
 	return "AWS Secrets Manager"
 }
 
+func SecretPath(identity DBKey) (string) {
+	return mountPath + "/" + identity.DBHost + "@" + identity.DBPort
+}
+
 func (a *awsSecretsManagerCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) {
 	// AWS Secrets Manager does not support ":" in their secret names
-	path := mountPath + "/" + identity.DBHost + "@" + identity.DBPort
+	path := SecretPath(identity)
 	input := &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(path),
 	}
