@@ -78,7 +78,7 @@ func TestHcVaultCredMgr_WithTokenPath(t *testing.T) {
 	os.Unsetenv(vault.EnvVaultToken)
 
 	// Try to read the creds through the cred manager.
-	credMgr, err := newHashiCorpVaultCreds(log, config.Config{
+	credMgr, err := newHashiCorpVaultCreds(nil, config.Config{
 		VaultTokenPath: tmpFile.Name(),
 	})
 	if err != nil {
@@ -132,7 +132,7 @@ func TestHcVaultCredMgr_WithoutTokenPath(t *testing.T) {
 	}
 
 	// Try to read the creds through the cred manager.
-	credMgr, err := newHashiCorpVaultCreds(log, config.Config{
+	credMgr, err := newHashiCorpVaultCreds(nil, config.Config{
 		VaultTokenPath: "",
 	})
 	if err != nil {

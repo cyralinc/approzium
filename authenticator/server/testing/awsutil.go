@@ -3,6 +3,7 @@ package testing
 import (
 	"os"
 	"testing"
+    "fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -27,7 +28,7 @@ func (e *AwsEnv) ClaimedArn() string {
 func (e *AwsEnv) SignedGetCallerIdentity(t *testing.T) (string, error) {
 
 	if os.Getenv(envVarTestRole) == "" {
-		t.Fatalf("skipping because %s is unset", envVarTestRole)
+		t.Skip(fmt.Sprintf("skipping because %s is unset", envVarTestRole))
 	}
 
 	// If it's cached, return it.
