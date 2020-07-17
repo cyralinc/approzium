@@ -43,5 +43,6 @@ services:
             - APPROZIUM_DISABLE_TLS=true
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
+            - AWS_REGION
         depends_on:
             - vault
