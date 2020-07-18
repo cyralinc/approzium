@@ -1,9 +1,8 @@
 {
   "name": "docs",
-  "version": "0.0.0",
+  "version": "2.0.0-rc.41",
   "private": true,
   "description": "Documentation for the Approzium project",
-  "version": "2.0.0-rc.41",
   "keywords": [
     "approzium",
     "documentation",
@@ -23,6 +22,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.58",
+    "@docusaurus/plugin-google-analytics": "^2.0.0-alpha.37",
     "@docusaurus/plugin-ideal-image": "^2.0.0-alpha.39",
     "@docusaurus/preset-classic": "^2.0.0-alpha.58",
     "clsx": "^1.1.1",
