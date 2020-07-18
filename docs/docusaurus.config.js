@@ -38,6 +38,11 @@ module.exports = {
       appId: '51LSIHDN1A', // Optional, if you run the DocSearch crawler on your own
       algoliaOptions: {}, // Optional, if provided by Algolia
     },
+    googleAnalytics: {
+      trackingID: 'UA-172971690-1',
+      anonymizeIP: true, // Should IPs be anonymized?
+    },
+
     footer: {
       style: 'light',
       copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
@@ -45,6 +50,7 @@ module.exports = {
   },
   plugins: [
     '@docusaurus/plugin-ideal-image',
+    '@docusaurus/plugin-google-analytics'
   ],
   presets: [
     [
