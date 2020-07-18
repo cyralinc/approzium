@@ -1,4 +1,4 @@
-# Reporiting Security Issues
+# Reporting Security Issues
 
 We take Approzium's security and our users' trust very seriously. If you believe you
 have found a security issue in Approzium, _please responsibly disclose_ by contacting
