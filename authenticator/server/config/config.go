@@ -159,7 +159,7 @@ func setConfigFlags() {
 		pflag.String("httpport", "", "")
 		pflag.String("grpcport", "", "")
 
-		pflag.String("disabletls", "", "")
+		pflag.Bool("disabletls", false, "")
 		pflag.String("tlscertpath", "", "")
 		pflag.String("tlskeypath", "", "")
 
