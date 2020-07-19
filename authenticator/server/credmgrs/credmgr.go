@@ -14,7 +14,6 @@ import (
 var (
 	ErrNotAuthorized = errors.New("not authorized")
 	ErrNotFound      = errors.New("not found")
-	options          = []string{"vault,", "aws", "local"}
 )
 
 type DBKey struct {
@@ -134,23 +133,29 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 	return password, err
 }
 
+
+var (
+options          = []string{"vault", "asm", "local"}
+)
+
 func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
 	if config_.SecretsManager == "" {
 		return legacySelectCredMgr(logger, config_)
 	}
 	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error){
 		"vault": newHashiCorpVaultCreds,
-		"aws":   newAWSSecretManagerCreds,
+		"asm":   newAWSSecretManagerCreds,
 		"local": newLocalFileCreds,
 	}
 	credMgrNew, ok := credMgrs[config_.SecretsManager]
 	if !ok {
-		return nil, fmt.Errorf("Unknown secrets manager option: %s", config_.SecretsManager)
+        msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", config_.SecretsManager, options)
+		return nil, fmt.Errorf(msg)
 	}
 	credMgr, err := credMgrNew(logger, config_)
 	if err != nil {
 		logger.Debugf("didn't select %s as credential manager due to err: %s", credMgr.Name(), err)
-		return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
+		return nil, errors.New("Could not configure the credential manager, see debug-level logs for more information")
 	}
 	logger.Infof("using %s as credentials manager", credMgr.Name())
 	return credMgr, nil
