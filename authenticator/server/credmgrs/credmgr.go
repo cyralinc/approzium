@@ -133,9 +133,8 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 	return password, err
 }
 
-
 var (
-options          = []string{"vault", "asm", "local"}
+	options = []string{"vault", "asm", "local"}
 )
 
 func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
@@ -149,7 +148,7 @@ func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager
 	}
 	credMgrNew, ok := credMgrs[config_.SecretsManager]
 	if !ok {
-        msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", config_.SecretsManager, options)
+		msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", config_.SecretsManager, options)
 		return nil, fmt.Errorf(msg)
 	}
 	credMgr, err := credMgrNew(logger, config_)
