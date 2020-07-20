@@ -17,8 +17,6 @@ from ._psycopg2_ctypes import (
 
 logger = logging.getLogger(__name__)
 
-pgconnect = psycopg2.connect
-
 
 def wait(pgconn):
     while True:
@@ -47,6 +45,7 @@ def construct_approzium_conn(is_sync, authenticator):
                 return
             if logger.getEffectiveLevel() <= logging.DEBUG:
                 set_debug(self)
+            self.authenticator = authenticator
             dbhost = self.get_dsn_parameters()["host"]
             dbport = self.get_dsn_parameters()["port"]
             dbuser = self.get_dsn_parameters()["user"]
@@ -118,4 +117,4 @@ def connect(dsn=None, cursor_factory=None, authenticator=None, **kwargs):
     if authenticator is None:
         raise TypeError("Auth client not specified and not default auth client is set")
     factory = construct_approzium_conn(is_sync, authenticator)
-    return pgconnect(dsn, factory, cursor_factory, **kwargs)
+    return psycopg2.connect(dsn, factory, cursor_factory, **kwargs)

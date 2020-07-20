@@ -16,7 +16,12 @@ result = next(cur)
 print(result)
 
 cnxpool = MySQLConnectionPool(
-    pool_name="mypool", pool_size=3, user="bob", host="dbmysql", authenticator=auth
+    pool_name="mypool",
+    pool_size=3,
+    user="bob",
+    host="dbmysqlsha1",
+    authenticator=auth,
+    use_pure=True,
 )
 print("Connection Pool Established")
 conn = cnxpool.get_connection()
