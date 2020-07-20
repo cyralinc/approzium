@@ -25,9 +25,9 @@ Approzium uses the following precedence order. Each item takes precedence over t
  - defaults
 
 # Approzium Secrets Manager Backends
-## Vault Backend
+## Hashicorp Vault Backend
 
-Approzium supports Vault for storing database credentials. To use it, set the `secretsmanager` option to `vault`.
+Approzium supports Hashicorp Vault for storing database credentials. To use it, set the `secretsmanager` option to `vault`.
 At a minimum, the `VAULT_ADDR` must be set. Either the `VAULT_TOKEN` or `APPROZIUM_VAULT_TOKEN_PATH` must be set,
 with the `VAULT_TOKEN`
 taking precedence. We recommend using the `APPROZIUM_VAULT_TOKEN_PATH` with the Vault agent, as described
