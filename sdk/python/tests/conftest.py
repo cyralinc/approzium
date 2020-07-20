@@ -14,7 +14,7 @@ def determine_authclients():
     that uses it"""
     pytest.authclients = []
     base_aws_auth = approzium.AuthClient(
-        "authenticator:6001",
+        "authenticatorvault:6001",
         tls_config=approzium.TLSConfig(
             trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
             client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
@@ -25,7 +25,7 @@ def determine_authclients():
     pytest.authclients.append(base_aws_auth)
     if environ.get("TEST_ASSUMABLE_ARN"):
         role_aws_auth = approzium.AuthClient(
-            "authenticator:6001",
+            "authenticatorvault:6001",
             tls_config=approzium.TLSConfig(
                 trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
                 client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
