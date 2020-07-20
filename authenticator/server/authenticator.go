@@ -111,7 +111,7 @@ func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.
 }
 
 func newAuthenticator(logger *log.Logger, config config.Config) (pb.AuthenticatorServer, error) {
-	credMgr, err := credmgrs.RetrieveConfigured(logger, config.VaultTokenPath)
+	credMgr, err := credmgrs.RetrieveConfigured(logger, config)
 	if err != nil {
 		return nil, err
 	}

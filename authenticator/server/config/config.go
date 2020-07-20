@@ -26,6 +26,8 @@ type Config struct {
 	LogFormat string
 	LogRaw    bool
 
+	SecretsManager string
+
 	VaultTokenPath string
 	ConfigFilePath string
 
@@ -130,6 +132,9 @@ func setConfigEnvVars() error {
 	if err := viper.BindEnv("LogRaw", "APPROZIUM_LOG_RAW"); err != nil {
 		return err
 	}
+	if err := viper.BindEnv("SecretsManager", "APPROZIUM_SECRETS_MANAGER"); err != nil {
+		return err
+	}
 
 	if err := viper.BindEnv("VaultTokenPath", "APPROZIUM_VAULT_TOKEN_PATH"); err != nil {
 		return err
@@ -150,22 +155,25 @@ func setConfigDefaults() {
 	viper.SetDefault("LogLevel", "info")
 	viper.SetDefault("LogFormat", "text")
 	viper.SetDefault("LogRaw", false)
+	viper.SetDefault("SecretsManager", "")
 }
 
 func setConfigFlags() {
+	// avoid redefining flags because it leads to panic
 	if pflag.Lookup("host") == nil {
-		// avoid redefining flags because it leads to panic
 		pflag.String("host", "", "")
 		pflag.String("httpport", "", "")
 		pflag.String("grpcport", "", "")
 
-		pflag.String("disabletls", "", "")
+		pflag.Bool("disabletls", false, "")
 		pflag.String("tlscertpath", "", "")
 		pflag.String("tlskeypath", "", "")
 
 		pflag.String("loglevel", "", "")
 		pflag.String("logformat", "", "")
 		pflag.Bool("lograw", false, "")
+
+		pflag.String("secretsmanager", "", "")
 
 		pflag.String("vaulttokenpath", "", "")
 		pflag.String("config", "", "")

@@ -19,6 +19,10 @@ RUN mv protoc3/include/* /usr/local/include/
 RUN wget https://releases.hashicorp.com/vault/1.4.2/vault_1.4.2_linux_amd64.zip
 RUN unzip vault_1.4.2_linux_amd64.zip
 RUN mv vault /usr/local/bin/
+# Intall AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
 RUN apt-get install -y \
   build-essential \
   libpq-dev \

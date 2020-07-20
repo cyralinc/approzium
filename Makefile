@@ -59,11 +59,22 @@ seed-vault-all-addrs:
 	for ADDR in $(TEST_DBADDRS); do \
 		make seed-vault-addr ADDR=$$ADDR; \
 	done
+# ASM uses @ to separate host and port, so replace : with @
+seed-asm-addr:
+	AWS_PAGER="" aws secretsmanager create-secret --name approzium/$(shell echo $(ADDR) | sed "s/:/@/g") \
+		--secret-string '{"$(TEST_DBUSER)": $(vault_secret)}' || true
+	AWS_PAGER="" aws secretsmanager put-secret-value --secret-id approzium/$(shell echo $(ADDR) | sed "s/:/@/g") \
+		--secret-string '{"$(TEST_DBUSER)": $(vault_secret)}'
+
+seed-asm-all-addrs:
+	for ADDR in $(TEST_DBADDRS); do \
+		make seed-asm-addr ADDR=$$ADDR; \
+	done
 
 run-testsuite: run-gotests run-pg2tests
 
 run-gotests:
 	cd authenticator && CGO_ENABLED=1 go test -v -race -p 1 ./...
 
-run-pythontests: enable-vault-path seed-vault-all-addrs
+run-pythontests: enable-vault-path seed-vault-all-addrs seed-asm-all-addrs
 	cd sdk/python && poetry run pytest --workers auto

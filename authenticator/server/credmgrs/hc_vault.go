@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	vault "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,21 +17,21 @@ import (
 // Someday we may wish to make this path configurable.
 const mountPath = "approzium"
 
-func newHashiCorpVaultCreds(tokenPath string) (CredentialManager, error) {
+func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialManager, error) {
 	if addr := os.Getenv(vault.EnvVaultAddress); addr == "" {
-		return nil, errors.New("no vault address detected")
+		return &hcVaultCredMgr{}, errors.New("no vault address detected")
 	}
 	credMgr := &hcVaultCredMgr{
-		tokenPath: tokenPath,
+		tokenPath: config.VaultTokenPath,
 	}
 
 	// Check that we're able to communicate with Vault by doing a test read.
 	client, err := credMgr.vaultClient()
 	if err != nil {
-		return nil, err
+		return &hcVaultCredMgr{}, err
 	}
 	if _, err := client.Logical().Read(mountPath); err != nil {
-		return nil, err
+		return &hcVaultCredMgr{}, err
 	}
 	return credMgr, nil
 }
@@ -61,46 +62,9 @@ func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) 
 		return "", fmt.Errorf("no response body data returned from Vault")
 	}
 
-	// Please see tests for examples of the kind of secret data we'd expect
-	// here.
-	userData := secret.Data[identity.DBUser]
-	userDataMap, ok := userData.(map[string]interface{})
-	if !ok {
-		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
-	}
-
-	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
-	iamArnsRaw, ok := userDataMap["iam_arns"]
-	if !ok {
-		return "", fmt.Errorf("iam_arns not found in %s", userDataMap)
-	}
-	iamArns, ok := iamArnsRaw.([]interface{})
-	if !ok {
-		return "", fmt.Errorf("could not convert %s to array, type is %T", iamArnsRaw, iamArnsRaw)
-	}
-	authorized := false
-	for _, iamArnRaw := range iamArns {
-		iamArn, ok := iamArnRaw.(string)
-		if !ok {
-			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamArnRaw, iamArnRaw)
-		}
-		if iamArn == identity.IAMArn {
-			authorized = true
-			break
-		}
-	}
-	if !authorized {
-		return "", ErrNotAuthorized
-	}
-
-	// Verification passed. OK to return the password.
-	passwordRaw, ok := userDataMap["password"]
-	if !ok {
-		return "", fmt.Errorf("password not found in %s", userDataMap)
-	}
-	password, ok := passwordRaw.(string)
-	if !ok {
-		return "", fmt.Errorf("could not convert %s to string, type is %T", passwordRaw, passwordRaw)
+	password, err := passwordFromSecret(secret.Data, identity)
+	if err != nil {
+		return "", err
 	}
 	return password, nil
 }

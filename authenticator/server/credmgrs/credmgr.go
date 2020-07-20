@@ -2,7 +2,9 @@ package credmgrs
 
 import (
 	"errors"
+	"fmt"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	"github.com/cyralinc/approzium/authenticator/server/metrics"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/metric"
@@ -23,8 +25,8 @@ type DBKey struct {
 
 // RetrieveConfigured checks the environment for configured cred
 // providers, and selects the first working configuration.
-func RetrieveConfigured(logger *log.Logger, vaultTokenPath string) (CredentialManager, error) {
-	credMgr, err := selectCredMgr(logger, vaultTokenPath)
+func RetrieveConfigured(logger *log.Logger, config config.Config) (CredentialManager, error) {
+	credMgr, err := selectCredMgr(logger, config)
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +133,36 @@ func (t *tracker) Password(reqLogger *log.Entry, identity DBKey) (string, error)
 	return password, err
 }
 
-func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager, error) {
-	credMgr, err := newHashiCorpVaultCreds(vaultTokenPath)
+var (
+	options = []string{"vault", "asm", "local"}
+)
+
+func selectCredMgr(logger *log.Logger, c config.Config) (CredentialManager, error) {
+	if c.SecretsManager == "" {
+		return legacySelectCredMgr(logger, c)
+	}
+	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error){
+		"vault": newHashiCorpVaultCreds,
+		"asm":   newAWSSecretManagerCreds,
+		"local": newLocalFileCreds,
+	}
+	credMgrNew, ok := credMgrs[c.SecretsManager]
+	if !ok {
+		msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", c.SecretsManager, options)
+		return nil, fmt.Errorf(msg)
+	}
+	credMgr, err := credMgrNew(logger, c)
+	if err != nil {
+		msg := fmt.Sprintf("could not configure %s as credential manager due to err: %s", credMgr.Name(), err)
+		return nil, errors.New(msg)
+	}
+	logger.Infof("using %s as credentials manager", credMgr.Name())
+	return credMgr, nil
+}
+
+func legacySelectCredMgr(logger *log.Logger, c config.Config) (CredentialManager, error) {
+	// Legacy behaviour: try vault then local file
+	credMgr, err := newHashiCorpVaultCreds(logger, c)
 	if err != nil {
 		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
 	} else {
@@ -140,7 +170,7 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 		return credMgr, nil
 	}
 
-	credMgr, err = newLocalFileCreds(logger)
+	credMgr, err = newLocalFileCreds(logger, c)
 	if err != nil {
 		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
 	} else {
@@ -149,4 +179,52 @@ func selectCredMgr(logger *log.Logger, vaultTokenPath string) (CredentialManager
 		return credMgr, err
 	}
 	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
+}
+
+func passwordFromSecret(secret map[string]interface{}, identity DBKey) (string, error) {
+	// Please see tests for examples of the kind of secret data we'd expect
+	// here.
+	userData, ok := secret[identity.DBUser]
+	if !ok {
+		return "", fmt.Errorf("username %s not found in stored credentials", identity.DBUser)
+	}
+	userDataMap, ok := userData.(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
+	}
+
+	// Verify that the inbound IAM role is one of the IAM roles listed as appropriate.
+	iamArnsRaw, ok := userDataMap["iam_arns"]
+	if !ok {
+		return "", fmt.Errorf("iam_arns not found in %s", userDataMap)
+	}
+	iamArns, ok := iamArnsRaw.([]interface{})
+	if !ok {
+		return "", fmt.Errorf("could not convert %s to array, type is %T", iamArnsRaw, iamArnsRaw)
+	}
+	authorized := false
+	for _, iamArnRaw := range iamArns {
+		iamArn, ok := iamArnRaw.(string)
+		if !ok {
+			return "", fmt.Errorf("couldn't convert %s to a string, type is %T", iamArnRaw, iamArnRaw)
+		}
+		if iamArn == identity.IAMArn {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return "", ErrNotAuthorized
+	}
+
+	// Verification passed. OK to return the password.
+	passwordRaw, ok := userDataMap["password"]
+	if !ok {
+		return "", fmt.Errorf("password not found in %s", userDataMap)
+	}
+	password, ok := passwordRaw.(string)
+	if !ok {
+		return "", fmt.Errorf("could not convert %s to string, type is %T", passwordRaw, passwordRaw)
+	}
+	return password, nil
 }

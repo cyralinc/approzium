@@ -7,7 +7,8 @@ title: Compatibility
 | Python       | Postgres     | psycopg2               | AWS IAM                    | _psycopg2-binary_ is not supported. Use the more recommended _psycopg2_ | ✅                | MD5, SCRAM-SHA256                      |
 | Python       | Postgres     | asyncpg                | AWS IAM                    |                                                                         | ✅                | MD5, SCRAM-SHA256                      |
 | Python       | MySQL        | mysql-connector-python | AWS IAM                    | C-extension based usage is not currently supported.                     | ✅                | SHA-1 (Native password authentication) |
+| Python       | MySQL        | PyMySQL                | AWS IAM                    |                                                                         | N/A               | SHA-1 (Native password authentication) |
 
 ## Secrets Managers
 - Vault
-- AWS Secrets Manager (coming soon!)
+- AWS Secrets Manager
