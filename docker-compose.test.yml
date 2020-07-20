@@ -19,6 +19,7 @@ services:
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
             - AWS_ACCESS_KEY_ID
+            - AWS_REGION
             - AWS_SECRET_ACCESS_KEY
             - TEST_ASSUMABLE_ARN
             - TEST_BASE_ARN
