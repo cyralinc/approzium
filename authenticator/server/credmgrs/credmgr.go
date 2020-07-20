@@ -153,7 +153,7 @@ func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager
 	}
 	credMgr, err := credMgrNew(logger, config_)
 	if err != nil {
-        msg := fmt.Sprintf("could not configure %s as credential manager due to err: %s", credMgr.Name(), err)
+		msg := fmt.Sprintf("could not configure %s as credential manager due to err: %s", credMgr.Name(), err)
 		return nil, errors.New(msg)
 	}
 	logger.Infof("using %s as credentials manager", credMgr.Name())
