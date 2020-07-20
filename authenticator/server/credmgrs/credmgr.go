@@ -137,21 +137,21 @@ var (
 	options = []string{"vault", "asm", "local"}
 )
 
-func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
-	if config_.SecretsManager == "" {
-		return legacySelectCredMgr(logger, config_)
+func selectCredMgr(logger *log.Logger, c config.Config) (CredentialManager, error) {
+	if c.SecretsManager == "" {
+		return legacySelectCredMgr(logger, c)
 	}
 	credMgrs := map[string]func(*log.Logger, config.Config) (CredentialManager, error){
 		"vault": newHashiCorpVaultCreds,
 		"asm":   newAWSSecretManagerCreds,
 		"local": newLocalFileCreds,
 	}
-	credMgrNew, ok := credMgrs[config_.SecretsManager]
+	credMgrNew, ok := credMgrs[c.SecretsManager]
 	if !ok {
-		msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", config_.SecretsManager, options)
+		msg := fmt.Sprintf("Unknown secrets manager option: %s. Valid options are %+q", c.SecretsManager, options)
 		return nil, fmt.Errorf(msg)
 	}
-	credMgr, err := credMgrNew(logger, config_)
+	credMgr, err := credMgrNew(logger, c)
 	if err != nil {
 		msg := fmt.Sprintf("could not configure %s as credential manager due to err: %s", credMgr.Name(), err)
 		return nil, errors.New(msg)
@@ -160,9 +160,9 @@ func selectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager
 	return credMgr, nil
 }
 
-func legacySelectCredMgr(logger *log.Logger, config_ config.Config) (CredentialManager, error) {
+func legacySelectCredMgr(logger *log.Logger, c config.Config) (CredentialManager, error) {
 	// Legacy behaviour: try vault then local file
-	credMgr, err := newHashiCorpVaultCreds(logger, config_)
+	credMgr, err := newHashiCorpVaultCreds(logger, c)
 	if err != nil {
 		logger.Debugf("didn't select HashiCorp Vault as credential manager due to err: %s", err)
 	} else {
@@ -170,7 +170,7 @@ func legacySelectCredMgr(logger *log.Logger, config_ config.Config) (CredentialM
 		return credMgr, nil
 	}
 
-	credMgr, err = newLocalFileCreds(logger, config_)
+	credMgr, err = newLocalFileCreds(logger, c)
 	if err != nil {
 		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
 	} else {
