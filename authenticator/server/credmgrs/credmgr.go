@@ -184,7 +184,10 @@ func legacySelectCredMgr(logger *log.Logger, c config.Config) (CredentialManager
 func passwordFromSecret(secret map[string]interface{}, identity DBKey) (string, error) {
 	// Please see tests for examples of the kind of secret data we'd expect
 	// here.
-	userData := secret[identity.DBUser]
+	userData, ok := secret[identity.DBUser]
+	if !ok {
+		return "", fmt.Errorf("username %s not found in stored credentials", identity.DBUser)
+	}
 	userDataMap, ok := userData.(map[string]interface{})
 	if !ok {
 		return "", fmt.Errorf("couldn't convert %s to a string, type is %T", userData, userData)
