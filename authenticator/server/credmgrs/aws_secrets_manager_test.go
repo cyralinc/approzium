@@ -1,7 +1,10 @@
+// IMPORTANT: for these tests to work:
+// - the environment variable AWS_REGION has to be set. This is necessary for the Go SDK to access AWS Secrets Manager.
 package credmgrs
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+    "github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -35,7 +38,30 @@ func TestAwsSecretsManager(t *testing.T) {
         ]
     }
 }`
-	input := &secretsmanager.PutSecretValueInput{
+    // Check if the test secret is there from prior test runs, if it is, modify it. Otherwise, create a new secret
+    _, err = svc.GetSecretValue(&secretsmanager.GetSecretValueInput{
+        SecretId:     &path,
+    })
+    if err != nil {
+        if aerr, ok := err.(awserr.Error); ok {
+            switch (aerr.Code()) {
+            case secretsmanager.ErrCodeResourceNotFoundException:
+                _, err = svc.CreateSecret(&secretsmanager.CreateSecretInput{
+                    Name: &path,
+                    SecretString: &secretString,
+                })
+                if err != nil {
+                    t.Fatal(err)
+                }
+            default:
+                t.Fatal(err)
+            }
+        } else {
+            t.Fatal(err)
+        }
+    }
+
+    input := &secretsmanager.PutSecretValueInput{
 		SecretId:     &path,
 		SecretString: &secretString,
 	}
