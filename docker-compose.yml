@@ -54,4 +54,8 @@ services:
             - APPROZIUM_HOST=0.0.0.0
             - APPROZIUM_DISABLE_TLS=true
             - APPROZIUM_SECRETS_MANAGER=asm
+            - AWS_ACCESS_KEY_ID
             - AWS_REGION
+            - AWS_SECRET_ACCESS_KEY
+        volumes:
+            - ~/.aws/:/root/.aws/:ro
