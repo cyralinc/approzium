@@ -12,12 +12,14 @@ auth = AuthClient(
 
 
 async def run():
-    conn = await connect(user="bob", database="db", host="host", authenticator=auth)
+    conn = await connect(user="bob", database="db", host="dbmd5", authenticator=auth)
     print("Connection Established!")
     await conn.fetch("""SELECT 1""")
     await conn.close()
 
-    pool = await create_pool(user="bob", database="db", host="host", authenticator=auth)
+    pool = await create_pool(
+        user="bob", database="db", host="dbmd5", authenticator=auth
+    )
     print("Connection Established!")
     async with pool.acquire() as conn:
         await conn.fetch("""SELECT 1""")
