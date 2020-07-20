@@ -19,7 +19,7 @@ func newAWSSecretManagerCreds(_ *log.Logger, _ config.Config) (CredentialManager
 	// Create an AWS Secrets Manager client
 	svc := secretsmanager.New(sess, aws.NewConfig())
 	if svc == nil {
-		return &awsSecretsManagerCredMgr{}, fmt.Errorf("Cannot instantiate AWS Secrets Manager Client")
+		return &awsSecretsManagerCredMgr{}, fmt.Errorf("cannot instantiate AWS Secrets Manager Client")
 	}
 	credMgr := &awsSecretsManagerCredMgr{
 		svc,
