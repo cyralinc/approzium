@@ -7,11 +7,11 @@ The last stable release is available on PyPI and can be installed with ``pip``::
 
 This installs only the approzium SDK. If you would like to additionally install all supported database drivers libraries, run::
 
-    $ pip3 install approzium[sqllibs]
+    $ pip3 install 'approzium[sqllibs]'
 
 To install Opentelemetry and other dependencies for generating tracing::
 
-    $ pip3 install approzium[tracing]
+    $ pip3 install 'approzium[tracing]'
 
 Requirements
 ------------
