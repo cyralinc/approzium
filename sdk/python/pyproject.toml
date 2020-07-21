@@ -15,11 +15,11 @@ python = "^3.5"
 boto3 = "^1.14.10"
 grpcio = "^1.30.0"
 grpcio-tools = "^1.30.0"
+ec2-metadata = "^2.2.0"
 asyncpg = { version = "^0.20.1", optional = true}
 mysql-connector-python = { version = "^8.0.20", optional = true}
 opentelemetry-ext-psycopg2 = { version = "^0.10b0", optional = true}
 opentelemetry-ext-jaeger = {version = "^0.10b0", optional = true}
-ec2-metadata = { version = "^2.2.0", optional = true}
 psycopg2 = { version = "^2.8.5", optional = true}
 pymysql = {version = "^0.9.3", optional = true}
 
@@ -30,7 +30,7 @@ pytest-asyncio = "^0.14.0"
 
 [tool.poetry.extras]
 sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python", "pymysql"]
-tracing = ["opentelemetry-ext-psycopg2", "opentelemetry-ext-jaeger", "ec2-metadata"]
+tracing = ["opentelemetry-ext-psycopg2", "opentelemetry-ext-jaeger"]
 
 [tool.black]
 target-version = ['py37']
