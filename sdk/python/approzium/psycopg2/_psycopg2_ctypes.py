@@ -75,6 +75,7 @@ def setup_ssl():
     # if none is found, use the SSL library that the system's dynamic linker finds
     if not sslpath:
         sslpath = find_library("ssl")
+    global libssl
     global libssl_SSL_read
     global libssl_SSL_write
     libssl = cdll.LoadLibrary(sslpath)

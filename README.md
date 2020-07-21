@@ -1,7 +1,7 @@
 # approzium
 
-![test](https://github.com/approzium/approzium/workflows/test/badge.svg)
-![lint](https://github.com/approzium/approzium/workflows/lint/badge.svg)
+![test](https://github.com/cyralinc/approzium/workflows/test/badge.svg)
+![lint](https://github.com/cyralinc/approzium/workflows/lint/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://approzium.readthedocs.io/?badge=latest)
 
 Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
@@ -11,6 +11,8 @@ identity is provided through the platform on which you're running.
 
 **Please note**: We take Approzium's security and our users' trust very seriously. If you believe you have found a security issue in Approzium, _please responsibly disclose_ by contacting us at [security@cyral.com](mailto:security@cyral.com).
 
+See the [SECURITY](.github/SECURITY.md) guide for more details.
+
 ----
 
 We currently support AWS for identity, and have a Python SDK for Postgres drivers. This project is under active development, please
@@ -18,7 +20,7 @@ do stay tuned for more identity platforms, databases, and SDK languages.
 
 ## Docs
 
-See https://approzium.org/ for a Quick Start, or elaboration on the architecture and API.
+See https://approzium.com/ for a Quick Start, or elaboration on the architecture and API.
 
 ## Support
 

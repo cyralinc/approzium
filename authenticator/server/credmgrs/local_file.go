@@ -3,16 +3,18 @@ package credmgrs
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
 	"strings"
 
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
-const secretsFileLocation = "testing/secrets.yaml"
+const secretsFileLocation = "/authenticator/server/testing/secrets.yaml"
 
 // newLocalFileCreds is for dev purposes: read credentials from a local file.
-func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
+func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, error) {
 	creds := make(map[DBKey]string)
 	type secrets []struct {
 		Dbhost   string `yaml:"dbhost"`
@@ -21,13 +23,23 @@ func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
 		Password string `yaml:"password"`
 		IamArn   string `yaml:"iam_arn"`
 	}
+
+	// To make sure we can find the secrets file, get the absolute path to
+	// the file that called this method. This will always be something like
+	// /Users/yourname/go/src/github.com/approzium/approzium/authenticator/server/credmgrs/credmgr.go
+	_, filename, _, _ := runtime.Caller(1)
+
+	homeDirPath := strings.TrimSuffix(filename, "/authenticator/server/credmgrs/credmgr.go")
+	pathToSecrets := homeDirPath + secretsFileLocation
+	logger.Infof("loading secrets at %q", pathToSecrets)
+
 	var devCreds secrets
-	yamlFile, err := ioutil.ReadFile(secretsFileLocation)
+	yamlFile, err := ioutil.ReadFile(pathToSecrets)
 	if err != nil {
-		return nil, err
+		return &localFileCredMgr{}, err
 	}
 	if err = yaml.Unmarshal(yamlFile, &devCreds); err != nil {
-		return nil, err
+		return &localFileCredMgr{}, err
 	}
 	for _, cred := range devCreds {
 		key := DBKey{
@@ -39,6 +51,8 @@ func newLocalFileCreds(logger *log.Logger) (CredentialManager, error) {
 		creds[key] = cred.Password
 		logger.Debugf("added dev credential for host %s", cred.Dbhost)
 	}
+	logger.Info("secrets loaded, please restart authenticator to load edits")
+	logger.Warn("local file credential manager should not be used in production")
 	return &localFileCredMgr{creds: creds}, nil
 }
 

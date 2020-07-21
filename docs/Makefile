@@ -1,13 +1,10 @@
 website-dev:
 	yarn install
-	gatsby clean
-	gatsby develop
+	yarn start
 
 website-build:
 	yarn install
-	gatsby clean
-	gatsby build
-	gatsby serve
+	yarn build
 
 # this target is meant to run only in the Netlify docs environment
 # since we cannot use `sudo` there, we cannot `sudo apt-get install libpq-dev`,

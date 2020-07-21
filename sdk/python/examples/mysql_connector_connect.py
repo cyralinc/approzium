@@ -1,8 +1,12 @@
-import approzium
+from approzium import AuthClient
 from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
-auth = approzium.AuthClient("authenticator:6001")
+auth = AuthClient(
+    "authenticator:6001",
+    # This is insecure, see https://approzium.org/configuration for proper use.
+    disable_tls=True,
+)
 conn = connect(user="bob", authenticator=auth, host="dbmysql", use_pure=True)
 print("Connection Established")
 
@@ -12,7 +16,12 @@ result = next(cur)
 print(result)
 
 cnxpool = MySQLConnectionPool(
-    pool_name="mypool", pool_size=3, user="bob", host="dbmysql", authenticator=auth
+    pool_name="mypool",
+    pool_size=3,
+    user="bob",
+    host="dbmysqlsha1",
+    authenticator=auth,
+    use_pure=True,
 )
 print("Connection Pool Established")
 conn = cnxpool.get_connection()

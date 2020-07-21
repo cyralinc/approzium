@@ -1,21 +1,24 @@
 # Approzium Docs
-This is the code for [approzium.org](https://approzium.org) which documents the [Approzium](https://github.com/approzium/approzium) project.
+This is the code for [approzium.org](https://approzium.org) which documents the [Approzium](https://github.com/cyralinc/approzium) project.
 
+### Installation
 
-## Development
-
-Clone this repo
-```sh
-git clone https://github.com/approzium/approzium-docs
-cd approzium-docs
+```
+$ yarn
 ```
 
-Run the site in development mode (hot-reloading)
+### Local Development
+
 ```
-make website-dev
+$ yarn start
 ```
 
-Build and serve a deployment version of the site
+This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+
+### Build
+
 ```
-make website-build
+$ yarn build
 ```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.

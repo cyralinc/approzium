@@ -1,0 +1,73 @@
+---
+title: Quickstart
+---
+
+This guide will show you how to:
+- Deploy the Authenticator.
+- Store database credentials in Vault to be retrieved by the Authenticator.
+- Connect to a Postgres database through the Approzium Python SDK.
+
+## Deploying the Authenticator
+Get the Authenticator binary [here](https://github.com/approzium/approzium/tree/develop/authenticator), then run it with
+the environment variables `VAULT_ADDR` and `VAULT_TOKEN` set. These are example values, in real life we'd expect Vault to
+be run elsewhere.
+```shell
+export VAULT_ADDR=http://localhost:8200
+export VAULT_TOKEN=root
+./authenticator
+```
+
+For availability, we recommend running the Authenticator in a long-running environment (such as an EC2 instance) rather
+than in a short-lived environment (like in AWS Lambda).
+
+### Storing Credentials in Vault
+The Authenticator expects credentials for a single database user as a secret stored against the database user as the key.
+The secret contains the database password and a set of IAM roles allowed to access the credentials in the following structure.
+```shell
+cat dbuser1-creds.json
+{
+    "dbuser1": {
+        "password": "asdfghjkl",
+        "iam_arns": [
+            "arn:aws:iam::accountid:role/rolename1",
+            "arn:aws:iam::accountid:role/rolename2"
+        ]
+    }
+}
+```
+
+For database access to be granted to a caller, the caller's exact `iam_arn` must be listed, _unless_ the caller has assumed a role.
+For assumed roles, either the role ARN or the assumed role ARN may be used to grant access.
+
+Enable Vault KV Version 1 (see [Vault documentation](https://www.vaultproject.io/docs/secrets/kv/kv-v1) for more information).
+```shell
+vault secrets enable -path=approzium -version=1 kv
+```
+
+Put the secret at path `approzium/<DATABASE_HOST:DATABASE_PORT>` with your database user as the key.
+```shell
+vault write approzium/1.2.3.4:5432 @dbuser1-creds.json
+```
+
+## SDK Usage
+Install the SDK in your client.
+```shell
+pip3 install approzium
+```
+
+Connect to your database as follows. (Note: TLS should **not** be disabled in production environments,
+see [our Python guide](https://approzium.readthedocs.io/en/latest/api.html#approzium.AuthClient) for how to configure them.)
+```python
+from approzium import AuthClient
+from approzium.psycopg2 import connect
+
+# create an Authenticator client
+auth = AuthClient('authenticator:6001', disable_tls=True)
+
+# connect using Approzium's connect method without providing a password
+conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydbhost", authenticator=auth)
+
+# use the connection as you typically would. very cool!
+cur = conn.cursor()
+cur.execute('SELECT 1')
+```

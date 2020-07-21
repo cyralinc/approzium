@@ -1,3 +1,5 @@
+.DS_Store
+
 # Sphinx built documentation
 sdk/python/docs/build/
 # Automatically built documentation is below to the path below before serving.
@@ -208,3 +210,8 @@ vendor/
 
 # Test resources
 .srl
+
+# Binaries
+
+authenticator/bin
+authenticator/pkg
