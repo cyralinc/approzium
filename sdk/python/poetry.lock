@@ -369,8 +369,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [extras]
-sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python", "pymysql"]
-tracing = ["opentelemetry-ext-psycopg2", "opentelemetry-ext-jaeger"]
+sqllibs = ["psycopg2", "asyncpg", "mysql-connector-python"]
 
 [metadata]
 content-hash = "a974e5237c7d2569075d0bc09e083449a87aa62398c81fae9f263978a77bd0b7"
