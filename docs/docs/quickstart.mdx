@@ -8,13 +8,17 @@ This guide will show you how to:
 - Connect to a Postgres database through the Approzium Python SDK.
 
 ## Deploying the Authenticator
-Get the Authenticator binary [here](https://github.com/approzium/approzium/tree/develop/authenticator), then run it with
-the environment variables `VAULT_ADDR` and `VAULT_TOKEN` set. These are example values, in real life we'd expect Vault to
-be run elsewhere.
-```shell
+
+- Head to [our latest release](https://github.com/cyralinc/approzium/releases/latest)
+- Choose the appropriate binary for your operating system, and run it with a set of commands like:
+
+```
+curl -LO https://github.com/cyralinc/approzium/releases/download/v0.1.1/darwin_amd64.zip
+unzip darwin_amd64.zip
+
 export VAULT_ADDR=http://localhost:8200
 export VAULT_TOKEN=root
-./authenticator
+./authenticator --disabletls
 ```
 
 For availability, we recommend running the Authenticator in a long-running environment (such as an EC2 instance) rather
