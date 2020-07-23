@@ -146,6 +146,10 @@ func setConfigEnvVars() error {
 		return err
 	}
 
+	if err := viper.BindEnv("VaultTokenPath", "APPROZIUM_VAULT_TOKEN_PATH"); err != nil {
+		return err
+	}
+
 	if err := viper.BindEnv("VaultToken", "VAULT_TOKEN"); err != nil {
 		return err
 	}
