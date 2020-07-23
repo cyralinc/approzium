@@ -2,12 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"reflect"
-    "fmt"
-    "net"
 	"strings"
 	"testing"
 	"time"
@@ -399,14 +399,14 @@ func TestMetrics(t *testing.T) {
 	// Start the API, which includes an endpoint for Prometheus to mine metrics.
 	config := config.Config{
 		Host:       "127.0.0.1",
-		Port:   6000,
+		Port:       6000,
 		DisableTLS: true,
 	}
-    serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.Port)
-    lis, err := net.Listen("tcp", serviceAddress)
-    if err != nil {
-        t.Fatal(err)
-    }
+	serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.Port)
+	lis, err := net.Listen("tcp", serviceAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_ = api.Start(testtools.TestLogger(), lis, config)
 
 	// Make some calls to increment the metrics.
