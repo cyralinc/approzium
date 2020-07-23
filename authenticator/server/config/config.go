@@ -33,13 +33,13 @@ type Config struct {
 	devMode bool
 	Version bool
 
-    // Vault specific flags
-    VaultToken string
+	// Vault specific flags
+	VaultToken     string
 	VaultTokenPath string
-    VaultAddr  string
+	VaultAddr      string
 
-    // AWS Secrets Manager specific flags
-    AwsRegion string
+	// AWS Secrets Manager specific flags
+	AwsRegion string
 }
 
 // Parse returns the parsed config. A pointer is not returned

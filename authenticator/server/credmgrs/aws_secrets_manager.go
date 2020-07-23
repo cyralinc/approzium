@@ -12,9 +12,9 @@ import (
 )
 
 func newAWSSecretManagerCreds(_ *log.Logger, c config.Config) (CredentialManager, error) {
-    if c.AwsRegion == "" {
-        return &awsSecretsManagerCredMgr{}, fmt.Errorf("AWS region not set")
-    }
+	if c.AwsRegion == "" {
+		return &awsSecretsManagerCredMgr{}, fmt.Errorf("AWS region not set")
+	}
 	sess, err := session.NewSession()
 	if err != nil {
 		return &awsSecretsManagerCredMgr{}, err

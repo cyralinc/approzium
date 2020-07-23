@@ -17,13 +17,13 @@ import (
 const mountPath = "approzium"
 
 func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialManager, error) {
-    if config.VaultAddr  == "" {
+	if config.VaultAddr == "" {
 		return &hcVaultCredMgr{}, errors.New("no vault address detected")
-    }
+	}
 	credMgr := &hcVaultCredMgr{
-        token: config.VaultToken,
+		token:     config.VaultToken,
 		tokenPath: config.VaultTokenPath,
-        addr: config.VaultAddr,
+		addr:      config.VaultAddr,
 	}
 
 	// Check that we're able to communicate with Vault by doing a test read.
@@ -38,9 +38,9 @@ func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialMana
 }
 
 type hcVaultCredMgr struct {
-    token string
+	token     string
 	tokenPath string
-    addr string
+	addr      string
 }
 
 func (h *hcVaultCredMgr) Name() string {
@@ -81,17 +81,17 @@ func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
 		if err != nil {
 			return nil, err
 		}
-        h.token = string(tokenBytes)
+		h.token = string(tokenBytes)
 	}
 
 	// This uses a default configuration for Vault. This includes reading
 	// Vault's environment variables and setting them as a configuration.
-    config := vault.DefaultConfig()
-    client, err := vault.NewClient(config)
-    if err != nil {
-        return nil, err
-    }
-    client.SetAddress(h.addr)
-    client.SetToken(h.token)
+	config := vault.DefaultConfig()
+	client, err := vault.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+	client.SetAddress(h.addr)
+	client.SetToken(h.token)
 	return client, err
 }
