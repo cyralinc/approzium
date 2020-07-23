@@ -75,9 +75,9 @@ func Start(logger *log.Logger, config config.Config) error {
 	if err := startGrpc(logger, grpcListener, config, svr); err != nil {
 		return err
 	}
-    go func() {
-        m.Serve()
-    }()
+	go func() {
+		m.Serve()
+	}()
 	return nil
 }
 
