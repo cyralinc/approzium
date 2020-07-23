@@ -3,7 +3,7 @@ from approzium.mysql.connector import connect
 from approzium.mysql.connector.pooling import MySQLConnectionPool
 
 auth = AuthClient(
-    "authenticator:6001",
+    "authenticator:6000",
     # This is insecure, see https://approzium.org/configuration for proper use.
     disable_tls=True,
 )

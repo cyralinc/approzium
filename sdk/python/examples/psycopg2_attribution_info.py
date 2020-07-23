@@ -5,9 +5,9 @@ database driver.
 import approzium
 from approzium.psycopg2 import connect
 
-auth = approzium.AuthClient("authenticator:6001")
+auth = approzium.AuthClient("authenticator:6000")
 print(auth.attribution_info)
-# {'authenticator_address': 'authenticator:6001',
+# {'authenticator_address': 'authenticator:6000',
 #  'iam_arn': 'arn:aws:iam::*******:user/****',
 # 'authenticated': False,
 # 'num_connections': 0
@@ -17,7 +17,7 @@ approzium.default_auth_client = auth
 dsn = "host=dbmd5 dbname=db user=bob"
 conn = connect(dsn)
 print(auth.attribution_info)
-# {'authenticator_address': 'authenticator:6001',
+# {'authenticator_address': 'authenticator:6000',
 #  'iam_arn': 'arn:aws:iam::*******:user/****',
 # 'authenticated': True,
 # 'num_connections': 1

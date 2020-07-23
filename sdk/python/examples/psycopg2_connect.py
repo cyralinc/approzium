@@ -4,7 +4,7 @@ from approzium.psycopg2 import connect
 from approzium.psycopg2.pool import ThreadedConnectionPool
 
 auth = AuthClient(
-    "authenticator:6001",
+    "authenticator:6000",
     # This is insecure, see https://approzium.org/configuration for proper use.
     disable_tls=True,
 )
