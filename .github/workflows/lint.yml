@@ -12,6 +12,11 @@ jobs:
       - name: gofmt
         run: gofmt -s -w .
 
+      - name: gosec
+        uses: securego/gosec@master
+        withs:
+            args: ./...
+
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
