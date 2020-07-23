@@ -19,10 +19,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+    "net"
 	"io"
-	"net"
 	"strings"
+	"strconv"
 
+    "github.com/soheilhy/cmux"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/cyralinc/approzium/authenticator/server/api"
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -53,14 +55,24 @@ var maxIterations = uint32(15000 * 10)
 // an error is returned from either, terminating the application. Both servers
 // respond to CTRL+C shutdowns.
 func Start(logger *log.Logger, config config.Config) error {
-	if err := api.Start(logger, config); err != nil {
+	serviceAddress := config.Host + ":" + strconv.Itoa(config.Port)
+    l, err := net.Listen("tcp", serviceAddress)
+    if err != nil {
+        return err
+    }
+
+    m := cmux.New(l)
+    grpcListener := m.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+    // All the rest is assumed to be HTTP
+    httpListener := m.Match(cmux.Any())
+	if err := api.Start(logger, httpListener, config); err != nil {
 		return err
 	}
 	svr, err := buildServer(logger, config)
 	if err != nil {
 		return err
 	}
-	if err := startGrpc(logger, config, svr); err != nil {
+	if err := startGrpc(logger, grpcListener, config, svr); err != nil {
 		return err
 	}
 	return nil
@@ -84,28 +96,22 @@ func buildServer(logger *log.Logger, config config.Config) (pb.AuthenticatorServ
 	return svr, nil
 }
 
-func startGrpc(logger *log.Logger, config config.Config, authenticatorServer pb.AuthenticatorServer) error {
-	serviceAddress := fmt.Sprintf("%s:%d", config.Host, config.GRPCPort)
-	lis, err := net.Listen("tcp", serviceAddress)
-	if err != nil {
-		return err
-	}
-
+func startGrpc(logger *log.Logger, listener net.Listener, config config.Config, authenticatorServer pb.AuthenticatorServer) error {
 	var grpcServer *grpc.Server
 	if config.DisableTLS {
 		grpcServer = grpc.NewServer()
-		logger.Infof("grpc starting on http://%s", serviceAddress)
+		logger.Infof("grpc starting without TLS")
 	} else {
 		creds, err := credentials.NewServerTLSFromFile(config.PathToTLSCert, config.PathToTLSKey)
 		if err != nil {
 			return err
 		}
 		grpcServer = grpc.NewServer(grpc.Creds(creds))
-		logger.Infof("grpc starting on https://%s", serviceAddress)
+		logger.Infof("grpc starting with TLS")
 	}
 	pb.RegisterAuthenticatorServer(grpcServer, authenticatorServer)
 	go func() {
-		logger.Fatal(grpcServer.Serve(lis))
+		logger.Fatal(grpcServer.Serve(listener))
 	}()
 	return nil
 }

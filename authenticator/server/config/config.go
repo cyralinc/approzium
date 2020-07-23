@@ -15,8 +15,7 @@ import (
 // each parameter.
 type Config struct {
 	Host     string
-	HTTPPort int
-	GRPCPort int
+	Port int
 
 	DisableTLS    bool
 	PathToTLSCert string
@@ -51,8 +50,7 @@ func Parse() (Config, error) {
 		os.Unsetenv("VAULT_ADDR")
 		config = Config{
 			Host:       "127.0.0.1",
-			HTTPPort:   6000,
-			GRPCPort:   6001,
+			Port:       6000,
 			DisableTLS: true,
 			LogLevel:   "debug",
 			LogFormat:  "text",
@@ -106,10 +104,7 @@ func setConfigEnvVars() error {
 	if err := viper.BindEnv("Host", "APPROZIUM_HOST"); err != nil {
 		return err
 	}
-	if err := viper.BindEnv("HTTPPort", "APPROZIUM_HTTP_PORT"); err != nil {
-		return err
-	}
-	if err := viper.BindEnv("GRPCPort", "APPROZIUM_GRPC_PORT"); err != nil {
+	if err := viper.BindEnv("Port", "APPROZIUM_PORT"); err != nil {
 		return err
 	}
 
@@ -147,8 +142,7 @@ func setConfigEnvVars() error {
 
 func setConfigDefaults() {
 	viper.SetDefault("Host", "127.0.0.1")
-	viper.SetDefault("HTTPPort", "6000")
-	viper.SetDefault("GRPCPort", "6001")
+	viper.SetDefault("Port", "6000")
 
 	viper.SetDefault("DisableTLS", false)
 
@@ -162,8 +156,7 @@ func setConfigFlags() {
 	// avoid redefining flags because it leads to panic
 	if pflag.Lookup("host") == nil {
 		pflag.String("host", "", "")
-		pflag.String("httpport", "", "")
-		pflag.String("grpcport", "", "")
+		pflag.String("port", "", "")
 
 		pflag.Bool("disabletls", false, "")
 		pflag.String("tlscertpath", "", "")

@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/sirupsen/logrus v1.6.0
+	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
 	go.opencensus.io v0.22.4

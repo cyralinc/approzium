@@ -2,10 +2,9 @@ package api
 
 import (
 	"crypto/tls"
-	"fmt"
 	"io/ioutil"
+    "net"
 	"net/http"
-	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/prometheus"
@@ -13,26 +12,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Start(logger *log.Logger, config config.Config) error {
+func Start(logger *log.Logger, listener net.Listener, config config.Config) error {
 
 	if err := loadEndpoints(logger, config); err != nil {
 		return err
 	}
 
-	serviceAddress := config.Host + ":" + strconv.Itoa(config.HTTPPort)
 	server := &http.Server{
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
 	if config.DisableTLS {
-		server.Addr = serviceAddress
 		go func() {
-			logger.Fatal(server.ListenAndServe())
+			logger.Fatal(server.Serve(listener))
 		}()
-		logger.Infof("api starting on http://%s", serviceAddress)
+		logger.Infof("api server starting without TLS")
 	} else {
-		server.Addr = fmt.Sprintf(":%d", config.HTTPPort)
 		crt, err := ioutil.ReadFile(config.PathToTLSCert)
 		if err != nil {
 			return err
@@ -51,9 +47,9 @@ func Start(logger *log.Logger, config config.Config) error {
 		}
 
 		go func() {
-			logger.Fatal(server.ListenAndServeTLS("", ""))
+			logger.Fatal(server.ServeTLS(listener, "", ""))
 		}()
-		logger.Infof("api starting on https://%s", serviceAddress)
+		logger.Infof("api server starting with TLS")
 	}
 	return nil
 }
