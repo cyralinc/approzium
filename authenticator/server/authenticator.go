@@ -192,6 +192,9 @@ func (a *authenticator) getPassword(reqLogger *log.Entry, req *pb.PasswordReques
 	return password, nil
 }
 
+// Even though MD5 is cryptographically insecure, it is the default authentication
+// method used by Postgres, and so we made the decision to support it. However, we
+// recommend using the more secure SCRAM-SHA256 authentication when possible.
 func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
