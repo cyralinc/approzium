@@ -19,12 +19,11 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-    "net"
 	"io"
-	"strings"
+	"net"
 	"strconv"
+	"strings"
 
-    "github.com/soheilhy/cmux"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/cyralinc/approzium/authenticator/server/api"
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -32,6 +31,7 @@ import (
 	"github.com/cyralinc/approzium/authenticator/server/identity"
 	pb "github.com/cyralinc/approzium/authenticator/server/protos"
 	log "github.com/sirupsen/logrus"
+	"github.com/soheilhy/cmux"
 	"golang.org/x/crypto/pbkdf2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -56,15 +56,15 @@ var maxIterations = uint32(15000 * 10)
 // respond to CTRL+C shutdowns.
 func Start(logger *log.Logger, config config.Config) error {
 	serviceAddress := config.Host + ":" + strconv.Itoa(config.Port)
-    l, err := net.Listen("tcp", serviceAddress)
-    if err != nil {
-        return err
-    }
+	l, err := net.Listen("tcp", serviceAddress)
+	if err != nil {
+		return err
+	}
 
-    m := cmux.New(l)
-    grpcListener := m.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
-    // All the rest is assumed to be HTTP
-    httpListener := m.Match(cmux.Any())
+	m := cmux.New(l)
+	grpcListener := m.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+	// All the rest is assumed to be HTTP
+	httpListener := m.Match(cmux.Any())
 	if err := api.Start(logger, httpListener, config); err != nil {
 		return err
 	}
