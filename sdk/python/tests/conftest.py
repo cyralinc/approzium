@@ -16,7 +16,7 @@ def determine_authclients():
     pytest.authclients = []
     for host in authenticatorhosts:
         base_aws_auth = approzium.AuthClient(
-            "%s:6001" % host,
+            "%s:6000" % host,
             tls_config=approzium.TLSConfig(
                 trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
                 client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
@@ -28,7 +28,7 @@ def determine_authclients():
     if environ.get("TEST_ASSUMABLE_ARN"):
         for host in authenticatorhosts:
             role_aws_auth = approzium.AuthClient(
-                "%s:6001" % host,
+                "%s:6000" % host,
                 tls_config=approzium.TLSConfig(
                     trusted_certs=environ.get("TEST_CERT_DIR") + "/approzium.pem",
                     client_cert=environ.get("TEST_CERT_DIR") + "/client.pem",
