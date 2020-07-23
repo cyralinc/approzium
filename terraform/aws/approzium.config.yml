@@ -7,7 +7,7 @@
 # logformat: text
 # lograw: false
 # secretsmanager: local
-# for example, if using Vault, use:
+# or .. if using Vault, use:
 # secretsmanager: vault
-# vaulttokenpath: ...
-# set environment variable: VAULT_ADDR and/or VALT_TOKEN
+# vaulttoken: ...
+# vaultaddr: ...
