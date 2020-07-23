@@ -10,7 +10,7 @@ import (
 func TestHealthChecker(t *testing.T) {
 	checker := newHealthChecker(testtools.TestLogger(), config.Config{
 		Host:     "127.0.0.1",
-		GRPCPort: 6001,
+		Port: 6001,
 	})
 	testWriter := &testtools.TestResponseWriter{}
 	checker.ServeHTTP(testWriter, nil)
