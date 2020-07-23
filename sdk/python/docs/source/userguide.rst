@@ -30,7 +30,7 @@ The following database driver libraries are supported:
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | Database   | Driver             | Authentication Methods                                   | Notes                                                       |
       +============+====================+==========================================================+=============================================================+
-      | Postgres   | Psycopg2_          | MD5 (Postgres default) and SCRAM-SHA-256 authentication  |                                                             |
+      | Postgres   | Psycopg2_          | MD5* (Postgres default) and SCRAM-SHA-256 authentication |                                                             |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | Postgres   | Asyncpg_           | Same as above                                            |                                                             |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
@@ -39,11 +39,18 @@ The following database driver libraries are supported:
       | MySQL      | PyMySQL_           | Same as above                                            |                                                             |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
 
+.. warning::
+
+    Even though MD5 is cryptographically insecure, it is the default authentication method
+    used by Postgres, and so we made the decision to support it. However, we recommend using
+    the more secure SCRAM-SHA256_ authentication when possible.
+
 .. _Psycopg2: https://github.com/psycopg/psycopg2
 .. _Asyncpg: https://github.com/MagicStack/asyncpg
 .. _MySQL Connector: https://dev.mysql.com/doc/connector-python/en/
 .. _PyMySQL: https://github.com/PyMySQL/PyMySQL
 .. _Native password authentication: https://dev.mysql.com/doc/refman/8.0/en/native-pluggable-authentication.html
+.. _SCRAM-SHA256: https://www.postgresql.org/docs/10/sasl-authentication.html
 
 
 Usage
