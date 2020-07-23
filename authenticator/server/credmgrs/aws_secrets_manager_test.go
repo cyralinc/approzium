@@ -3,6 +3,7 @@
 package credmgrs
 
 import (
+    "os"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -70,7 +71,9 @@ func TestAwsSecretsManager(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	credMgr, err := newAWSSecretManagerCreds(nil, config.Config{})
+	credMgr, err := newAWSSecretManagerCreds(nil, config.Config{
+        AwsRegion: os.Getenv("AWS_REGION"),
+    })
 	if err != nil {
 		t.Fatal(err)
 	}
