@@ -9,7 +9,7 @@ import (
 
 func TestHealthChecker(t *testing.T) {
 	checker := newHealthChecker(testtools.TestLogger(), config.Config{
-		Host:     "127.0.0.1",
+		Host: "127.0.0.1",
 		Port: 6001,
 	})
 	testWriter := &testtools.TestResponseWriter{}
