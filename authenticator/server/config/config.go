@@ -27,13 +27,19 @@ type Config struct {
 	LogRaw    bool
 
 	SecretsManager string
-
-	VaultTokenPath string
 	ConfigFilePath string
 
 	// Special flags
 	devMode bool
 	Version bool
+
+    // Vault specific flags
+    VaultToken string
+	VaultTokenPath string
+    VaultAddr  string
+
+    // AWS Secrets Manager specific flags
+    AwsRegion string
 }
 
 // Parse returns the parsed config. A pointer is not returned
@@ -136,10 +142,19 @@ func setConfigEnvVars() error {
 		return err
 	}
 
-	if err := viper.BindEnv("VaultTokenPath", "APPROZIUM_VAULT_TOKEN_PATH"); err != nil {
+	if err := viper.BindEnv("ConfigFilePath", "APPROZIUM_CONFIG_FILE_PATH"); err != nil {
 		return err
 	}
-	if err := viper.BindEnv("ConfigFilePath", "APPROZIUM_CONFIG_FILE_PATH"); err != nil {
+
+	if err := viper.BindEnv("VaultToken", "VAULT_TOKEN"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("VaultAddr", "VAULT_ADDR"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("AwsRegion", "AWS_REGION"); err != nil {
 		return err
 	}
 	return nil
@@ -174,12 +189,16 @@ func setConfigFlags() {
 		pflag.Bool("lograw", false, "")
 
 		pflag.String("secretsmanager", "", "")
-
-		pflag.String("vaulttokenpath", "", "")
 		pflag.String("config", "", "")
 
 		pflag.Bool("dev", false, "whether to run the authenticator in dev mode")
 		pflag.Bool("version", false, "output the current authenticator version")
+
+		pflag.String("vaulttokenpath", "", "")
+		pflag.String("vaulttoken", "", "")
+		pflag.String("vaultaddr", "", "")
+
+		pflag.String("awsregion", "", "")
 	}
 
 	pflag.Parse()
