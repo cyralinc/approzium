@@ -1,0 +1,13 @@
+# This config file will be used by the deployed Approzium authenticator.
+# Remember to uncomment variables and change them to suit your setup.
+# host: 127.0.0.0
+# httpport: 6000
+# grpcport: 6001
+# loglevel: info
+# logformat: text
+# lograw: false
+# secretsmanager: local
+# for example, if using Vault, use:
+# secretsmanager: vault
+# vaulttokenpath: ...
+# set environment variable: VAULT_ADDR and/or VALT_TOKEN
