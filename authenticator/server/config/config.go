@@ -14,7 +14,7 @@ import (
 // Please see https://approzium.org/configuration for elaboration upon
 // each parameter.
 type Config struct {
-	Host     string
+	Host string
 	Port int
 
 	DisableTLS    bool
