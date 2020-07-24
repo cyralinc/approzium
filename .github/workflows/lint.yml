@@ -16,6 +16,8 @@ jobs:
         uses: securego/gosec@master
         with:
             args: ./...
+        env:
+            GO111MODULE: on
 
       - name: Setup Python
         uses: actions/setup-python@v1
