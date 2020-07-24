@@ -82,7 +82,10 @@ func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
 		}
 		// There is no way to directly pass in the token, so we
 		// must set it in the environment.
-		os.Setenv(vault.EnvVaultToken, string(tokenBytes))
+		err = os.Setenv(vault.EnvVaultToken, string(tokenBytes))
+		if err != nil {
+			return nil, err
+		}
 		defer os.Unsetenv(vault.EnvVaultToken)
 	}
 
