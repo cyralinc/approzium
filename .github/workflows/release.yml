@@ -42,8 +42,10 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: approzium/authenticator
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: test
+          password: test
+#         username: ${{ secrets.DOCKER_USERNAME }}
+#         password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "latest,${{ env.RELEASE_VERSION }}"
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
