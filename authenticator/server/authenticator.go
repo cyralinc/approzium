@@ -13,8 +13,8 @@ a stateful, clustered design. Thanks!
 import (
 	"context"
 	"crypto/hmac"
-	"crypto/md5"
-	"crypto/sha1"
+	"crypto/md5" // #nosec
+	"crypto/sha1" // #nosec
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -308,7 +308,7 @@ func toDatabaseARN(logger *log.Entry, fullIAMArn string) (string, error) {
 }
 
 func computeMD5(s string, salt []byte) (string, error) {
-	hasher := md5.New()
+	hasher := md5.New() // #nosec
 	if _, err := io.WriteString(hasher, s); err != nil {
 		return "", err
 	}
@@ -380,15 +380,15 @@ func computePGSHA256Sproof(spassword []byte, authMsg string) string {
 }
 
 func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
-	hasher := sha1.New()
+	hasher := sha1.New() // #nosec
 	if _, err := io.WriteString(hasher, password); err != nil {
 		return nil, err
 	}
 	firstHash := hasher.Sum(nil)
-	hasher = sha1.New()
+	hasher = sha1.New() // #nosec
 	hasher.Write(firstHash)
 	secondHash := hasher.Sum(nil)
-	hasher = sha1.New()
+	hasher = sha1.New() // #nosec
 	hasher.Write(salt)
 	hasher.Write(secondHash)
 	thirdHash := hasher.Sum(nil)
