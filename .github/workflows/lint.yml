@@ -15,7 +15,7 @@ jobs:
         run: gofmt -s -w .
       
       - name: DEBUG
-        run: echo $GO111MODULE
+        run: go version
 
       - name: gosec
         run: |
