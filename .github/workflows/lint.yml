@@ -13,6 +13,9 @@ jobs:
 
       - name: gofmt
         run: gofmt -s -w .
+      
+      - name: DEBUG
+        run: echo $GO111MODULE
 
       - name: gosec
         uses: securego/gosec@master
