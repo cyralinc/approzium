@@ -1,6 +1,6 @@
 archives:
     -
-        name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+        name_template: "{ .Os }}_{{ .Arch }}"
         format: zip
         files:
             - none*
