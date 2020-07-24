@@ -7,7 +7,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     env:
-        GO111MODULE: on
+      GO111MODULE: on
     steps:
       - uses: actions/checkout@v2
 
@@ -16,6 +16,8 @@ jobs:
 
       - name: gosec
         uses: securego/gosec@master
+        env:
+          GO111MODUE: on 
         with:
             args: ./...
 
