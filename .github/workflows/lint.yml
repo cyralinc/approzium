@@ -18,9 +18,10 @@ jobs:
         run: echo $GO111MODULE
 
       - name: gosec
-        uses: securego/gosec@master
-        with:
-            args: ./...
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          go get github.com/securego/gosec/cmd/gosec
+          GO111MODULE=on gosec ./...  
 
       - name: Setup Python
         uses: actions/setup-python@v1
