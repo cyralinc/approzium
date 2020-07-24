@@ -22,9 +22,9 @@ jobs:
 
       - name: Release Authenticator Binaries
         uses: goreleaser/goreleaser-action@v1
-        working-directory: ./authenticator/
         with:
           version: latest
+          workdir: authenticator
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
