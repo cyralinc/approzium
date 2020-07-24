@@ -12,14 +12,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.13.8' # The Go version to download (if necessary) and use.
-
+          go-version: '1.13'
+      - run: go version
+        
       - name: gofmt
         run: gofmt -s -w .
-      
-      - name: DEBUG
-        run: go version
-
+        
       - name: gosec
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
