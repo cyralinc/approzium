@@ -21,3 +21,6 @@ builds:
             - freebsd
             - netbsd
             - solaris
+        ignore:
+            - goos: freebsd
+              goarch: arm64
