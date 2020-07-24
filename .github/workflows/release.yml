@@ -38,8 +38,6 @@ jobs:
 #       env:
 #         POETRY_HTTP_BASIC_PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
 #         POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-
-      - uses: actions/checkout@master
       - name: Publish Authenticator Docker Image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -47,6 +45,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "latest,${{ env.RELEASE_VERSION }}"
-          env:
-            COMPOSE_DOCKER_CLI_BUILD: 1
-            DOCKER_BUILDKIT: 1
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
