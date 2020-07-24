@@ -3,6 +3,7 @@ package credmgrs
 import (
 	"io/ioutil"
 	"os"
+    "path/filepath"
 	"runtime"
 	"strings"
 
@@ -34,7 +35,7 @@ func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, 
 	logger.Infof("loading secrets at %q", pathToSecrets)
 
 	var devCreds secrets
-	yamlFile, err := ioutil.ReadFile(pathToSecrets)
+	yamlFile, err := ioutil.ReadFile(filepath.Clean(pathToSecrets))
 	if err != nil {
 		return &localFileCredMgr{}, err
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+    "path/filepath"
 	"os"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -75,7 +76,7 @@ func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
 	// Only use the token sink if there's not already an environmental
 	// VAULT_TOKEN.
 	if h.tokenPath != "" && os.Getenv(vault.EnvVaultToken) == "" {
-		tokenBytes, err := ioutil.ReadFile(h.tokenPath)
+		tokenBytes, err := ioutil.ReadFile(filepath.Clean(h.tokenPath))
 		if err != nil {
 			return nil, err
 		}
