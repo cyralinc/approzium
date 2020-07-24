@@ -6,6 +6,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+        GO111MODULE: on
     steps:
       - uses: actions/checkout@v2
 
@@ -16,8 +18,6 @@ jobs:
         uses: securego/gosec@master
         with:
             args: ./...
-        env:
-            GO111MODULE: on
 
       - name: Setup Python
         uses: actions/setup-python@v1
