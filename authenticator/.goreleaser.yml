@@ -1,6 +1,11 @@
 archives:
     -
         name_template: "{{ .Os }}_{{ .Arch }}"
+        goarch:
+            - 386
+            - amd64
+            - arm
+            - arm64
         goos:
             - linux
             - darwin
