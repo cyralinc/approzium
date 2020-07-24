@@ -22,6 +22,7 @@ jobs:
 
       - name: Release Authenticator Binaries
         uses: goreleaser/goreleaser-action@v1
+        working-directory: ./authenticator/
         with:
           version: latest
           args: release --rm-dist
