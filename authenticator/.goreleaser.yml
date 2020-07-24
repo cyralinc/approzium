@@ -1,6 +1,13 @@
 archives:
     -
         name_template: "{{ .Os }}_{{ .Arch }}"
+        goos:
+            - linux
+            - darwin
+            - windows
+            - freebsd
+            - netbsd
+            - solaris
         format: zip
         files:
             - none*
