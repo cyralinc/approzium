@@ -16,8 +16,6 @@ jobs:
 
       - name: gosec
         uses: securego/gosec@master
-        env:
-          GO111MODULE: "on"
         with:
             args: ./...
 
