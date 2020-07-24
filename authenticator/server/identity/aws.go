@@ -99,7 +99,7 @@ func (a *aws) executeGetCallerIdentity(signedGetCallerIdentity string, clientLan
 	case pb.ClientLanguage_GO:
 		resp, err = http.Get(signedGetCallerIdentity) // #nosec: URL is verified before execution
 	case pb.ClientLanguage_PYTHON:
-        resp, err = http.Post(signedGetCallerIdentity, "", nil) // #nosec: URL is verified before execution
+		resp, err = http.Post(signedGetCallerIdentity, "", nil) // #nosec: URL is verified before execution
 	case pb.ClientLanguage_LANGUAGE_NOT_PROVIDED:
 		return "", fmt.Errorf("client language must be provided for AWS authentication")
 	default:

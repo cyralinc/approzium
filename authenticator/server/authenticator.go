@@ -13,7 +13,7 @@ a stateful, clustered design. Thanks!
 import (
 	"context"
 	"crypto/hmac"
-	"crypto/md5" // #nosec
+	"crypto/md5"  // #nosec
 	"crypto/sha1" // #nosec
 	"crypto/sha256"
 	"encoding/base64"
@@ -315,7 +315,7 @@ func computeMD5(s string, salt []byte) (string, error) {
 	if _, err := io.WriteString(hasher, s); err != nil {
 		return "", err
 	}
-    if _, err := hasher.Write(salt); err != nil {
+	if _, err := hasher.Write(salt); err != nil {
 		return "", err
 	}
 	hashedBytes := hasher.Sum(nil)
@@ -360,15 +360,15 @@ func xorBytes(a, b []byte) ([]byte, error) {
 // SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
 func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
 	mac := hmac.New(sha256.New, spassword)
-    if _, err := mac.Write([]byte("Client Key")); err != nil {
+	if _, err := mac.Write([]byte("Client Key")); err != nil {
 		return "", err
-    }
+	}
 	ckey := mac.Sum(nil)
 	ckeyHash := sha256.Sum256(ckey)
 	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
 	if _, err := cproofHmac.Write([]byte(authMsg)); err != nil {
 		return "", err
-    }
+	}
 	cproof, err := xorBytes(cproofHmac.Sum(nil), ckey)
 	if err != nil {
 		return "", err
@@ -379,14 +379,14 @@ func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
 
 func computePGSHA256Sproof(spassword []byte, authMsg string) (string, error) {
 	mac := hmac.New(sha256.New, spassword)
-    if _, err := mac.Write([]byte("Server Key")); err != nil {
+	if _, err := mac.Write([]byte("Server Key")); err != nil {
 		return "", err
-    }
+	}
 	skey := mac.Sum(nil)
 	sproofHmac := hmac.New(sha256.New, skey)
-    if _, err := sproofHmac.Write([]byte(authMsg)); err != nil {
+	if _, err := sproofHmac.Write([]byte(authMsg)); err != nil {
 		return "", err
-    }
+	}
 	sproof := sproofHmac.Sum(nil)
 	sproof64 := base64.StdEncoding.EncodeToString(sproof)
 	return sproof64, nil
@@ -399,17 +399,17 @@ func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
 	}
 	firstHash := hasher.Sum(nil)
 	hasher = sha1.New() // #nosec
-    if _, err := hasher.Write(firstHash); err != nil {
+	if _, err := hasher.Write(firstHash); err != nil {
 		return nil, err
-    }
+	}
 	secondHash := hasher.Sum(nil)
 	hasher = sha1.New() // #nosec
-    if _, err := hasher.Write(salt); err != nil {
+	if _, err := hasher.Write(salt); err != nil {
 		return nil, err
-    }
-    if _, err := hasher.Write(secondHash); err != nil {
+	}
+	if _, err := hasher.Write(secondHash); err != nil {
 		return nil, err
-    }
+	}
 	thirdHash := hasher.Sum(nil)
 	finalHash, err := xorBytes(firstHash, thirdHash)
 	if err != nil {

@@ -48,9 +48,9 @@ func Parse() (Config, error) {
 	}
 	if config.devMode {
 		// dev mode uses the file back-end
-        if err := os.Unsetenv("VAULT_ADDR"); err != nil {
-            return Config{}, err
-        }
+		if err := os.Unsetenv("VAULT_ADDR"); err != nil {
+			return Config{}, err
+		}
 		config = Config{
 			Host:       "127.0.0.1",
 			HTTPPort:   6000,
@@ -187,11 +187,11 @@ func setConfigFlags() error {
 	}
 
 	pflag.Parse()
-    if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-        return err
-    }
-    if err := viper.BindPFlag("configfilepath", pflag.Lookup("config")); err != nil {
-        return err
-    }
-    return nil
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		return err
+	}
+	if err := viper.BindPFlag("configfilepath", pflag.Lookup("config")); err != nil {
+		return err
+	}
+	return nil
 }
