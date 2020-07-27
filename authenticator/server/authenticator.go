@@ -13,8 +13,8 @@ a stateful, clustered design. Thanks!
 import (
 	"context"
 	"crypto/hmac"
-	"crypto/md5"
-	"crypto/sha1"
+	"crypto/md5"  // #nosec
+	"crypto/sha1" // #nosec
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -192,6 +192,9 @@ func (a *authenticator) getPassword(reqLogger *log.Entry, req *pb.PasswordReques
 	return password, nil
 }
 
+// Even though MD5 is cryptographically insecure, it is the default authentication
+// method used by Postgres, and so we made the decision to support it. However, we
+// recommend using the more secure SCRAM-SHA256 authentication when possible.
 func (a *authenticator) GetPGMD5Hash(ctx context.Context, req *pb.PGMD5HashRequest) (*pb.PGMD5Response, error) {
 	// Return early if we didn't get a valid salt.
 	salt := req.GetSalt()
@@ -249,7 +252,10 @@ func (a *authenticator) GetPGSHA256Hash(ctx context.Context, req *pb.PGSHA256Has
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
-	sproof := computePGSHA256Sproof(saltedPass, authMsg)
+	sproof, err := computePGSHA256Sproof(saltedPass, authMsg)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	return &pb.PGSHA256Response{Cproof: cproof, Sproof: sproof}, nil
 }
 
@@ -305,11 +311,13 @@ func toDatabaseARN(logger *log.Entry, fullIAMArn string) (string, error) {
 }
 
 func computeMD5(s string, salt []byte) (string, error) {
-	hasher := md5.New()
+	hasher := md5.New() // #nosec
 	if _, err := io.WriteString(hasher, s); err != nil {
 		return "", err
 	}
-	hasher.Write(salt)
+	if _, err := hasher.Write(salt); err != nil {
+		return "", err
+	}
 	hashedBytes := hasher.Sum(nil)
 	return hex.EncodeToString(hashedBytes), nil
 }
@@ -352,11 +360,15 @@ func xorBytes(a, b []byte) ([]byte, error) {
 // SCRAM reference: https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism
 func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
 	mac := hmac.New(sha256.New, spassword)
-	mac.Write([]byte("Client Key"))
+	if _, err := mac.Write([]byte("Client Key")); err != nil {
+		return "", err
+	}
 	ckey := mac.Sum(nil)
 	ckeyHash := sha256.Sum256(ckey)
 	cproofHmac := hmac.New(sha256.New, ckeyHash[:])
-	cproofHmac.Write([]byte(authMsg))
+	if _, err := cproofHmac.Write([]byte(authMsg)); err != nil {
+		return "", err
+	}
 	cproof, err := xorBytes(cproofHmac.Sum(nil), ckey)
 	if err != nil {
 		return "", err
@@ -365,29 +377,39 @@ func computePGSHA256Cproof(spassword []byte, authMsg string) (string, error) {
 	return cproof64, nil
 }
 
-func computePGSHA256Sproof(spassword []byte, authMsg string) string {
+func computePGSHA256Sproof(spassword []byte, authMsg string) (string, error) {
 	mac := hmac.New(sha256.New, spassword)
-	mac.Write([]byte("Server Key"))
+	if _, err := mac.Write([]byte("Server Key")); err != nil {
+		return "", err
+	}
 	skey := mac.Sum(nil)
 	sproofHmac := hmac.New(sha256.New, skey)
-	sproofHmac.Write([]byte(authMsg))
+	if _, err := sproofHmac.Write([]byte(authMsg)); err != nil {
+		return "", err
+	}
 	sproof := sproofHmac.Sum(nil)
 	sproof64 := base64.StdEncoding.EncodeToString(sproof)
-	return sproof64
+	return sproof64, nil
 }
 
 func computeMYSQLSHA1Hash(password string, salt []byte) ([]byte, error) {
-	hasher := sha1.New()
+	hasher := sha1.New() // #nosec
 	if _, err := io.WriteString(hasher, password); err != nil {
 		return nil, err
 	}
 	firstHash := hasher.Sum(nil)
-	hasher = sha1.New()
-	hasher.Write(firstHash)
+	hasher = sha1.New() // #nosec
+	if _, err := hasher.Write(firstHash); err != nil {
+		return nil, err
+	}
 	secondHash := hasher.Sum(nil)
-	hasher = sha1.New()
-	hasher.Write(salt)
-	hasher.Write(secondHash)
+	hasher = sha1.New() // #nosec
+	if _, err := hasher.Write(salt); err != nil {
+		return nil, err
+	}
+	if _, err := hasher.Write(secondHash); err != nil {
+		return nil, err
+	}
 	thirdHash := hasher.Sum(nil)
 	finalHash, err := xorBytes(firstHash, thirdHash)
 	if err != nil {

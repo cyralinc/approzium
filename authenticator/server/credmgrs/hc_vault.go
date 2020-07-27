@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
 	vault "github.com/hashicorp/vault/api"

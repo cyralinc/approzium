@@ -54,7 +54,9 @@ func Parse() (Config, error) {
 	}
 	if config.devMode {
 		// dev mode uses the file back-end
-		os.Unsetenv("VAULT_ADDR")
+		if err := os.Unsetenv("VAULT_ADDR"); err != nil {
+			return Config{}, err
+		}
 		config = Config{
 			Host:       "127.0.0.1",
 			HTTPPort:   6000,
@@ -71,7 +73,9 @@ func Parse() (Config, error) {
 func parse() (Config, error) {
 	var config Config
 	setConfigDefaults()
-	setConfigFlags()
+	if err := setConfigFlags(); err != nil {
+		return Config{}, err
+	}
 	if err := setConfigEnvVars(); err != nil {
 		return Config{}, err
 	}
@@ -177,7 +181,7 @@ func setConfigDefaults() {
 	viper.SetDefault("SecretsManager", "")
 }
 
-func setConfigFlags() {
+func setConfigFlags() error {
 	// avoid redefining flags because it leads to panic
 	if pflag.Lookup("host") == nil {
 		pflag.String("host", "", "")
@@ -206,6 +210,11 @@ func setConfigFlags() {
 	}
 
 	pflag.Parse()
-	viper.BindPFlags(pflag.CommandLine)
-	viper.BindPFlag("configfilepath", pflag.Lookup("config"))
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		return err
+	}
+	if err := viper.BindPFlag("configfilepath", pflag.Lookup("config")); err != nil {
+		return err
+	}
+	return nil
 }
