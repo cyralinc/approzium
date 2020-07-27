@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -79,7 +78,7 @@ func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) 
 func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
 	// Only use the token sink if a vault token is not provided
 	if h.tokenPath != "" && h.token == "" {
-		tokenBytes, err := ioutil.ReadFile(h.tokenPath)
+		tokenBytes, err := ioutil.ReadFile(filepath.Clean(h.tokenPath))
 		if err != nil {
 			return nil, err
 		}
