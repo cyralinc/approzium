@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -12,7 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const secretsFileLocation = "/authenticator/server/testing/secrets.yaml"
+const secretsFileLocation = "testing/secrets.yaml"
 
 // newLocalFileCreds is for dev purposes: read credentials from a local file.
 func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, error) {
@@ -25,13 +24,10 @@ func newLocalFileCreds(logger *log.Logger, _ config.Config) (CredentialManager, 
 		IamArn   string `yaml:"iam_arn"`
 	}
 
-	// To make sure we can find the secrets file, get the absolute path to
-	// the file that called this method. This will always be something like
-	// /Users/yourname/go/src/github.com/approzium/approzium/authenticator/server/credmgrs/credmgr.go
-	_, filename, _, _ := runtime.Caller(1)
-
-	homeDirPath := strings.TrimSuffix(filename, "/authenticator/server/credmgrs/credmgr.go")
-	pathToSecrets := homeDirPath + secretsFileLocation
+	pathToSecrets, err := filepath.Abs(secretsFileLocation)
+	if err != nil {
+		return &localFileCredMgr{}, err
+	}
 	logger.Infof("loading secrets at %q", pathToSecrets)
 
 	var devCreds secrets

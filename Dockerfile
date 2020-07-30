@@ -46,10 +46,10 @@ COPY --from=dev /usr/src/approzium/authenticator/authenticator .
 ENTRYPOINT ["./authenticator"]
 
 FROM authenticator-build AS authenticator-dev
-COPY --from=dev /usr/src/approzium/authenticator/server/testing/approzium.pem .
+COPY --from=dev /usr/src/approzium/authenticator/testing/approzium.pem .
 RUN chmod 644 /app/approzium.pem
-COPY --from=dev /usr/src/approzium/authenticator/server/testing/approzium.key .
+COPY --from=dev /usr/src/approzium/authenticator/testing/approzium.key .
 RUN chmod 644 /app/approzium.key
 RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
-COPY --from=dev /usr/src/approzium/authenticator/server/testing/ca.cert /usr/local/share/ca-certificates/self-signed-ca.cert
+COPY --from=dev /usr/src/approzium/authenticator/testing/ca.cert /usr/local/share/ca-certificates/self-signed-ca.cert
 RUN chmod 644 /usr/local/share/ca-certificates/self-signed-ca.cert && update-ca-certificates

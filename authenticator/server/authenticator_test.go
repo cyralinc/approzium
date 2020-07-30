@@ -423,7 +423,7 @@ func TestMetrics(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedResponse, err := ioutil.ReadFile("testing/prometheus.txt")
+	expectedResponse, err := ioutil.ReadFile("../testing/prometheus.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
