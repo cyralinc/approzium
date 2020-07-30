@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
-	testtools "github.com/cyralinc/approzium/authenticator/server/testing"
+	testtools "github.com/cyralinc/approzium/authenticator/testing"
 )
 
 func TestHealthChecker(t *testing.T) {
