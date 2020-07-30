@@ -13,7 +13,7 @@ import (
 	"github.com/cyralinc/approzium/authenticator/server/api"
 	"github.com/cyralinc/approzium/authenticator/server/config"
 	pb "github.com/cyralinc/approzium/authenticator/server/protos"
-	testtools "github.com/cyralinc/approzium/authenticator/server/testing"
+	testtools "github.com/cyralinc/approzium/authenticator/testing"
 	"github.com/google/gofuzz"
 	vault "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	pb "github.com/cyralinc/approzium/authenticator/server/protos"
-	testtools "github.com/cyralinc/approzium/authenticator/server/testing"
+	testtools "github.com/cyralinc/approzium/authenticator/testing"
 )
 
 var testEnv = &testtools.AwsEnv{}

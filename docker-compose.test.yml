@@ -15,7 +15,7 @@ services:
             - APPROZIUM_DISABLE_TLS=false
             - APPROZIUM_PATH_TO_TLS_CERT=/app/approzium.pem
             - APPROZIUM_PATH_TO_TLS_KEY=/app/approzium.key
-            - TEST_CERT_DIR=/usr/src/approzium/authenticator/server/testing
+            - TEST_CERT_DIR=/usr/src/approzium/authenticator/testing
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
             - AWS_ACCESS_KEY_ID
