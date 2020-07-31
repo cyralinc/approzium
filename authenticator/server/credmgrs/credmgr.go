@@ -6,6 +6,7 @@ import (
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
 	"github.com/cyralinc/approzium/authenticator/server/metrics"
+	_ "github.com/cyralinc/approzium/authenticator/testing"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/metric"
 	"go.opencensus.io/metric/metricdata"
@@ -175,10 +176,9 @@ func legacySelectCredMgr(logger *log.Logger, c config.Config) (CredentialManager
 		logger.Debugf("didn't select local file as credential manager due to err: %s", err)
 	} else {
 		logger.Info("selected local file as credential manager")
-		logger.Warn("local file credential manager should not be used in production")
 		return credMgr, err
 	}
-	return nil, errors.New("no valid credential manager available, see debug-level logs for more information")
+	return nil, fmt.Errorf("no valid credential manager available: %s", err)
 }
 
 func passwordFromSecret(secret map[string]interface{}, identity DBKey) (string, error) {

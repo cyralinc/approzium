@@ -3,6 +3,8 @@ package testing
 import (
 	"net/http"
 	"os"
+	"path"
+	"runtime"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -40,4 +42,16 @@ func (t *TestResponseWriter) Write(input []byte) (int, error) {
 
 func (t *TestResponseWriter) WriteHeader(statusCode int) {
 	t.LastStatusCodeReceived = statusCode
+}
+
+func init() {
+	// This allows tests to run from the project root directory, instead of
+	// from their own subdirectory. This is helpful for accessing test files
+	// (e.g.: secrets.yaml) from a consistent path.
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "..")
+	err := os.Chdir(dir)
+	if err != nil {
+		panic(err)
+	}
 }
