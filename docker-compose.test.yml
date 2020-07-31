@@ -33,4 +33,5 @@ services:
             - dbmd5
             - dbsha256
             - dbmysqlsha1
+            - dbmongo
             - vault
