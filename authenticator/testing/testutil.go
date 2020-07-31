@@ -51,5 +51,5 @@ func ChToRoot() error {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "..")
 	err := os.Chdir(dir)
-    return err
+	return err
 }

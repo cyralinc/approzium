@@ -30,9 +30,9 @@ var (
 )
 
 func init() {
-    if err := testtools.ChToRoot(); err != nil {
-        panic(err)
-    }
+	if err := testtools.ChToRoot(); err != nil {
+		panic(err)
+	}
 }
 
 // TestAuthenticator_GetPGMD5Hash issues real STS GetCallerIdentity because at the
