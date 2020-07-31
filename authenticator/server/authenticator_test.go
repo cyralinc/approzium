@@ -29,10 +29,17 @@ var (
 	testCtx = context.WithValue(context.Background(), ctxLogger, testLogEntry)
 )
 
+func init() {
+    if err := testtools.ChToRoot(); err != nil {
+        panic(err)
+    }
+}
+
 // TestAuthenticator_GetPGMD5Hash issues real STS GetCallerIdentity because at the
 // time of writing there were no documented limits. Hitting the real API will allow
 // us to catch if it changes.
 func TestAuthenticator_GetPGMD5Hash(t *testing.T) {
+
 	// These tests rely upon the file back-end, so unset the Vault addr if it exists.
 	_ = os.Setenv(vault.EnvVaultAddress, "")
 	signedGetCallerIdentity, err := testEnv.SignedGetCallerIdentity(t)
