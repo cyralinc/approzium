@@ -8,10 +8,10 @@ docs/static/api/
 authenticator/authenticator
 main
 
-ssl/*.key
-ssl/*.crt
-ssl/*.srl
-ssl/*.csr
+testing/postgresql/*.key
+testing/postgresql/*.crt
+testing/postgresql/*.srl
+testing/postgresql/*.csr
 sdk/python/tests/pg2_testsuite/
 
 # Prerequisites

@@ -9,7 +9,7 @@ dev:
 	make run-in-docker CMD="bash"
 dev-env: dc-build
 	$(docker_env) docker-compose up
-dc-build: ssl/rootCA.key
+dc-build: testing/postgresql/rootCA.key
 	$(docker_env) docker-compose -f docker-compose.yml -f docker-compose.test.yml build
 test: dc-build
 	make run-in-docker CMD="make run-testsuite"
@@ -46,8 +46,8 @@ testsuite_env = TEST_ASSUMABLE_ARN=$(TEST_ASSUMABLE_ARN) TEST_BASE_ARN=$(value T
 
 
 # Generates self-signed certificates that can be used to run Postgres DBs with SSL
-ssl/rootCA.key:
-	cd ssl && ./gen_cert.sh
+testing/postgresql/rootCA.key:
+	cd testing/postgresql/ && ./gen_cert.sh
 
 # Following targets are called by the `tests` Docker compose service
 enable-vault-path:
