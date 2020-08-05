@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/cyralinc/approzium/authenticator/server/config"
+	"os"
 	"testing"
 )
 
@@ -70,7 +71,9 @@ func TestAwsSecretsManager(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	credMgr, err := newAWSSecretManagerCreds(nil, config.Config{})
+	credMgr, err := newAWSSecretManagerCreds(nil, config.Config{
+		AwsRegion: os.Getenv("AWS_REGION"),
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

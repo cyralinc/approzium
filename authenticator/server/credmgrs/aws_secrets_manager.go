@@ -11,13 +11,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func newAWSSecretManagerCreds(_ *log.Logger, _ config.Config) (CredentialManager, error) {
+func newAWSSecretManagerCreds(_ *log.Logger, c config.Config) (CredentialManager, error) {
+	if c.AwsRegion == "" {
+		return &awsSecretsManagerCredMgr{}, fmt.Errorf("AWS region not set")
+	}
 	sess, err := session.NewSession()
 	if err != nil {
 		return &awsSecretsManagerCredMgr{}, err
 	}
 	// Create an AWS Secrets Manager client
-	svc := secretsmanager.New(sess, aws.NewConfig())
+	svc := secretsmanager.New(sess, aws.NewConfig().WithRegion(c.AwsRegion))
 	if svc == nil {
 		return &awsSecretsManagerCredMgr{}, fmt.Errorf("cannot instantiate AWS Secrets Manager Client")
 	}

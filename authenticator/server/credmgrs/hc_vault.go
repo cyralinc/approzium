@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -19,11 +18,13 @@ import (
 const mountPath = "approzium"
 
 func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialManager, error) {
-	if addr := os.Getenv(vault.EnvVaultAddress); addr == "" {
+	if config.VaultAddr == "" {
 		return &hcVaultCredMgr{}, errors.New("no vault address detected")
 	}
 	credMgr := &hcVaultCredMgr{
+		token:     config.VaultToken,
 		tokenPath: config.VaultTokenPath,
+		addr:      config.VaultAddr,
 	}
 
 	// Check that we're able to communicate with Vault by doing a test read.
@@ -38,7 +39,9 @@ func newHashiCorpVaultCreds(_ *log.Logger, config config.Config) (CredentialMana
 }
 
 type hcVaultCredMgr struct {
+	token     string
 	tokenPath string
+	addr      string
 }
 
 func (h *hcVaultCredMgr) Name() string {
@@ -73,23 +76,23 @@ func (h *hcVaultCredMgr) Password(_ *log.Entry, identity DBKey) (string, error) 
 // vaultClient retrieves a client using either the environmental VAULT_TOKEN,
 // or reading the latest token from the token file sink.
 func (h *hcVaultCredMgr) vaultClient() (*vault.Client, error) {
-	// Only use the token sink if there's not already an environmental
-	// VAULT_TOKEN.
-	if h.tokenPath != "" && os.Getenv(vault.EnvVaultToken) == "" {
+	// Only use the token sink if a vault token is not provided
+	if h.tokenPath != "" && h.token == "" {
 		tokenBytes, err := ioutil.ReadFile(filepath.Clean(h.tokenPath))
 		if err != nil {
 			return nil, err
 		}
-		// There is no way to directly pass in the token, so we
-		// must set it in the environment.
-		err = os.Setenv(vault.EnvVaultToken, string(tokenBytes))
-		if err != nil {
-			return nil, err
-		}
-		defer os.Unsetenv(vault.EnvVaultToken)
+		h.token = string(tokenBytes)
 	}
 
 	// This uses a default configuration for Vault. This includes reading
 	// Vault's environment variables and setting them as a configuration.
-	return vault.NewClient(nil)
+	config := vault.DefaultConfig()
+	client, err := vault.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+	client.SetAddress(h.addr)
+	client.SetToken(h.token)
+	return client, err
 }
