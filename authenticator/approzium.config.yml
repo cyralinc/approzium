@@ -5,3 +5,7 @@
 # logformat: text
 # lograw: false
 # secretsmanager: vault
+# vaultaddr: vault.example.com:8200
+# vaulttoken: token
+# vaulttokenpath: path/to/token
+# awsregion: magrathea-1
