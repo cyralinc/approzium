@@ -180,8 +180,8 @@ func parseWithPrecedence() (*Config, error) {
 	flag.Parse()
 
 	// Our order of precedence is:
-	// 1. Env var
-	// 2. Command-line flag
+	// 1. Command-line flag
+	// 2. Env var
 	// 3. Config file
 	// 4. Default
 	conf, err := defaultConfig()
@@ -193,10 +193,10 @@ func parseWithPrecedence() (*Config, error) {
 			return nil, err
 		}
 	}
-	if err := overrideWithFlagConf(conf); err != nil {
+	if err := overrideWithEnvConf(conf); err != nil {
 		return nil, err
 	}
-	if err := overrideWithEnvConf(conf); err != nil {
+	if err := overrideWithFlagConf(conf); err != nil {
 		return nil, err
 	}
 	return conf, nil
