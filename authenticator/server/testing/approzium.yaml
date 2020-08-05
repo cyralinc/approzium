@@ -1,13 +1,13 @@
 listener:
-  http_port = 3
-  grpc_port = 2
+  http_port: 3
+  grpc_port: 2
 
 logging:
-  log_level = info
-  log_format = json
+  log_level: info
+  log_format: json
 
 tls:
-  disable_tls = true
+  disable_tls: true
 
 secrets:
-  secrets_manager = local
+  secrets_manager: local

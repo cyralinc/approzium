@@ -222,37 +222,25 @@ func overrideWithFileConf(conf *Config) error {
 		return err
 	}
 
-	bodyMap := make(map[section]interface{})
+	bodyMap := make(map[section]map[string]interface{})
 	if err := yaml.Unmarshal(body, &bodyMap); err != nil {
 		return err
 	}
 
 	for section, registeredFields := range fieldRegistry {
 
-		bodyIfc, exists := bodyMap[section]
+		sectionFields, exists := bodyMap[section]
 		if !exists {
 			continue
 		}
 
-		// Create a map of the fields in the section's body.
-		bodyStr := bodyIfc.(string)
-		bodyStr = strings.ReplaceAll(bodyStr, " = ", "=")
-		sectionFields := make(map[string]string)
-		bodyEqFields := strings.Fields(bodyStr)
-		for _, field := range bodyEqFields {
-			kv := strings.Split(field, "=")
-			if len(kv) != 2 {
-				return fmt.Errorf("unexpected field %s", field)
-			}
-			sectionFields[kv[0]] = kv[1]
-		}
-
 		for _, registeredField := range registeredFields {
-			fieldValue, exists := sectionFields[fileName(registeredField.name)]
+			fieldIfc, exists := sectionFields[fileName(registeredField.name)]
 			if !exists {
 				continue
 			}
-			if err := setField(writableConfFields, registeredField, fieldValue); err != nil {
+			strVal := fmt.Sprintf("%v", fieldIfc)
+			if err := setField(writableConfFields, registeredField, strVal); err != nil {
 				return err
 			}
 		}
