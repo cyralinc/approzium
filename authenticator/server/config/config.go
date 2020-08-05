@@ -40,31 +40,31 @@ var (
 	// for them in env vars, config files, command-line flags, and defaults.
 	fieldRegistry = map[section][]field{
 		sectionListener: {
-			{name: "host", defaultVal: "127.0.0.1", flagConfField: &flagConf.Host, goFieldName: "Host"},
-			{name: "http port", defaultVal: 6000, flagConfField: &flagConf.HTTPPort, goFieldName: "HTTPPort"},
-			{name: "grpc port", defaultVal: 6001, flagConfField: &flagConf.GRPCPort, goFieldName: "GRPCPort"},
+			{name: "host", defaultVal: "127.0.0.1", flagConfField: &flagConf.Host, goFieldName: "Host", prependEnvVar: true},
+			{name: "http port", defaultVal: 6000, flagConfField: &flagConf.HTTPPort, goFieldName: "HTTPPort", prependEnvVar: true},
+			{name: "grpc port", defaultVal: 6001, flagConfField: &flagConf.GRPCPort, goFieldName: "GRPCPort", prependEnvVar: true},
 		},
 		sectionLogging: {
-			{name: "log level", defaultVal: "info", flagConfField: &flagConf.LogLevel, goFieldName: "LogLevel"},
-			{name: "log format", defaultVal: "text", flagConfField: &flagConf.LogFormat, goFieldName: "LogFormat"},
-			{name: "log raw", defaultVal: false, flagConfField: &flagConf.LogRaw, goFieldName: "LogRaw"},
+			{name: "log level", defaultVal: "info", flagConfField: &flagConf.LogLevel, goFieldName: "LogLevel", prependEnvVar: true},
+			{name: "log format", defaultVal: "text", flagConfField: &flagConf.LogFormat, goFieldName: "LogFormat", prependEnvVar: true},
+			{name: "log raw", defaultVal: false, flagConfField: &flagConf.LogRaw, goFieldName: "LogRaw", prependEnvVar: true},
 		},
 		sectionTLS: {
-			{name: "disable tls", defaultVal: false, flagConfField: &flagConf.DisableTLS, goFieldName: "DisableTLS"},
-			{name: "tls cert path", defaultVal: "", flagConfField: &flagConf.PathToTLSCert, goFieldName: "PathToTLSCert"},
-			{name: "tls key path", defaultVal: "", flagConfField: &flagConf.PathToTLSKey, goFieldName: "PathToTLSKey"},
+			{name: "disable tls", defaultVal: false, flagConfField: &flagConf.DisableTLS, goFieldName: "DisableTLS", prependEnvVar: true},
+			{name: "tls cert path", defaultVal: "", flagConfField: &flagConf.PathToTLSCert, goFieldName: "PathToTLSCert", prependEnvVar: true},
+			{name: "tls key path", defaultVal: "", flagConfField: &flagConf.PathToTLSKey, goFieldName: "PathToTLSKey", prependEnvVar: true},
 		},
 		sectionSecretsMgr: {
-			{name: "secrets manager", defaultVal: "", flagConfField: &flagConf.SecretsManager, goFieldName: "SecretsManager"},
-			{name: "vault token", defaultVal: "", flagConfField: &flagConf.VaultToken, goFieldName: "VaultToken"},
-			{name: "vault token path", defaultVal: "", flagConfField: &flagConf.VaultTokenPath, goFieldName: "VaultTokenPath"},
-			{name: "vault addr", defaultVal: "", flagConfField: &flagConf.VaultAddr, goFieldName: "VaultAddr"},
-			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion"},
+			{name: "secrets manager", defaultVal: "", flagConfField: &flagConf.SecretsManager, goFieldName: "SecretsManager", prependEnvVar: true},
+			{name: "vault token", defaultVal: "", flagConfField: &flagConf.VaultToken, goFieldName: "VaultToken", prependEnvVar: false},
+			{name: "vault token path", defaultVal: "", flagConfField: &flagConf.VaultTokenPath, goFieldName: "VaultTokenPath", prependEnvVar: true},
+			{name: "vault addr", defaultVal: "", flagConfField: &flagConf.VaultAddr, goFieldName: "VaultAddr", prependEnvVar: false},
+			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion", prependEnvVar: false},
 		},
 		sectionExclude: {
-			{name: "config", defaultVal: "", flagConfField: &flagConf.ConfigFilePath, goFieldName: "ConfigFilePath"},
-			{name: "dev", defaultVal: false, flagConfField: &flagConf.DevMode, goFieldName: "DevMode"},
-			{name: "version", defaultVal: false, flagConfField: &flagConf.Version, goFieldName: "Version"},
+			{name: "config", defaultVal: "", flagConfField: &flagConf.ConfigFilePath, goFieldName: "ConfigFilePath", prependEnvVar: true},
+			{name: "dev", defaultVal: false, flagConfField: &flagConf.DevMode, goFieldName: "DevMode", prependEnvVar: true},
+			{name: "version", defaultVal: false, flagConfField: &flagConf.Version, goFieldName: "Version", prependEnvVar: true},
 		},
 	}
 
@@ -91,6 +91,9 @@ type field struct {
 
 	// The name of the Go field this should be bound with.
 	goFieldName string
+
+	// Whether to prepend this option's env var with APPROZIUM_ when looking for it.
+	prependEnvVar bool
 }
 
 func init() {
@@ -228,7 +231,9 @@ func overrideWithFileConf(conf *Config) error {
 	}
 
 	for section, registeredFields := range fieldRegistry {
-
+		if section == sectionExclude {
+			continue
+		}
 		sectionFields, exists := bodyMap[section]
 		if !exists {
 			continue
@@ -267,7 +272,7 @@ func overrideWithFlagConf(conf *Config) error {
 func overrideWithEnvConf(conf *Config) error {
 	writableConfFields := reflect.ValueOf(conf).Elem()
 	for _, registeredField := range allRegisteredFields {
-		fieldValue := os.Getenv(envVarName(registeredField.name))
+		fieldValue := os.Getenv(envVarName(registeredField))
 		if fieldValue == "" {
 			continue
 		}
@@ -295,8 +300,12 @@ func devModeConfig() (*Config, error) {
 	}, nil
 }
 
-func envVarName(name string) string {
-	return envVarPrefix + strings.ToUpper(strings.ReplaceAll(name, " ", "_"))
+func envVarName(f field) string {
+	envVar := strings.ToUpper(strings.ReplaceAll(f.name, " ", "_"))
+	if !f.prependEnvVar {
+		return envVar
+	}
+	return envVarPrefix + envVar
 }
 
 func fileName(name string) string {
