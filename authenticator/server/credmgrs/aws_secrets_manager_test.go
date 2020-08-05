@@ -1,5 +1,5 @@
 // IMPORTANT: for these tests to work:
-// - the environment variable AWS_REGION has to be set. This is necessary for the Go SDK to access AWS Secrets Manager.
+// - the environment variable APPROZIUM_AWS_REGION has to be set. This is necessary for the Go SDK to access AWS Secrets Manager.
 package credmgrs
 
 import (
@@ -72,7 +72,7 @@ func TestAwsSecretsManager(t *testing.T) {
 	}
 
 	credMgr, err := newAWSSecretManagerCreds(nil, config.Config{
-		AwsRegion: os.Getenv("AWS_REGION"),
+		AwsRegion: os.Getenv("APPROZIUM_AWS_REGION"),
 	})
 	if err != nil {
 		t.Fatal(err)
