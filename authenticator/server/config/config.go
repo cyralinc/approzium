@@ -159,6 +159,10 @@ func Parse() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	if config.Version {
+		// Nothing further to do here.
+		return *config, nil
+	}
 	if config.DevMode {
 		config, err = devModeConfig()
 		if err != nil {
