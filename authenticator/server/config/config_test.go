@@ -81,19 +81,20 @@ func TestParseConfigDevMode(t *testing.T) {
 	}
 }
 
-func TestPrecedenceEnvFirst(t *testing.T) {
+func TestPrecedenceFlagFirst(t *testing.T) {
 	testConfDir := os.Getenv(envVarTestConfDir)
 	if testConfDir == "" {
 		t.Skip("skipping because TEST_CONF_DIR is unset")
 	}
 
-	if err := os.Setenv("APPROZIUM_HTTP_PORT", "1"); err != nil {
-		t.Fatal(err)
-	}
 	if err := flag.Set("config", testConfDir+"/approzium.yaml"); err != nil {
 		t.Fatal(err)
 	}
-	if err := flag.Set("http-port", "2"); err != nil {
+	if err := flag.Set("http-port", "1"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Setenv("APPROZIUM_HTTP_PORT", "2"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -102,20 +103,21 @@ func TestPrecedenceEnvFirst(t *testing.T) {
 		t.Fatal(err)
 	}
 	if config.HTTPPort != 1 {
-		t.Fatalf("expected 1 but received %d, should be 1 from the env var because it should take precedence", config.HTTPPort)
+		t.Fatalf("expected 1 but received %d, should be 1 from the flag because it should take precedence", config.HTTPPort)
 	}
 }
 
-func TestPrecedenceFlagSecond(t *testing.T) {
+func TestPrecedenceEnvSecond(t *testing.T) {
 	testConfDir := os.Getenv(envVarTestConfDir)
 	if testConfDir == "" {
 		t.Skip("skipping because TEST_CONF_DIR is unset")
 	}
 
-	if err := flag.Set("config", testConfDir+"/approzium.yaml"); err != nil {
+	if err := os.Setenv("APPROZIUM_HTTP_PORT", "2"); err != nil {
 		t.Fatal(err)
 	}
-	if err := flag.Set("http-port", "2"); err != nil {
+
+	if err := flag.Set("config", testConfDir+"/approzium.yaml"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -124,7 +126,7 @@ func TestPrecedenceFlagSecond(t *testing.T) {
 		t.Fatal(err)
 	}
 	if config.HTTPPort != 2 {
-		t.Fatalf("expected 2 but received %d, should be 2 from the flag because it should take precedence", config.HTTPPort)
+		t.Fatalf("expected 1 but received %d, should be 1 from the env var because it should take precedence", config.HTTPPort)
 	}
 }
 
