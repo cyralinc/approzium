@@ -6,8 +6,8 @@ title: Configuration
 
 Approzium uses the following precedence order. Each item takes precedence over the item below it:
 
- - environment variables
  - command-line flags
+ - environment variables
  - config file
  - defaults
 
@@ -41,9 +41,9 @@ Approzium uses the following precedence order. Each item takes precedence over t
 |--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | --secrets-manager  | APPROZIUM_SECRETS_MANAGER  |            | Supported options are "vault" (Hashicorp Vault), "asm" (AWS Secrets Manager), and "local" (Local YAML file)                                                                                                                                                                                                                                                                   |
 | --vault-token-path | APPROZIUM_VAULT_TOKEN_PATH |            | Optional, if set it will cause the latest Vault token to always be pulled from the given file. This option takes precedence over --vaulttoken                                                                                                                                                                                                                             |
-| --vault-token      | APPROZIUM_VAULT_TOKEN      |            | Optional, if set it will be used at the Vault token.                                                                                                                                                                                                                                                                                                                      |
-| --vault-addr       | APPROZIUM_VAULT_ADDR       |            | Required if using Vault as the secrets manaager.                                                                                                                                                                                                                                                                                                                          |
-| --aws-region       | APPROZIUM_AWS_REGION       |            | Required if using AWS Secrets Manager as the secrets manager.                                                                                                                                                                                                                                                                                                             |
+| --vault-token      | VAULT_TOKEN                |            | Optional, if set it will be used at the Vault token.                                                                                                                                                                                                                                                                                                                      |
+| --vault-addr       | VAULT_ADDR                 |            | Required if using Vault as the secrets manaager.                                                                                                                                                                                                                                                                                                                          |
+| --aws-region       | AWS_REGION                 |            | Required if using AWS Secrets Manager as the secrets manager.                                                                                                                                                                                                                                                                                                             |
 
 ## Misc Flags
 
@@ -56,25 +56,23 @@ Approzium uses the following precedence order. Each item takes precedence over t
 Example config file, which can be passed in through `approzium --config=/path/to/config.yaml`:
 
 ```
+---
 listener:
-  host      = 127.0.0.1
-  http_port = 6000
-  grpc_port = 6001
-
+  grpc_port: 6001
+  host: "127.0.0.1"
+  http_port: 6000
 logging:
-  log_level  = info
-  log_format = json
-  log_raw    = false
-
-tls:
-  disable_tls   = false
-  tls_cert_path = /path/to/approzium.pem
-  tls_cert_path = /path/to/approzium.key
-
+  log_format: json
+  log_level: info
+  log_raw: false
 secrets:
-  secrets_manager = vault
-  vault_addr      = https://somewhere:8200
-  vault_token_path = /path/to/tokensink.txt
+  secrets_manager: "vault"
+  vault_addr: "https://somewhere:8200"
+  vault_token_path: "/path/to/tokensink.txt"
+tls:
+  disable_tls: false
+  tls_cert_path: "/path/to/approzium.pem"
+  tls_key_path: "/path/to/approzium.key"
 ```
 
 # Approzium Secrets Manager Backends
