@@ -73,8 +73,9 @@ seed-asm-all-addrs:
 
 run-testsuite: run-gotests run-pg2tests
 
-run-gotests:
-	cd authenticator && CGO_ENABLED=1 go test -v -race -p 1 ./...
+run-gotests: enable-vault-path seed-vault-all-addrs seed-asm-all-addrs
+	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
+	cd sdk/go/approzium && CGO_ENABLED=1 go test -v -race ./...
 
 run-pythontests: enable-vault-path seed-vault-all-addrs seed-asm-all-addrs
 	cd sdk/python && poetry run pytest --workers auto

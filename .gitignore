@@ -215,3 +215,4 @@ vendor/
 
 authenticator/bin
 authenticator/pkg
+identitytest

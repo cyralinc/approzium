@@ -50,6 +50,19 @@ services:
             - VAULT_TOKEN=root
         depends_on:
             - vault
+    authenticatortls:
+        build:
+            context: ./
+            target: authenticator-dev
+        environment:
+            - APPROZIUM_HOST=0.0.0.0
+            - APPROZIUM_TLS_CERT_PATH=/app/approzium.pem
+            - APPROZIUM_TLS_KEY_PATH=/app/approzium.key
+            - APPROZIUM_SECRETS_MANAGER=vault
+            - VAULT_ADDR=http://vault:8200
+            - VAULT_TOKEN=root
+        depends_on:
+            - vault
     authenticatorasm:
         build:
             context: ./

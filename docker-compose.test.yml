@@ -28,6 +28,7 @@ services:
             - PSYCOPG2_TESTDB_PORT
             - PSYCOPG2_TESTDB_USER=bob
         depends_on:
+            - authenticatortls
             - authenticatorvault
             - authenticatorasm
             - dbmd5
