@@ -13,13 +13,13 @@ services:
         environment:
             - APPROZIUM_HOST=0.0.0.0
             - APPROZIUM_DISABLE_TLS=false
-            - APPROZIUM_PATH_TO_TLS_CERT=/app/approzium.pem
-            - APPROZIUM_PATH_TO_TLS_KEY=/app/approzium.key
+            - APPROZIUM_TLS_CERT_PATH=/app/approzium.pem
+            - APPROZIUM_TLS_KEY_PATH=/app/approzium.key
+            - AWS_REGION
             - TEST_CERT_DIR=/usr/src/approzium/authenticator/server/testing
             - VAULT_ADDR=http://vault:8200
             - VAULT_TOKEN=root
             - AWS_ACCESS_KEY_ID
-            - AWS_REGION
             - AWS_SECRET_ACCESS_KEY
             - TEST_ASSUMABLE_ARN
             - TEST_BASE_ARN
