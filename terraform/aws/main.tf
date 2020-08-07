@@ -36,6 +36,7 @@ resource "aws_security_group_rule" "approzium-http-api" {
     from_port = 6000
     to_port = 6000
     protocol = "tcp"
+    cidr_blocks = [var.cidr-block]
 }
 
 resource "aws_security_group_rule" "approzium-grpc" {
@@ -44,6 +45,7 @@ resource "aws_security_group_rule" "approzium-grpc" {
     from_port = 6001
     to_port = 6001
     protocol = "tcp"
+    cidr_blocks = [var.cidr-block]
 }
 
 resource "aws_security_group_rule" "approzium-egress" {
@@ -52,4 +54,5 @@ resource "aws_security_group_rule" "approzium-egress" {
     from_port = 0
     to_port = 0
     protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
 }
