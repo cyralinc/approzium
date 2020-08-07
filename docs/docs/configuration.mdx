@@ -39,10 +39,11 @@ Approzium uses the following precedence order. Each item takes precedence over t
 
 | Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
 |--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --secrets-manager  | APPROZIUM_SECRETS_MANAGER  |            | Supported options are "vault" (Hashicorp Vault), "asm" (AWS Secrets Manager), and "local" (Local YAML file)                                                                                                                                                                                                                                                                   |
+| --secrets-manager  | APPROZIUM_SECRETS_MANAGER  |            | Supported options are "vault" (Hashicorp Vault), "asm" (AWS Secrets Manager), and "local" (Local YAML file)                                                                                                                                                                                                                                                               |
 | --vault-token-path | APPROZIUM_VAULT_TOKEN_PATH |            | Optional, if set it will cause the latest Vault token to always be pulled from the given file. This option takes precedence over --vaulttoken                                                                                                                                                                                                                             |
 | --vault-token      | VAULT_TOKEN                |            | Optional, if set it will be used as the Vault token.                                                                                                                                                                                                                                                                                                                      |
-| --vault-addr       | VAULT_ADDR                 |            | Required if "vault" is set under "secrets-manager".                                                                                                                                                                                                                                                                                                                          |
+| --vault-addr       | VAULT_ADDR                 |            | Required if "vault" is set under "secrets-manager".                                                                                                                                                                                                                                                                                                                       |
+| --assume-aws-role  | APPROZIUM_ASSUME_AWS_ROLE  |            | Optional, only valid for AWS Secrets Manager. The role Approzium should assume when retrieving secrets. This parameter is useful for AWS Lambda environments, and for local testing.                                                                                                                                                                                      |
 | --aws-region       | AWS_REGION                 |            | Required if using AWS Secrets Manager as the secrets manager.                                                                                                                                                                                                                                                                                                             |
 
 ## Misc Flags
@@ -78,6 +79,8 @@ tls:
 # Approzium Secrets Manager Backends
 ## Hashicorp Vault Backend
 
+See our QuickStart section for how to plant a password in Vault for Approzium.
+
 Approzium supports Hashicorp Vault for storing database credentials. To use it, set the `secretsmanager` option to `vault`.
 At a minimum, the `--vaultaddr` must be set. Either the `--vaulttoken` or `--vaulttokenpath` must be set,
 with the `--vaulttoken` taking precedence.
@@ -95,3 +98,58 @@ Approzium supports AWS Secrets Manager for storing database credentials. To use 
 AWS credentials have to be configured on the system. If you are not sure how to do that, consult the [AWS docs](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials).
 
 **Important**: For AWS Secrets Manager to work, the AWS region `--awsregion` has to be explicitly provided.
+
+To plant a password in AWS Secrets Manager for Approzium to use, choose "Other type of secrets", and as the plaintext
+value, place a JSON object like this:
+
+```
+{
+  "dbuser1": {
+    "password": "asdfghjkl",
+    "iam_arns": [
+      "arn:aws:iam::accountid:role/rolename1",
+      "arn:aws:iam::accountid:role/rolename2"
+    ]
+  }
+}
+```
+
+The fields in this JSON object represent:
+
+```
+{
+  "<database_user_name>": {
+    "password": "<database_password_that_should_never_be_shared>",
+    "iam_arns": [
+      "<the_iam_arns_of_callers_who_should_be_allowed_access_via_this_database_user>"
+    ]
+  }
+}
+```
+
+Then, set the secret name to:
+
+```
+approzium/postgres-host@5432
+```
+
+This schema is as follows: `approzium/<postgres-host-name>@<postgres-port>`.
+
+Note the Secret ARN, and use it to create an IAM policy like:
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": "arn:aws:secretsmanager:us-east-1:0123456789012:secret:approzium/postgres-host@5432"
+        }
+    ]
+}
+```
+
+Create an IAM Role for the Approzium Authenticator to use, and attach the new policy to the IAM Role. Then,
+run the Approzium Authenticator on an EC2 instance that has been launched into this IAM Role.
