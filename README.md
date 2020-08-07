@@ -7,7 +7,7 @@
 Approzium is a tool that provides:
 - Password-less database authentication
 - Authentication through your cloud-provider's built-in identity
-- Highly security-oriented logging and metricsg
+- Highly security-oriented logging and metrics
 
 Its aim is to prevent data breaches, and to help you detect them promptly if they do occur or are attempted.
 
