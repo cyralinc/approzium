@@ -2,9 +2,13 @@
 title: Installation
 ---
 
+# Client-Side
+
 ## Client SDKs
 
 - Python: `pip3 install approzium`
+
+# Server-Side
 
 ## Authentication server binaries
 
@@ -53,3 +57,9 @@ Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
 ```
 docker run approzium/authenticator:latest
 ```
+
+## Terraform 0.12 and Above
+
+To speed you up, we offer stock Terraform configs for deploying the Approzium Authenticator. They live
+[in our Github repo](https://github.com/cyralinc/approzium/tree/develop/terraform). We would also like
+to add support for GCP and Azure, and we welcome community contributions.
