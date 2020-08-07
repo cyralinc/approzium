@@ -99,6 +99,14 @@ AWS credentials have to be configured on the system. If you are not sure how to 
 
 **Important**: For AWS Secrets Manager to work, the AWS region `--awsregion` has to be explicitly provided.
 
+Example secrets section:
+
+```
+secrets:
+  secrets_manager: "asm"
+  aws_region: "us-east-1"
+```
+
 To plant a password in AWS Secrets Manager for Approzium to use, choose "Other type of secrets", and as the plaintext
 value, place a JSON object like this:
 
