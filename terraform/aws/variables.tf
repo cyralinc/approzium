@@ -3,7 +3,7 @@
 //-------------------------------------------------------------------
 
 variable "download-url" {
-    default = "https://github.com/cyralinc/approzium/releases/download/v0.1.2/linux_amd64.zip"
+    default = "https://github.com/cyralinc/approzium/releases/download/v0.2.0/linux_amd64.zip"
     description = "Download url for Approzium authenticator"
 }
 
@@ -45,6 +45,16 @@ variable "instance_name" {
     description = "Instance name for Approzium"
 }
 
+//-------------------------------------------------------------------
+// An example key name would be "ellen" as it appears in AWS, not "ellen.pem".
+//-------------------------------------------------------------------
 variable "key-name" {
     description = "SSH key name for Approzium instances"
+}
+
+//-------------------------------------------------------------------
+// Example: "192.168. 100.0/24"
+//-------------------------------------------------------------------
+variable "cidr-block" {
+    description = "The CIDR block that should be allowed to ingress into Approzium instances."
 }

@@ -3,22 +3,20 @@ set -e
 
 sudo apt-get update -y
 sudo apt-get install -y curl unzip
-curl -L "${download-url}" > /tmp/approzium.zip
+curl -o approzium.zip -LO "${download-url}"
 
-cd /tmp
 sudo unzip approzium.zip
 sudo mv authenticator /usr/local/bin/authenticator
-sudo chmod 0755 /usr/local/bin/authenticator
 sudo chown root:root /usr/local/bin/authenticator
 
 # Setup the configuration
-cat <<EOF > /tmp/authenticator-config
+cat <<EOF > approzium.config
 ${config}
 EOF
-sudo mv /tmp/authenticator-config /usr/local/etc/approzium.config.yml
+sudo mv approzium.config /usr/local/etc/approzium.config
 
 # Setup the init script
-cat <<EOF > /tmp/upstart
+cat <<EOF > approzium.conf
 description "Approzium Authenticator server"
 start on runlevel [2345]
 stop on runlevel [!2345]
@@ -31,11 +29,11 @@ script
   fi
 
   exec /usr/local/bin/authenticator \
-    --config="/usr/local/etc/" \
+    --config="/usr/local/etc/approzium.config" \
     >> "${logs-file}" 2>&1
 end script
 EOF
-sudo mv /tmp/upstart /etc/init/approzium.conf
+sudo mv approzium.conf /etc/init/approzium.conf
 
 # Extra install steps (if any)
 ${extra-install}
