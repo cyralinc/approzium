@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/cyralinc/approzium/authenticator/server/config"
@@ -19,11 +20,19 @@ func newAWSSecretManagerCreds(_ *log.Logger, c config.Config) (CredentialManager
 	if err != nil {
 		return &awsSecretsManagerCredMgr{}, err
 	}
+
 	// Create an AWS Secrets Manager client
-	svc := secretsmanager.New(sess, aws.NewConfig().WithRegion(c.AwsRegion))
+	var svc *secretsmanager.SecretsManager
+	if c.AssumeAWSRole != "" {
+		creds := stscreds.NewCredentials(sess, c.AssumeAWSRole)
+		svc = secretsmanager.New(sess, aws.NewConfig().WithRegion(c.AwsRegion).WithCredentials(creds))
+	} else {
+		svc = secretsmanager.New(sess, aws.NewConfig().WithRegion(c.AwsRegion))
+	}
 	if svc == nil {
 		return &awsSecretsManagerCredMgr{}, fmt.Errorf("cannot instantiate AWS Secrets Manager Client")
 	}
+
 	credMgr := &awsSecretsManagerCredMgr{
 		svc,
 	}

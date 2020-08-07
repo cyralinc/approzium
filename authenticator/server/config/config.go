@@ -30,7 +30,7 @@ const (
 	sectionTLS = "tls"
 
 	// For fields configuring a secrets manager.
-	sectionSecretsMgr = "secrets_manager"
+	sectionSecretsMgr = "secrets"
 )
 
 var (
@@ -59,6 +59,7 @@ var (
 			{name: "vault token", defaultVal: "", flagConfField: &flagConf.VaultToken, goFieldName: "VaultToken", prependEnvVar: false},
 			{name: "vault token path", defaultVal: "", flagConfField: &flagConf.VaultTokenPath, goFieldName: "VaultTokenPath", prependEnvVar: true},
 			{name: "vault addr", defaultVal: "", flagConfField: &flagConf.VaultAddr, goFieldName: "VaultAddr", prependEnvVar: false},
+			{name: "assume aws role", defaultVal: "", flagConfField: &flagConf.AssumeAWSRole, goFieldName: "AssumeAWSRole", prependEnvVar: true},
 			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion", prependEnvVar: false},
 		},
 		sectionExclude: {
@@ -135,7 +136,8 @@ type Config struct {
 	VaultAddr      string
 
 	// AWS secrets manager related
-	AwsRegion string
+	AwsRegion     string
+	AssumeAWSRole string
 
 	// Special flags
 	ConfigFilePath string
