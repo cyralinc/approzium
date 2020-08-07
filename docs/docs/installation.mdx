@@ -6,11 +6,9 @@ title: Installation
 
 - Python: `pip3 install approzium`
 
-## Authentication server binaries
+## Server Binaries
 
 - Our binaries are posted with [our releases](https://github.com/cyralinc/approzium/releases).
-
-## Running the server binary
 
 ### Linux
 
@@ -53,3 +51,9 @@ Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
 ```
 docker run approzium/authenticator:latest
 ```
+
+## Terraform 0.12 and Above
+
+To speed you up, we offer stock Terraform configs for deploying the Approzium Authenticator. They live
+[in our Github repo](https://github.com/cyralinc/approzium/tree/develop/terraform). We would also like
+to add support for GCP and Azure, and we welcome community contributions.

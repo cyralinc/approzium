@@ -212,6 +212,11 @@ vendor/
 .srl
 
 # Binaries
-
 authenticator/bin
 authenticator/pkg
+
+# Terraform-related
+terraform/*/.tfvars
+terraform/*/.tfvars.json
+terraform/*/.terraform
+terraform/*/terraform.tfstate*
