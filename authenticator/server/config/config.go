@@ -17,6 +17,10 @@ const envVarPrefix = "APPROZIUM_"
 type section string
 
 const (
+	// IMPORTANT NOTE
+	// If adding a section, also, add it to the commandLineUsage func below
+	// or it won't be included in command-line help.
+	//
 	// For fields that shouldn't be included in the file conf
 	sectionExclude section = "exclude"
 
