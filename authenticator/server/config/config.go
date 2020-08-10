@@ -129,6 +129,9 @@ func init() {
 			flag.StringVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(string), registeredField.description)
 		}
 	}
+
+	// Customize command-line help output with our own grouped format.
+	flag.Usage = commandLineUsage
 }
 
 // Config is an object for storing configuration variables set through
@@ -377,4 +380,33 @@ func setField(elem reflect.Value, registeredField field, value string) error {
 		return fmt.Errorf("unrecognized field type: %T", registeredField.flagConfField)
 	}
 	return nil
+}
+
+// commandLineUsage customizes the response when a user makes a mistake or needs help using flags.
+// Normally, flags are outputted as one group, alphabetically by field name. However, we would prefer
+// to group them by section and keep them in the same order as they've been added to the registry.
+func commandLineUsage() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", "authenticator")
+	sectionOrder := []section{sectionListener, sectionTLS, sectionLogging, sectionSecretsMgr, sectionExclude}
+
+	for _, section := range sectionOrder {
+		sectionFields := fieldRegistry[section]
+		if section != sectionExclude {
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("\n%s", section), "\n")
+		} else {
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("\n%s", "miscellaneous"), "\n")
+		}
+
+		for _, field := range sectionFields {
+			switch f := field.flagConfField.(type) {
+			case *bool:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			case *int:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			case *string:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			}
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("      %s", field.description), "\n")
+		}
+	}
 }
