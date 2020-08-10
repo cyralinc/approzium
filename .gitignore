@@ -214,6 +214,7 @@ vendor/
 # Binaries
 authenticator/bin
 authenticator/pkg
+identitytest
 
 # Terraform-related
 terraform/*/.tfvars
