@@ -400,7 +400,7 @@ func TestMetrics(t *testing.T) {
 		HTTPPort:   6000,
 		DisableTLS: true,
 	}
-	_ = api.Start(testtools.TestLogger(), config)
+	_, _ = api.Start(testtools.TestLogger(), config)
 
 	// Make some calls to increment the metrics.
 	svr, err := buildServer(testtools.TestLogger(), config)

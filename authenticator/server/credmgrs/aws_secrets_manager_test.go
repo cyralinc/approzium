@@ -13,6 +13,9 @@ import (
 )
 
 func TestAwsSecretsManager(t *testing.T) {
+	if os.Getenv("AWS_REGION") == "" {
+		t.Skip("skipping because AWS_REGION is unset")
+	}
 	sess, err := session.NewSession()
 	if err != nil {
 		t.Skip("skipping because no AWS config is available")
