@@ -17,6 +17,10 @@ const envVarPrefix = "APPROZIUM_"
 type section string
 
 const (
+	// IMPORTANT NOTE
+	// If adding a section, also, add it to the commandLineUsage func below
+	// or it won't be included in command-line help.
+	//
 	// For fields that shouldn't be included in the file conf
 	sectionExclude section = "exclude"
 
@@ -40,32 +44,50 @@ var (
 	// for them in env vars, config files, command-line flags, and defaults.
 	fieldRegistry = map[section][]field{
 		sectionListener: {
-			{name: "host", defaultVal: "127.0.0.1", flagConfField: &flagConf.Host, goFieldName: "Host", prependEnvVar: true},
-			{name: "http port", defaultVal: 6000, flagConfField: &flagConf.HTTPPort, goFieldName: "HTTPPort", prependEnvVar: true},
-			{name: "grpc port", defaultVal: 6001, flagConfField: &flagConf.GRPCPort, goFieldName: "GRPCPort", prependEnvVar: true},
+			{name: "host", defaultVal: "127.0.0.1", flagConfField: &flagConf.Host, goFieldName: "Host", prependEnvVar: true,
+				description: "The address at which Approzium's authenticator should run."},
+			{name: "http port", defaultVal: 6000, flagConfField: &flagConf.HTTPPort, goFieldName: "HTTPPort", prependEnvVar: true,
+				description: "The port that should serve HTTP traffic."},
+			{name: "grpc port", defaultVal: 6001, flagConfField: &flagConf.GRPCPort, goFieldName: "GRPCPort", prependEnvVar: true,
+				description: "The port that should serve GRPC traffic, used for client authentication requests."},
 		},
 		sectionLogging: {
-			{name: "log level", defaultVal: "info", flagConfField: &flagConf.LogLevel, goFieldName: "LogLevel", prependEnvVar: true},
-			{name: "log format", defaultVal: "text", flagConfField: &flagConf.LogFormat, goFieldName: "LogFormat", prependEnvVar: true},
-			{name: "log raw", defaultVal: false, flagConfField: &flagConf.LogRaw, goFieldName: "LogRaw", prependEnvVar: true},
+			{name: "log level", defaultVal: "info", flagConfField: &flagConf.LogLevel, goFieldName: "LogLevel", prependEnvVar: true,
+				description: `Valid values are "panic", "fatal", "error", "warn", "info", "debug", and "trace".`},
+			{name: "log format", defaultVal: "text", flagConfField: &flagConf.LogFormat, goFieldName: "LogFormat", prependEnvVar: true,
+				description: `Valid values are "text" and "json".`},
+			{name: "log raw", defaultVal: false, flagConfField: &flagConf.LogRaw, goFieldName: "LogRaw", prependEnvVar: true,
+				description: "Set to true to disable removing sensitive values from logging."},
 		},
 		sectionTLS: {
-			{name: "disable tls", defaultVal: false, flagConfField: &flagConf.DisableTLS, goFieldName: "DisableTLS", prependEnvVar: true},
-			{name: "tls cert path", defaultVal: "", flagConfField: &flagConf.PathToTLSCert, goFieldName: "PathToTLSCert", prependEnvVar: true},
-			{name: "tls key path", defaultVal: "", flagConfField: &flagConf.PathToTLSKey, goFieldName: "PathToTLSKey", prependEnvVar: true},
+			{name: "disable tls", defaultVal: false, flagConfField: &flagConf.DisableTLS, goFieldName: "DisableTLS", prependEnvVar: true,
+				description: "Set to true to disable TLS encryption. Not recommended in production environments."},
+			{name: "tls cert path", defaultVal: "", flagConfField: &flagConf.PathToTLSCert, goFieldName: "PathToTLSCert", prependEnvVar: true,
+				description: "The path to the certificate proving the Approzium authenticator's identity."},
+			{name: "tls key path", defaultVal: "", flagConfField: &flagConf.PathToTLSKey, goFieldName: "PathToTLSKey", prependEnvVar: true,
+				description: "The path to the private key to be used for decrypting inbound communication."},
 		},
 		sectionSecretsMgr: {
-			{name: "secrets manager", defaultVal: "", flagConfField: &flagConf.SecretsManager, goFieldName: "SecretsManager", prependEnvVar: true},
-			{name: "vault token", defaultVal: "", flagConfField: &flagConf.VaultToken, goFieldName: "VaultToken", prependEnvVar: false},
-			{name: "vault token path", defaultVal: "", flagConfField: &flagConf.VaultTokenPath, goFieldName: "VaultTokenPath", prependEnvVar: true},
-			{name: "vault addr", defaultVal: "", flagConfField: &flagConf.VaultAddr, goFieldName: "VaultAddr", prependEnvVar: false},
-			{name: "assume aws role", defaultVal: "", flagConfField: &flagConf.AssumeAWSRole, goFieldName: "AssumeAWSRole", prependEnvVar: true},
-			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion", prependEnvVar: false},
+			{name: "secrets manager", defaultVal: "", flagConfField: &flagConf.SecretsManager, goFieldName: "SecretsManager", prependEnvVar: true,
+				description: `Valid values include "vault" for HashiCorp Vault, "asm" for AWS Secrets Manager", or "local" for a file-based development environment.`},
+			{name: "vault token", defaultVal: "", flagConfField: &flagConf.VaultToken, goFieldName: "VaultToken", prependEnvVar: false,
+				description: `If "vault" is selected as the secrets manager, a Vault token that won't expire for the Approzium authenticator's lifetime. Use "vault token path" instead in production.`},
+			{name: "vault token path", defaultVal: "", flagConfField: &flagConf.VaultTokenPath, goFieldName: "VaultTokenPath", prependEnvVar: true,
+				description: `If "vault" is selected as the secrets manager, the path to a file containing a Vault token that is constantly refreshed by the Vault agent.`},
+			{name: "vault addr", defaultVal: "", flagConfField: &flagConf.VaultAddr, goFieldName: "VaultAddr", prependEnvVar: false,
+				description: `If "vault" is selected as the secrets manager, Vault's address.`},
+			{name: "assume aws role", defaultVal: "", flagConfField: &flagConf.AssumeAWSRole, goFieldName: "AssumeAWSRole", prependEnvVar: true,
+				description: `If "asm" is selected as the secrets manager, an optional role for the Approzium authenticator to assume when communicating with AWS.`},
+			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion", prependEnvVar: false,
+				description: `If "asm" is selected as the secrets manager, the region where the AWS Secrets Manager resides.`},
 		},
 		sectionExclude: {
-			{name: "config", defaultVal: "", flagConfField: &flagConf.ConfigFilePath, goFieldName: "ConfigFilePath", prependEnvVar: true},
-			{name: "dev", defaultVal: false, flagConfField: &flagConf.DevMode, goFieldName: "DevMode", prependEnvVar: true},
-			{name: "version", defaultVal: false, flagConfField: &flagConf.Version, goFieldName: "Version", prependEnvVar: true},
+			{name: "config", defaultVal: "", flagConfField: &flagConf.ConfigFilePath, goFieldName: "ConfigFilePath", prependEnvVar: true,
+				description: "The path to a yaml file bearing configuration settings."},
+			{name: "dev", defaultVal: false, flagConfField: &flagConf.DevMode, goFieldName: "DevMode", prependEnvVar: true,
+				description: `When true, starts the Approzium authenticator in dev mode, with TLS disabled, with the "local" secrets manager, and debug-level logs.`},
+			{name: "version", defaultVal: false, flagConfField: &flagConf.Version, goFieldName: "Version", prependEnvVar: true,
+				description: `Outputs the Approzium authenticator's version.`},
 		},
 	}
 
@@ -84,6 +106,9 @@ type field struct {
 	// A user-friendly name for the field. Multi-word parameters should be separated by spaces: "fizz buzz".
 	name string
 
+	// A user-friendly description for the field.
+	description string
+
 	// The default value for the field.
 	defaultVal interface{}
 
@@ -101,13 +126,16 @@ func init() {
 	for _, registeredField := range allRegisteredFields {
 		switch fieldOnConf := registeredField.flagConfField.(type) {
 		case *bool:
-			flag.BoolVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(bool), "")
+			flag.BoolVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(bool), registeredField.description)
 		case *int:
-			flag.IntVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(int), "")
+			flag.IntVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(int), registeredField.description)
 		case *string:
-			flag.StringVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(string), "")
+			flag.StringVar(fieldOnConf, flagName(registeredField.name), registeredField.defaultVal.(string), registeredField.description)
 		}
 	}
+
+	// Customize command-line help output with our own grouped format.
+	flag.Usage = commandLineUsage
 }
 
 // Config is an object for storing configuration variables set through
@@ -356,4 +384,33 @@ func setField(elem reflect.Value, registeredField field, value string) error {
 		return fmt.Errorf("unrecognized field type: %T", registeredField.flagConfField)
 	}
 	return nil
+}
+
+// commandLineUsage customizes the response when a user makes a mistake or needs help using flags.
+// Normally, flags are outputted as one group, alphabetically by field name. However, we would prefer
+// to group them by section and keep them in the same order as they've been added to the registry.
+func commandLineUsage() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", "authenticator")
+	sectionOrder := []section{sectionListener, sectionTLS, sectionLogging, sectionSecretsMgr, sectionExclude}
+
+	for _, section := range sectionOrder {
+		sectionFields := fieldRegistry[section]
+		if section != sectionExclude {
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("\n%s", section), "\n")
+		} else {
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("\n%s", "miscellaneous"), "\n")
+		}
+
+		for _, field := range sectionFields {
+			switch f := field.flagConfField.(type) {
+			case *bool:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			case *int:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			case *string:
+				fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("  -%s %T", flagName(field.name), *f), "\n")
+			}
+			fmt.Fprint(flag.CommandLine.Output(), fmt.Sprintf("      %s", field.description), "\n")
+		}
+	}
 }
