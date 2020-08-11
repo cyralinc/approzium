@@ -6,18 +6,16 @@ title: Installation
 
 - Python: `pip3 install approzium`
 
-## Authentication server binaries
+## Server Binaries
 
 - Our binaries are posted with [our releases](https://github.com/cyralinc/approzium/releases).
-
-## Running the server binary
 
 ### Linux
 
 Please replace `linux_amd64.zip` with the correct version of Linux for your environment.
 
 ```
-curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/linux_amd64.zip
+curl https://github.com/cyralinc/approzium/releases/download/v0.2.0/linux_amd64.zip
 unzip linux_amd64.zip
 chmod +x authenticator
 ./authenticator
@@ -28,7 +26,7 @@ chmod +x authenticator
 Please replace `darwin_amd64.zip` with the correct version of Mac for your environment.
 
 ```
-curl https://github.com/cyralinc/approzium/releases/download/v0.1.0/darwin_amd64.zip
+curl https://github.com/cyralinc/approzium/releases/download/v0.2.0/darwin_amd64.zip
 unzip darwin_amd64.zip
 chmod +x authenticator
 ./authenticator
@@ -39,7 +37,7 @@ chmod +x authenticator
 Please replace `windows_amd64.zip` with the correct version of Windows for your environment.
 
 ```
-$url = "https://github.com/cyralinc/approzium/releases/download/v0.1.0/windows_amd64.zip"
+$url = "https://github.com/cyralinc/approzium/releases/download/v0.2.0/windows_amd64.zip"
 $outpath = "$PSScriptRoot/windows_amd64.zip"
 Invoke-WebRequest -Uri $url -OutFile $outpath
 $wc = New-Object System.Net.WebClient
@@ -48,3 +46,14 @@ $args = @("Comma","Separated","Arguments")
 Expand-Archive -LiteralPath $outpath -DestinationPath C:\ $PSScriptRoot
 Start-Process -Filepath "$PSScriptRoot/authenticator.exe" -ArgumentList $args
 ```
+
+## Docker
+```
+docker run approzium/authenticator:latest
+```
+
+## Terraform 0.12 and Above
+
+To speed you up, we offer stock Terraform configs for deploying the Approzium Authenticator. They live
+[in our Github repo](https://github.com/cyralinc/approzium/tree/develop/terraform). We would also like
+to add support for GCP and Azure, and we welcome community contributions.

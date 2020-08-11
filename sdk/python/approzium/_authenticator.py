@@ -7,7 +7,7 @@ from pathlib import Path
 
 import grpc
 
-from . import _mysql, _postgres
+from . import _iam, _mysql, _postgres
 from ._iam import (
     assume_role,
     get_local_arn,
@@ -105,6 +105,7 @@ class AuthClient(object):
         info["iam_arn"] = self.claimed_arn
         info["authenticated"] = self.authenticated
         info["num_connections"] = self.n_conns
+        info.update(_iam.attribution_info())
         return info
 
     @property

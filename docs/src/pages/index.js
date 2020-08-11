@@ -12,12 +12,12 @@ function Home() {
   const { siteConfig = {} } = context;
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={`Approzium`}
+      description="Enhance the observability and security of your database applications">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className={clsx('container', styles.container)}>
           <div>
-            <img className={clsx('icon', styles.icon)} src={'img/apzm-icon.png'} />
+            <img className={clsx('icon', styles.icon)} src={'img/apzm-icon.svg'} />
             <h1 className={clsx('hero__title', styles.heroTitle)}>{siteConfig.title}</h1>
             <p className={clsx('hero__subtitle', styles.heroSubtitle)}>
               Enhance the <strong>observability</strong> and <strong>security</strong><br /> of your database applications.

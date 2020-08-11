@@ -5,7 +5,7 @@ from mysql.connector import MySQLConnection
 
 import approzium
 
-from ..._mysql import get_auth_resp
+from ..._mysql import get_auth_resp_msg
 
 
 class ApproziumMySQLConnection(MySQLConnection):
@@ -26,20 +26,21 @@ class ApproziumMySQLConnection(MySQLConnection):
                     client_flags
                     & mysql.connector.constants.ClientFlag.SECURE_CONNECTION
                 )
-                auth_response = get_auth_resp(
+                auth_response = get_auth_resp_msg(
+                    is_secure_connection,
                     authenticator,
                     host,
                     str(port),
                     username,
                     auth_plugin,
                     auth_data,
-                    is_secure_connection,
                 )
                 return auth_response
 
             host = self.server_host
             port = self.server_port
             self._protocol._auth_response = _auth_response
+            self.authenticator = self._password
 
         return super(ApproziumMySQLConnection, self)._do_auth(*args, **kwargs)
 
@@ -89,7 +90,7 @@ def connect(*args, authenticator=None, **kwargs):
 
         >>> import approzium
         >>> from approzium.mysql.connector import connect
-        >>> auth = approzium.AuthClient("myauthenticator.com:6001")
+        >>> auth = approzium.AuthClient("myauthenticator.com:6001", disable_tls=True)
         >>> con = connect(user="bob", host="host.com", authenticator=auth, \
         ...     use_pure=True)
         >>> # use the connection just like any other MySQL connector connection

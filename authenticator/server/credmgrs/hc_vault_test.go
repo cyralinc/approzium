@@ -1,6 +1,7 @@
 package credmgrs
 
 import (
+	"github.com/cyralinc/approzium/authenticator/server/config"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -77,7 +78,10 @@ func TestHcVaultCredMgr_WithTokenPath(t *testing.T) {
 	os.Unsetenv(vault.EnvVaultToken)
 
 	// Try to read the creds through the cred manager.
-	credMgr, err := newHashiCorpVaultCreds(tmpFile.Name())
+	credMgr, err := newHashiCorpVaultCreds(nil, config.Config{
+		VaultTokenPath: tmpFile.Name(),
+		VaultAddr:      addr,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +133,11 @@ func TestHcVaultCredMgr_WithoutTokenPath(t *testing.T) {
 	}
 
 	// Try to read the creds through the cred manager.
-	credMgr, err := newHashiCorpVaultCreds("")
+	credMgr, err := newHashiCorpVaultCreds(nil, config.Config{
+		VaultTokenPath: "",
+		VaultAddr:      addr,
+		VaultToken:     os.Getenv(vault.EnvVaultToken),
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

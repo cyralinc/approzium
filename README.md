@@ -4,12 +4,18 @@
 ![lint](https://github.com/cyralinc/approzium/workflows/lint/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/approzium/badge/?version=latest)](http://approzium.readthedocs.io/?badge=latest)
 
-Approzium provides SDKs that allow you to authenticate to a database without ever having access to its password. Your
-identity is provided through the platform on which you're running.
+Approzium is a tool that provides:
+- Password-less database authentication
+- Authentication through your cloud-provider's built-in identity
+- Highly security-oriented logging and metrics
+
+Its aim is to prevent data breaches, and to help you detect them promptly if they do occur or are attempted.
 
 ----
 
 **Please note**: We take Approzium's security and our users' trust very seriously. If you believe you have found a security issue in Approzium, _please responsibly disclose_ by contacting us at [security@cyral.com](mailto:security@cyral.com).
+
+See the [SECURITY](.github/SECURITY.md) guide for more details.
 
 ----
 
@@ -18,7 +24,7 @@ do stay tuned for more identity platforms, databases, and SDK languages.
 
 ## Docs
 
-See https://approzium.org/ for a Quick Start, or elaboration on the architecture and API.
+See https://approzium.com/ for a Quick Start, or elaboration on the architecture and API.
 
 ## Support
 

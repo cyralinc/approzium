@@ -1,0 +1,26 @@
+archives:
+    -
+        builds:
+        - authenticator
+        name_template: "{{ .Os }}_{{ .Arch }}"
+        format: zip
+        files:
+            - none*
+builds:
+    -
+        id: "authenticator"
+        goarch:
+            - 386
+            - amd64
+            - arm
+            - arm64
+        goos:
+            - linux
+            - darwin
+            - windows
+            - freebsd
+            - netbsd
+            - solaris
+        ignore:
+            - goos: freebsd
+              goarch: arm64

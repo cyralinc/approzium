@@ -1,6 +1,18 @@
-# host: 127.0.0.0
-# httpport: 6000
-# grpcport: 6001
-# loglevel: info
-# logformat: text
-# lograw: false
+# Example authenticator config file
+---
+listener:
+  grpc_port: 6001
+  host: "127.0.0.1"
+  http_port: 6000
+logging:
+  log_format: text
+  log_level: info
+  log_raw: false
+secrets:
+  secrets_manager: "vault1"
+  vault_addr: "https://somewhere:8200"
+  vault_token_path: "/path/to/tokensink.txt"
+tls:
+  disable_tls: true
+  tls_cert_path: "/path/to/approzium.pem"
+  tls_key_path: "/path/to/approzium.key"

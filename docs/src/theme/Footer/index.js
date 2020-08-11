@@ -113,11 +113,8 @@ function Footer() {
               </div>
             )}
 
-            <div
-              dangerouslySetInnerHTML={{
-                __html: copyright,
-              }}
-            />
+            <div />
+            Copyright © 2020 <a href='https://cyral.com/'>Cyral, Inc.</a>
           </div>
         )}
       </div>

@@ -1,0 +1,15 @@
+# Please edit it appropriately before production deploys.
+# See https://approzium.com/docs/configuration for more.
+---
+listener:
+  grpc_port: 6001
+  host: "127.0.0.1"
+  http_port: 6000
+logging:
+  log_format: json
+  log_level: info
+  log_raw: false
+secrets:
+  secrets_manager: "local"
+tls:
+  disable_tls: true

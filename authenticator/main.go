@@ -12,10 +12,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const currentVersion = "0.2.0"
+
 func main() {
-	c, err := config.ParseConfig()
+	c, err := config.Parse()
 	if err != nil {
 		log.Errorf("couldn't parse config: %s", err)
+		return
+	}
+
+	if c.Version {
+		// Just output the version and be done.
+		fmt.Println("Approzium v" + currentVersion)
 		return
 	}
 

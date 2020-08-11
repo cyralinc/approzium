@@ -1,15 +1,19 @@
 ---
 title: Compatibility
 ---
-
 ## Client Libraries
-- Python
-  - psycopg2
-  - asyncpg
-  - MySQL Connector
-- Go
-  - lib/pq (coming soon!)
+| **Language** | **Database** | **Library**            | **Cloud Identity Support** | **Notes**                                                               | **Connection Pool Support**  | **Auth Methods**                       |
+|--------------|--------------|------------------------|----------------------------|-------------------------------------------------------------------------|------------------------------|----------------------------------------|
+| Python       | Postgres     | psycopg2               | AWS IAM                    | _psycopg2-binary_ is not supported. Use the more recommended _psycopg2_ | ✅                           | MD5*, SCRAM-SHA256                     |
+| Python       | Postgres     | asyncpg                | AWS IAM                    |                                                                         | ✅                           | MD5*, SCRAM-SHA256                     |
+| Python       | MySQL        | mysql-connector-python | AWS IAM                    | C-extension based usage is not currently supported.                     | ✅                           | SHA-1 (Native password authentication) |
+| Python       | MySQL        | PyMySQL                | AWS IAM                    |                                                                         | N/A                          | SHA-1 (Native password authentication) |
+
+** Even though MD5 is cryptographically insecure, it is the default authentication method
+used by Postgres, and so we made the decision to support it. However, we recommend using
+the more secure [SCRAM-SHA256](https://www.postgresql.org/docs/10/sasl-authentication.html)
+authentication when possible.*
 
 ## Secrets Managers
 - Vault
-- AWS Secrets Manager (coming soon!)
+- AWS Secrets Manager

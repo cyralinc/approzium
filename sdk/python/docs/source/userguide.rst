@@ -3,7 +3,15 @@ Installation
 
 The last stable release is available on PyPI and can be installed with ``pip``::
 
-    $ python3 -m pip install approzium
+    $ pip3 install approzium
+
+This installs only the approzium SDK. If you would like to additionally install all supported database drivers libraries, run::
+
+    $ pip3 install 'approzium[sqllibs]'
+
+To install Opentelemetry and other dependencies for generating tracing::
+
+    $ pip3 install 'approzium[tracing]'
 
 Requirements
 ------------
@@ -22,17 +30,27 @@ The following database driver libraries are supported:
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | Database   | Driver             | Authentication Methods                                   | Notes                                                       |
       +============+====================+==========================================================+=============================================================+
-      | Postgres   | Psycopg2_          | MD5 (Postgres default) and SCRAM-SHA-256 authentication  |                                                             |
+      | Postgres   | Psycopg2_          | MD5* (Postgres default) and SCRAM-SHA-256 authentication |                                                             |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | Postgres   | Asyncpg_           | Same as above                                            |                                                             |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
       | MySQL      | `MySQL Connector`_ | `Native password authentication`_                        | Currently, only the pure Python implementation is supported |
       +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
+      | MySQL      | PyMySQL_           | Same as above                                            |                                                             |
+      +------------+--------------------+----------------------------------------------------------+-------------------------------------------------------------+
+
+.. warning::
+
+    Even though MD5 is cryptographically insecure, it is the default authentication method
+    used by Postgres, and so we made the decision to support it. However, we recommend using
+    the more secure SCRAM-SHA256_ authentication when possible.
 
 .. _Psycopg2: https://github.com/psycopg/psycopg2
 .. _Asyncpg: https://github.com/MagicStack/asyncpg
 .. _MySQL Connector: https://dev.mysql.com/doc/connector-python/en/
+.. _PyMySQL: https://github.com/PyMySQL/PyMySQL
 .. _Native password authentication: https://dev.mysql.com/doc/refman/8.0/en/native-pluggable-authentication.html
+.. _SCRAM-SHA256: https://www.postgresql.org/docs/10/sasl-authentication.html
 
 
 Usage
