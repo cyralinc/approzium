@@ -54,6 +54,8 @@ vault write approzium/1.2.3.4:5432 @dbuser1-creds.json
 ```
 
 ## SDK Usage
+
+### Python
 Install the SDK in your client.
 ```shell
 pip3 install 'approzium[sqllibs]'
@@ -74,4 +76,49 @@ conn = connect("host=1.2.3.4 user=dbuser1 dbname=mydbhost", authenticator=auth)
 # use the connection as you typically would. very cool!
 cur = conn.cursor()
 cur.execute('SELECT 1')
+```
+
+### Go
+
+The Approzium Go SDK currently supports MD5 authentication to Postgres.
+
+```
+go get github.com/cyralinc/approzium
+```
+
+```
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/cyralinc/approzium"
+)
+
+func main() {
+	// Create a connection to the Approzium authenticator,
+	// because only the authenticator knows the password.
+	authClient, err := approzium.NewAuthClient("localhost:6001", &approzium.Config{
+		DisableTLS:      true,
+		RoleArnToAssume: os.Getenv("TEST_ASSUMABLE_ARN"), // Optional.
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Now create a Postgres connection without a password.
+	// We also support strings like:
+	// "postgres://pqgotest:@localhost/pqgotest?sslmode=verify-full"
+	dataSourceName := "user=postgres dbname=postgres host=localhost port=5432 sslmode=disable"
+	db, err := authClient.Open("postgres", dataSourceName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT 1")
+    ...
+}
 ```
