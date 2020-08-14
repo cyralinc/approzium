@@ -16,6 +16,10 @@ type testCase struct {
 	Name     string
 	Args     []string
 	Expected string
+
+	// Instead of matching exact values, just check that we have or don't have something.
+	Has        bool
+	DoesntHave bool
 }
 
 func TestLocalFile(t *testing.T) {
@@ -100,6 +104,7 @@ func TestVault(t *testing.T) {
 			Name:     "it was really written",
 			Args:     []string{"approzium", "passwords", "list"},
 			Expected: "vault-passwords-list.txt",
+			Has:      true,
 		},
 		{
 			Name:     "deleting a record works",
@@ -107,9 +112,10 @@ func TestVault(t *testing.T) {
 			Expected: "passwords-delete.txt",
 		},
 		{
-			Name:     "the record is gone",
-			Args:     []string{"approzium", "passwords", "list"},
-			Expected: "passwords-empty-list.txt",
+			Name:       "the record is gone",
+			Args:       []string{"approzium", "passwords", "list"},
+			Expected:   "vault-passwords-list.txt",
+			DoesntHave: true,
 		},
 	}
 
@@ -205,8 +211,22 @@ func ensureExpectedOutputForArgs(t *testing.T, tstCase *testCase) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if clean(result) != clean(expected) {
-		t.Fatalf("unexpected response: \n%s", result)
+	switch {
+	case tstCase.Has:
+		// The new state should contain the expected state.
+		if !strings.Contains(clean(result), clean(expected)) {
+			t.Fatalf("unexpected response: \n%s", result)
+		}
+	case tstCase.DoesntHave:
+		// The new state should contain the expected state.
+		if strings.Contains(clean(result), clean(expected)) {
+			t.Fatalf("unexpected response: \n%s", result)
+		}
+	default:
+		// We should have an exact match.
+		if clean(result) != clean(expected) {
+			t.Fatalf("unexpected response: \n%s", result)
+		}
 	}
 	done()
 }
