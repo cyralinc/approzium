@@ -27,6 +27,9 @@ func TestLocalFile(t *testing.T) {
 	}
 	project := "github.com/cyralinc/approzium"
 	i := strings.Index(wd, project)
+	if i == -1 {
+		t.Skip("skipping because unable to determine the path to test secrets")
+	}
 	pathToSecretsYaml := wd[:i] + project + "/authenticator/server/testing/secrets.yaml"
 	os.Setenv("APPROZIUM_LOCAL_FILE_PATH", pathToSecretsYaml)
 
