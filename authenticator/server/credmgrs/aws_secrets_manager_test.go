@@ -3,13 +3,14 @@
 package credmgrs
 
 import (
+	"os"
+	"testing"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/cyralinc/approzium/authenticator/server/config"
-	"os"
-	"testing"
 )
 
 func TestAwsSecretsManager(t *testing.T) {
@@ -28,7 +29,7 @@ func TestAwsSecretsManager(t *testing.T) {
 		DBPort: "5432",
 		DBUser: "dbuser1",
 	}
-	path := AsmSecretPath(identity)
+	path := asmSecretPath(identity.DBHost, identity.DBPort)
 	secretString := `
 {
     "dbuser1": {

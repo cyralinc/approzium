@@ -1,0 +1,9 @@
+approzium supports the following sub-commands:
+  passwords
+
+Example commands:
+  approzium passwords list
+  approzium passwords read --h
+  approzium passwords read -port=5432
+
+Get help with any command by adding '--h' or '--help'.

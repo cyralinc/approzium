@@ -80,6 +80,8 @@ var (
 				description: `If "asm" is selected as the secrets manager, an optional role for the Approzium authenticator to assume when communicating with AWS.`},
 			{name: "aws region", defaultVal: "", flagConfField: &flagConf.AwsRegion, goFieldName: "AwsRegion", prependEnvVar: false,
 				description: `If "asm" is selected as the secrets manager, the region where the AWS Secrets Manager resides.`},
+			{name: "local file path", defaultVal: "", flagConfField: &flagConf.LocalFilePath, goFieldName: "LocalFilePath", prependEnvVar: true,
+				description: `If "local" is selected as the secrets manager, the path to where secrets.yaml resides.`},
 		},
 		sectionExclude: {
 			{name: "config", defaultVal: "", flagConfField: &flagConf.ConfigFilePath, goFieldName: "ConfigFilePath", prependEnvVar: true,
@@ -167,18 +169,21 @@ type Config struct {
 	AwsRegion     string
 	AssumeAWSRole string
 
+	// Local file related
+	LocalFilePath string
+
 	// Special flags
 	ConfigFilePath string
 	DevMode        bool
 	Version        bool
 }
 
-func verify(config *Config) error {
-	if !config.DisableTLS {
-		if config.PathToTLSCert == "" {
+func (c *Config) VerifyForServer() error {
+	if !c.DisableTLS {
+		if c.PathToTLSCert == "" {
 			return errors.New("tls is enabled but no tls cert has been provided")
 		}
-		if config.PathToTLSKey == "" {
+		if c.PathToTLSKey == "" {
 			return errors.New("tls is enabled but no tls key has been provided")
 		}
 	}
@@ -201,9 +206,6 @@ func Parse() (Config, error) {
 		if err != nil {
 			return Config{}, err
 		}
-	}
-	if err := verify(config); err != nil {
-		return Config{}, err
 	}
 	// We return a non-pointer to signal that it will never change.
 	return *config, nil

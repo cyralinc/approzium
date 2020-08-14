@@ -20,6 +20,10 @@ func main() {
 		log.Errorf("couldn't parse config: %s", err)
 		return
 	}
+	if err := c.VerifyForServer(); err != nil {
+		log.Errorf("couldn't verify config: %s", err)
+		return
+	}
 
 	if c.Version {
 		// Just output the version and be done.
