@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -13,10 +14,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Start(logger *log.Logger, config config.Config) error {
+// Start beings the authenticator's API server, and returns a function
+// that can be called to begin graceful shutdown. Be sure to wait until
+// the graceful shutdown function completes to end the program.
+func Start(logger *log.Logger, config config.Config) (func(), error) {
 
 	if err := loadEndpoints(logger, config); err != nil {
-		return err
+		return nil, err
 	}
 
 	serviceAddress := config.Host + ":" + strconv.Itoa(config.HTTPPort)
@@ -35,15 +39,15 @@ func Start(logger *log.Logger, config config.Config) error {
 		server.Addr = fmt.Sprintf(":%d", config.HTTPPort)
 		crt, err := ioutil.ReadFile(config.PathToTLSCert)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		key, err := ioutil.ReadFile(config.PathToTLSKey)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cert, err := tls.X509KeyPair(crt, key)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		server.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
@@ -51,11 +55,23 @@ func Start(logger *log.Logger, config config.Config) error {
 		}
 
 		go func() {
-			logger.Fatal(server.ListenAndServeTLS("", ""))
+			// ListenAndServeTLS always blocks indefinitely until it returns an error
+			// describing how it stopped.
+			if err := server.ListenAndServeTLS("", ""); err != nil {
+				if err.Error() == http.ErrServerClosed.Error() {
+					logger.Info(err)
+				} else {
+					logger.Fatal(err)
+				}
+			}
 		}()
 		logger.Infof("api starting on https://%s", serviceAddress)
 	}
-	return nil
+	return func() {
+		if err := server.Shutdown(context.Background()); err != nil {
+			logger.Errorf("error shutting down gracefully: %s", err)
+		}
+	}, nil
 }
 
 func loadEndpoints(logger *log.Logger, config config.Config) error {

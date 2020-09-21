@@ -53,7 +53,7 @@ var maxIterations = uint32(15000 * 10)
 // an error is returned from either, terminating the application. Both servers
 // respond to CTRL+C shutdowns.
 func Start(logger *log.Logger, config config.Config) error {
-	if err := api.Start(logger, config); err != nil {
+	if _, err := api.Start(logger, config); err != nil {
 		return err
 	}
 	svr, err := buildServer(logger, config)
