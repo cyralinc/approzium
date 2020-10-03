@@ -35,6 +35,7 @@ type healthResponse struct {
 func (h *healthChecker) ServeHTTP(wr http.ResponseWriter, _ *http.Request) {
 	h.logger.Debug("server is healthy")
 
+	wr.WriteHeader(http.StatusOK)
 	wr.Header().Set("Content-Type", "application/json")
 	response := healthResponse{
 		ServerTime: time.Now().UTC().Format(time.RFC3339),
