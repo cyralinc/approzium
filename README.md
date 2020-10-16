@@ -43,7 +43,7 @@ We use `docker-compose.yml` to quickly and easily provide you with a development
 To spin up an end-to-end development environment based in Docker:
 
 - Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
-- In your local environment, run `$ aws configure` and add an access key and secret.
+- In your local environment, run `$ aws configure` and add an access key and a secret.
 - Run `$ make dc-build`. This will build the authenticator and development Docker images.
 - Run `$ docker-compose up`. This will run the authenticator with a Vault backend and will run test database servers (Postgres and MySQL).
 - In another window, `$ make dev`. This will start a shell in the development environment.
