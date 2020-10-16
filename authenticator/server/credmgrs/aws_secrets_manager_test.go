@@ -3,12 +3,14 @@
 package credmgrs
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/cyralinc/approzium/authenticator/server/config"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -82,6 +84,12 @@ func TestAwsSecretsManager(t *testing.T) {
 	}
 	password, err := credMgr.Password(testLogEntry, identity)
 	if err != nil {
+		if strings.Contains(err.Error(), "not authorized") {
+			// The issue isn't with our code itself, it's that the creds we're using for
+			// testing aren't sufficient.
+			fmt.Println("insufficient authorization to run this test")
+			t.SkipNow()
+		}
 		t.Fatal(err)
 	}
 	if password != "asdfghjkl" {
