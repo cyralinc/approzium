@@ -110,9 +110,19 @@ func (a *aws) executeGetCallerIdentity(signedGetCallerIdentity string, clientLan
 	}
 	defer resp.Body.Close()
 
+	if resp.Header.Get("Content-Type") != "text/xml" {
+		return "", fmt.Errorf("unsupported Content-Type header of %s", resp.Header.Get("Content-Type"))
+	}
+
 	respBody, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("received unexpected get caller identity response %d: %s", resp.StatusCode, respBody)
+	}
+	if strings.Contains(string(respBody), "{") || strings.Contains(string(respBody), "[") {
+		// Just to err on the side of caution, ensure that the body doesn't hold anything
+		// that might be JSON. This is to avoid the exploit described in
+		// https://googleprojectzero.blogspot.com/2020/10/enter-the-vault-auth-issues-hashicorp-vault.html.
+		return "", fmt.Errorf("body appears to contain JSON: %s", string(respBody))
 	}
 
 	type GetCallerIdentityResponse struct {
