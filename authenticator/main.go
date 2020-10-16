@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const currentVersion = "0.2.0"
+const currentVersion = "0.2.1"
 
 func main() {
 	c, err := config.Parse()
