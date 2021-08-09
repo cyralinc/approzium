@@ -16,19 +16,13 @@ auth = approzium.AuthClient("authenticator:6001")
 approzium.default_auth_client = auth
 
 trace.set_tracer_provider(
-    TracerProvider(
-        resource=Resource.create({SERVICE_NAME: "approzium_service"})
-    )
+    TracerProvider(resource=Resource.create({SERVICE_NAME: "approzium_service"}))
 )
 tracer = trace.get_tracer(__name__)
 
-jaeger_exporter = JaegerExporter(
-    agent_host_name="jaeger", agent_port=6831
-)
+jaeger_exporter = JaegerExporter(agent_host_name="jaeger", agent_port=6831)
 
-trace.get_tracer_provider().add_span_processor(
-    BatchSpanProcessor(jaeger_exporter)
-)
+trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
 
 approzium.opentelemetry.instrument()
 Psycopg2Instrumentor().instrument()

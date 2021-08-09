@@ -38,7 +38,9 @@ def instrument():
     """
     global original_DatabaseApiIntegration
     original_DatabaseApiIntegration = DatabaseApiIntegration
-    opentelemetry.instrumentation.dbapi.DatabaseApiIntegration = _ApproziumDatabaseApiIntegration
+    opentelemetry.instrumentation.dbapi.DatabaseApiIntegration = (
+        _ApproziumDatabaseApiIntegration
+    )
 
 
 def uninstrument():
@@ -48,4 +50,6 @@ def uninstrument():
     """
     if original_DatabaseApiIntegration is None:
         raise Exception("Opentelemetry is not currently instrumented by Approzium")
-    opentelemetry.instrumentation.dbapi.DatabaseApiIntegration = original_DatabaseApiIntegration
+    opentelemetry.instrumentation.dbapi.DatabaseApiIntegration = (
+        original_DatabaseApiIntegration
+    )
