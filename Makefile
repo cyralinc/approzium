@@ -71,7 +71,7 @@ seed-asm-all-addrs:
 		make seed-asm-addr ADDR=$$ADDR; \
 	done
 
-run-testsuite: run-gotests run-pg2tests
+run-testsuite: run-gotests run-pythontests
 
 run-gotests: enable-vault-path seed-vault-all-addrs seed-asm-all-addrs
 	cd authenticator && CGO_ENABLED=1 go test -v -race ./...
