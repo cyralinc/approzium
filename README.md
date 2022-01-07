@@ -43,9 +43,12 @@ We use `docker-compose.yml` to quickly and easily provide you with a development
 To spin up an end-to-end development environment based in Docker:
 
 - Ensure you have [Docker](https://www.docker.com/) installed with Buildkit support (Docker 18.09 or higher)
-- In your local environment, run `$ aws configure` and add an access key and a secret.
-- Run `$ make dc-build`. This will build the authenticator and development Docker images.
-- Run `$ docker-compose up`. This will run the authenticator with a Vault backend and will run test database servers (Postgres and MySQL).
+- In your local environment, run `$ aws configure` and add an access key and a secret. Also,
+make sure that you have the `AWS_REGION` environment variable set, informing the AWS region that will be used. For instance:
+```
+export AWS_REGION=us-east-1
+```
+- Then run `$ make dev-env`. This will build the authenticator and development Docker images. Also, it will run the authenticator with a Vault backend and the test database servers (Postgres and MySQL).
 - In another window, `$ make dev`. This will start a shell in the development environment.
 - You now have a full development and testing environment!
 - For example, to use our Python SDK to create an Approzium connection to a Postgres server:
@@ -57,7 +60,32 @@ To spin up an end-to-end development environment based in Docker:
 
 Our end-to-end tests take a few minutes to run. Please run them once locally before you submit a PR.
 
-To run the end-to-end test, from our home directory:
+To run the tests, first you will need to:
+- Create an AWS `Role` (E.g. ApproziumTestAssumableRole) thats going to be used during the tests.
+- Ensure that you are using an AWS `User` with at least the following permissions:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "secretsmanager:*",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Resource": "arn:aws:iam::<some-account-id>:role/ApproziumTestAssumableRole"
+        }
+    ]
+}
+```
+- Set the `AWS_REGION` and the `TEST_ASSUMABLE_ARN` environment variables, for instance:
+```
+export AWS_REGION=us-east-1 && \
+export TEST_ASSUMABLE_ARN=arn:aws:iam::<some-account-id>:role/ApproziumTestAssumableRole
+```
+Then, to run the end-to-end tests, from our home directory:
 - Run `make test`. That's it!
 
 ## Credits
