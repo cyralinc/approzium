@@ -13,7 +13,7 @@ Its aim is to prevent data breaches, and to help you detect them promptly if the
 
 ----
 
-**Please note**: We take Approzium's security and our users' trust very seriously. If you believe you have found a security issue in Approzium, _please responsibly disclose_ by contacting us at [security@cyral.com](mailto:security@cyral.com).
+**Please note**: We take Approzium's security and our user's trust very seriously. If you believe you have found a security issue in Approzium, _please responsibly disclose_ by contacting us at [security@cyral.com](mailto:security@cyral.com).
 
 See the [SECURITY](.github/SECURITY.md) guide for more details.
 
@@ -68,13 +68,19 @@ To run the tests, first you will need to:
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": "secretsmanager:*",
             "Effect": "Allow",
-            "Resource": "*"
+            "Action": [
+                "secretsmanager:CreateSecret",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:DeleteSecret",
+                "secretsmanager:PutSecretValue"
+            ],
+            "Resource": "arn:aws:secretsmanager:us-east-2:<some-account-id>:secret:approzium/*"
         },
         {
-            "Action": "sts:AssumeRole",
             "Effect": "Allow",
+            "Action": "sts:AssumeRole",
             "Resource": "arn:aws:iam::<some-account-id>:role/ApproziumTestAssumableRole"
         }
     ]
