@@ -16,7 +16,7 @@ boto3 = "^1.14.10"
 grpcio = "^1.30.0"
 grpcio-tools = "^1.30.0"
 ec2-metadata = "^2.2.0"
-asyncpg = { version = "^0.20.1", optional = true}
+asyncpg = { version = ">=0.20.1,<0.22.0", optional = true}
 mysql-connector-python = { version = "^8.0.20", optional = true}
 opentelemetry-instrumentation-psycopg2 = { version = "^0.23b2", optional = true}
 opentelemetry-exporter-jaeger = {version = "^1.4.1", optional = true}
