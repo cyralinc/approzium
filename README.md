@@ -1,4 +1,4 @@
-# approzium
+# Approzium
 
 ![test](https://github.com/cyralinc/approzium/workflows/test/badge.svg)
 ![lint](https://github.com/cyralinc/approzium/workflows/lint/badge.svg)
