@@ -4,150 +4,148 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import React, {useCallback, useState, useEffect} from 'react';
-import clsx from 'clsx';
-import Translate from '@docusaurus/Translate';
-import SearchBar from '@theme/SearchBar';
-import Toggle from '@theme/Toggle';
-import useThemeContext from '@theme/hooks/useThemeContext';
+import React, { useCallback, useState, useEffect } from 'react'
+import clsx from 'clsx'
+import { useLocation } from 'react-router-dom'
+
+import Translate from '@docusaurus/Translate'
+import SearchBar from '@theme/SearchBar'
+import Toggle from '@theme/Toggle'
+import useThemeContext from '@theme/hooks/useThemeContext'
 import {
   useThemeConfig,
   useMobileSecondaryMenuRenderer,
   usePrevious,
   useHistoryPopHandler,
-} from '@docusaurus/theme-common';
-import useHideableNavbar from '@theme/hooks/useHideableNavbar';
-import useLockBodyScroll from '@theme/hooks/useLockBodyScroll';
-import useWindowSize from '@theme/hooks/useWindowSize';
-import {useActivePlugin} from '@theme/hooks/useDocs';
-import NavbarItem from '@theme/NavbarItem';
-import Logo from '@theme/Logo';
-import IconMenu from '@theme/IconMenu';
-import IconClose from '@theme/IconClose';
-import styles from './styles.module.css'; // retrocompatible with v1
+} from '@docusaurus/theme-common'
+import useHideableNavbar from '@theme/hooks/useHideableNavbar'
+import useLockBodyScroll from '@theme/hooks/useLockBodyScroll'
+import useWindowSize from '@theme/hooks/useWindowSize'
+import { useActivePlugin } from '@theme/hooks/useDocs'
+import NavbarItem from '@theme/NavbarItem'
+import Logo from '@theme/Logo'
+import IconMenu from '@theme/IconMenu'
+import IconClose from '@theme/IconClose'
+import styles from './styles.module.css' // retrocompatible with v1
 
-const DefaultNavItemPosition = 'right';
+const DefaultNavItemPosition = 'right'
 
 function useNavbarItems() {
   // TODO temporary casting until ThemeConfig type is improved
-  return useThemeConfig().navbar.items;
+  return useThemeConfig().navbar.items
 } // If split links by left/right
 // if position is unspecified, fallback to right (as v1)
 
 function splitNavItemsByPosition(items) {
-  const leftItems = items.filter(
-    (item) => (item.position ?? DefaultNavItemPosition) === 'left',
-  );
-  const rightItems = items.filter(
-    (item) => (item.position ?? DefaultNavItemPosition) === 'right',
-  );
+  const leftItems = items.filter(item => (item.position ?? DefaultNavItemPosition) === 'left')
+  const rightItems = items.filter(item => (item.position ?? DefaultNavItemPosition) === 'right')
   return {
     leftItems,
     rightItems,
-  };
+  }
 }
 
 function useMobileSidebar() {
-  const windowSize = useWindowSize(); // Mobile sidebar not visible on hydration: can avoid SSR rendering
+  const windowSize = useWindowSize() // Mobile sidebar not visible on hydration: can avoid SSR rendering
 
-  const shouldRender = windowSize === 'mobile'; // || windowSize === 'ssr';
+  const shouldRender = windowSize === 'mobile' // || windowSize === 'ssr';
 
-  const [shown, setShown] = useState(false); // Close mobile sidebar on navigation pop
+  const [shown, setShown] = useState(false) // Close mobile sidebar on navigation pop
   // Most likely firing when using the Android back button (but not only)
 
   useHistoryPopHandler(() => {
     if (shown) {
-      setShown(false); // Should we prevent the navigation here?
+      setShown(false) // Should we prevent the navigation here?
       // See https://github.com/facebook/docusaurus/pull/5462#issuecomment-911699846
 
-      return false; // prevent pop navigation
+      return false // prevent pop navigation
     }
 
-    return undefined;
-  });
+    return undefined
+  })
   const toggle = useCallback(() => {
-    setShown((s) => !s);
-  }, []);
+    setShown(s => !s)
+  }, [])
   useEffect(() => {
     if (windowSize === 'desktop') {
-      setShown(false);
+      setShown(false)
     }
-  }, [windowSize]);
+  }, [windowSize])
   return {
     shouldRender,
     toggle,
     shown,
-  };
+  }
 }
 
 function useColorModeToggle() {
   const {
-    colorMode: {disableSwitch},
-  } = useThemeConfig();
-  const {isDarkTheme, setLightTheme, setDarkTheme} = useThemeContext();
+    colorMode: { disableSwitch },
+  } = useThemeConfig()
+  const { isDarkTheme, setLightTheme, setDarkTheme } = useThemeContext()
   const toggle = useCallback(
-    (e) => (e.target.checked ? setDarkTheme() : setLightTheme()),
-    [setLightTheme, setDarkTheme],
-  );
+    e => (e.target.checked ? setDarkTheme() : setLightTheme()),
+    [setLightTheme, setDarkTheme]
+  )
   return {
     isDarkTheme,
     toggle,
     disabled: disableSwitch,
-  };
+  }
 }
 
-function useSecondaryMenu({sidebarShown, toggleSidebar}) {
+function useSecondaryMenu({ sidebarShown, toggleSidebar }) {
   const content = useMobileSecondaryMenuRenderer()?.({
     toggleSidebar,
-  });
-  const previousContent = usePrevious(content);
+  })
+  const previousContent = usePrevious(content)
   const [shown, setShown] = useState(
     () =>
       // /!\ content is set with useEffect,
       // so it's not available on mount anyway
       // "return !!content" => always returns false
-      false,
-  ); // When content is become available for the first time (set in useEffect)
+      false
+  ) // When content is become available for the first time (set in useEffect)
   // we set this content to be shown!
 
   useEffect(() => {
-    const contentBecameAvailable = content && !previousContent;
+    const contentBecameAvailable = content && !previousContent
 
     if (contentBecameAvailable) {
-      setShown(true);
+      setShown(true)
     }
-  }, [content, previousContent]);
-  const hasContent = !!content; // On sidebar close, secondary menu is set to be shown on next re-opening
+  }, [content, previousContent])
+  const hasContent = !!content // On sidebar close, secondary menu is set to be shown on next re-opening
   // (if any secondary menu content available)
 
   useEffect(() => {
     if (!hasContent) {
-      setShown(false);
-      return;
+      setShown(false)
+      return
     }
 
     if (!sidebarShown) {
-      setShown(true);
+      setShown(true)
     }
-  }, [sidebarShown, hasContent]);
+  }, [sidebarShown, hasContent])
   const hide = useCallback(() => {
-    setShown(false);
-  }, []);
+    setShown(false)
+  }, [])
   return {
     shown,
     hide,
     content,
-  };
+  }
 }
 
-function NavbarMobileSidebar({sidebarShown, toggleSidebar}) {
-  useLockBodyScroll(sidebarShown);
-  const items = useNavbarItems();
-  const colorModeToggle = useColorModeToggle();
+function NavbarMobileSidebar({ sidebarShown, toggleSidebar }) {
+  useLockBodyScroll(sidebarShown)
+  const items = useNavbarItems()
+  const colorModeToggle = useColorModeToggle()
   const secondaryMenu = useSecondaryMenu({
     sidebarShown,
     toggleSidebar,
-  });
+  })
   return (
     <div className="navbar-sidebar">
       <div className="navbar-sidebar__brand">
@@ -163,10 +161,7 @@ function NavbarMobileSidebar({sidebarShown, toggleSidebar}) {
             onChange={colorModeToggle.toggle}
           />
         )}
-        <button
-          type="button"
-          className="clean-btn navbar-sidebar__close"
-          onClick={toggleSidebar}>
+        <button type="button" className="clean-btn navbar-sidebar__close" onClick={toggleSidebar}>
           <IconClose
             color="var(--ifm-color-emphasis-600)"
             className={styles.navbarSidebarCloseSvg}
@@ -177,7 +172,8 @@ function NavbarMobileSidebar({sidebarShown, toggleSidebar}) {
       <div
         className={clsx('navbar-sidebar__items', {
           'navbar-sidebar__items--show-secondary': secondaryMenu.shown,
-        })}>
+        })}
+      >
         <div className="navbar-sidebar__item menu">
           <ul className="menu__list">
             {items.map((item, i) => (
@@ -191,10 +187,12 @@ function NavbarMobileSidebar({sidebarShown, toggleSidebar}) {
             <button
               type="button"
               className="clean-btn navbar-sidebar__back"
-              onClick={secondaryMenu.hide}>
+              onClick={secondaryMenu.hide}
+            >
               <Translate
                 id="theme.navbar.mobileSidebarSecondaryMenu.backButtonLabel"
-                description="The label of the back button to return to main menu, inside the mobile navbar sidebar secondary menu (notably used to display the docs sidebar)">
+                description="The label of the back button to return to main menu, inside the mobile navbar sidebar secondary menu (notably used to display the docs sidebar)"
+              >
                 ← Back to main menu
               </Translate>
             </button>
@@ -203,20 +201,23 @@ function NavbarMobileSidebar({sidebarShown, toggleSidebar}) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function Navbar() {
   const {
-    navbar: {hideOnScroll, style},
-  } = useThemeConfig();
-  const mobileSidebar = useMobileSidebar();
-  const colorModeToggle = useColorModeToggle();
-  const activeDocPlugin = useActivePlugin();
-  const {navbarRef, isNavbarVisible} = useHideableNavbar(hideOnScroll);
-  const items = useNavbarItems();
-  const hasSearchNavbarItem = items.some((item) => item.type === 'search');
-  const {leftItems, rightItems} = splitNavItemsByPosition(items);
+    navbar: { hideOnScroll, style },
+  } = useThemeConfig()
+  const mobileSidebar = useMobileSidebar()
+  const colorModeToggle = useColorModeToggle()
+  const activeDocPlugin = useActivePlugin()
+  const { navbarRef, isNavbarVisible } = useHideableNavbar(hideOnScroll)
+  const items = useNavbarItems()
+  const hasSearchNavbarItem = items.some(item => item.type === 'search')
+  const { leftItems, rightItems } = splitNavItemsByPosition(items)
+
+  const location = useLocation()
+  const hideBorder = location.pathname == '/'
   return (
     <nav
       ref={navbarRef}
@@ -226,7 +227,9 @@ function Navbar() {
         'navbar-sidebar--show': mobileSidebar.shown,
         [styles.navbarHideable]: hideOnScroll,
         [styles.navbarHidden]: hideOnScroll && !isNavbarVisible,
-      })}>
+        [styles.hideBorder]: hideBorder,
+      })}
+    >
       <div className="navbar__inner">
         <div className="navbar__items">
           {(items?.length > 0 || activeDocPlugin) && (
@@ -236,7 +239,8 @@ function Navbar() {
               type="button"
               tabIndex={0}
               onClick={mobileSidebar.toggle}
-              onKeyDown={mobileSidebar.toggle}>
+              onKeyDown={mobileSidebar.toggle}
+            >
               <IconMenu />
             </button>
           )}
@@ -277,7 +281,7 @@ function Navbar() {
         />
       )}
     </nav>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar

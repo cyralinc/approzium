@@ -6,6 +6,8 @@
  */
 import React from 'react'
 import clsx from 'clsx'
+import { useLocation } from 'react-router-dom'
+
 import Link from '@docusaurus/Link'
 import { useThemeConfig } from '@docusaurus/theme-common'
 import useBaseUrl from '@docusaurus/useBaseUrl'
@@ -125,9 +127,13 @@ function Footer() {
     return null
   }
 
+  const location = useLocation()
+  const showBorder = location.pathname != '/'
+
   return (
     <footer
       className={clsx('footer', {
+        [styles.footerBorder]: showBorder,
         'footer--dark': footer.style === 'dark',
       })}
     >

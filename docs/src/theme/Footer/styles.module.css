@@ -13,3 +13,7 @@
 .footerLogoLink:hover {
   opacity: 1;
 }
+
+.footerBorder {
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
