@@ -6,6 +6,23 @@ module.exports = {
   favicon: 'img/apzm-icon.svg',
   organizationName: 'cyralinc',
   projectName: 'approzium',
+
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          sidebarPath: require.resolve('./sidebars.js'),
+          // Please change this to your repo.
+          editUrl: 'https://github.com/cyralinc/approzium/',
+        },
+        theme: {
+          customCss: require.resolve('./src/css/custom.css'),
+        },
+      },
+    ],
+  ],
+
   themeConfig: {
     navbar: {
       title: 'Approzium',
@@ -13,7 +30,7 @@ module.exports = {
         alt: 'Approzium Logo',
         src: 'img/apzm-icon.svg',
       },
-      links: [
+      items: [
         {
           to: 'docs/',
           activeBasePath: 'docs',
@@ -38,36 +55,20 @@ module.exports = {
       appId: '51LSIHDN1A', // Optional, if you run the DocSearch crawler on your own
       algoliaOptions: {}, // Optional, if provided by Algolia
     },
-    googleAnalytics: {
-      trackingID: 'UA-172971690-1',
-      anonymizeIP: true, // Should IPs be anonymized?
-    },
-
     footer: {
       style: 'light',
       copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
     },
   },
+
   plugins: [
     '@docusaurus/plugin-ideal-image',
-    '@docusaurus/plugin-google-analytics'
-  ],
-  presets: [
     [
-      '@docusaurus/preset-classic',
+      '@docusaurus/plugin-google-analytics',
       {
-        docs: {
-          // It is recommended to set document id as docs home page (`docs/` path).
-          homePageId: 'overview',
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
-        },
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
+        trackingID: 'UA-172971690-1',
+        anonymizeIP: true, // Should IPs be anonymized?
       },
     ],
   ],
-};
+}

@@ -21,14 +21,17 @@
     "deploy": "docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.58",
-    "@docusaurus/plugin-google-analytics": "^2.0.0-alpha.37",
-    "@docusaurus/plugin-ideal-image": "^2.0.0-alpha.39",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.58",
+    "@docusaurus/core": "^2.0.0-beta.14",
+    "@docusaurus/plugin-google-analytics": "^2.0.0-beta.14",
+    "@docusaurus/plugin-ideal-image": "^2.0.0-beta.14",
+    "@docusaurus/preset-classic": "^2.0.0-beta.14",
     "clsx": "^1.1.1",
     "jpeg-js": "^0.4.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
+  },
+  "devDependencies": {
+    "prettier": "^2.5.1"
   },
   "browserslist": {
     "production": [
