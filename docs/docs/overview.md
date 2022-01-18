@@ -3,8 +3,6 @@ title: Overview
 slug: /
 ---
 
-import Image from '@theme/IdealImage';
-
 ## Introduction
 Approzium enables developers to improve the observability and security of their applications. It allows applications to connect to databases without requiring access to credentials, and emits logs, metrics and traces with enriched information about their runtime execution context. It is built as a lightweight open source library with multi-language and multi-cloud support.
 
@@ -41,7 +39,7 @@ Approzium is developed by the engineering team at Cyral and is available under t
 ## Overview 
 Approzium comprises two components that are deployed independently -- an SDK that runs as part of the application code, and a standalone service called the Authenticator with which the SDK interacts on behalf of the application.
 
-<Image img={require('./images/overview-diagram.png')} />
+<img src='/img/overview-diagram.png' />
 
 Together, the SDK and Authenticator provide observability and security benefits to the application. The SDK has the ability to query infrastructure metadata services native to the various cloud platforms, and to orchestration frameworks such as Kubernetes to generate rich execution time context about the application.
 
