@@ -13,7 +13,7 @@ This guide will show you how to:
 - Head to [our latest release](https://github.com/cyralinc/approzium/releases/latest)
 - Choose the appropriate binary for your operating system, and run it with a set of commands like:
 
-```
+```shell
 curl -LO https://github.com/cyralinc/approzium/releases/download/v0.2.0/darwin_amd64.zip
 unzip darwin_amd64.zip
 
@@ -90,11 +90,11 @@ cur.execute('SELECT 1')
 
 The Approzium Go SDK currently supports MD5 authentication to Postgres.
 
-```
+```shell
 go get github.com/cyralinc/approzium
 ```
 
-```
+```go
 package main
 
 import (
