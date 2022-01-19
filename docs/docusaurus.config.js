@@ -24,7 +24,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/cyralinc/approzium/',
+          editUrl: 'https://github.com/cyralinc/approzium/tree/main/docs',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -72,8 +72,6 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
         defaultLanguage: 'python',
       },
     }),

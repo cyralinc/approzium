@@ -5,12 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-.codeBlockContainer {
-  margin-bottom: var(--ifm-leading);
-  border-radius: var(--ifm-global-radius);
-  box-shadow: var(--ifm-global-shadow-lw);
-}
-
 .codeBlockContent {
   position: relative;
   /*rtl:ignore*/
@@ -18,17 +12,13 @@
 }
 
 .codeBlockTitle {
-  border-bottom: 1px solid var(--ifm-color-emphasis-300);
-  font-size: var(--ifm-code-font-size);
-  font-weight: 500;
-  padding: 0.75rem var(--ifm-pre-padding);
   border-top-left-radius: var(--ifm-global-radius);
   border-top-right-radius: var(--ifm-global-radius);
-}
-
-.codeBlockTitle + .codeBlockContent .codeBlock {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  font-family: var(--ifm-font-family-monospace);
+  font-weight: bold;
+  padding: 0.75rem var(--ifm-pre-padding);
+  width: 100%;
 }
 
 .codeBlock {
@@ -36,28 +26,45 @@
   border-radius: var(--ifm-global-radius);
 }
 
+.codeBlockContainer {
+  margin-bottom: var(--ifm-leading);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.codeBlockTitle + .codeBlockContent .codeBlock {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .copyButton {
   background: rgba(0, 0, 0, 0.3);
+  border: none;
   border-radius: var(--ifm-global-radius);
   color: var(--ifm-color-white);
+  cursor: pointer;
   opacity: 0;
-  user-select: none;
+  outline: none;
   padding: 0.4rem 0.5rem;
   position: absolute;
   right: calc(var(--ifm-pre-padding) / 2);
   top: calc(var(--ifm-pre-padding) / 2);
-  transition: opacity 200ms ease-in-out;
+  visibility: hidden;
+  transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
 }
 
 .codeBlockTitle:hover + .codeBlockContent .copyButton,
 .codeBlockContent:hover > .copyButton,
 .copyButton:focus {
+  visibility: visible;
   opacity: 1;
 }
 
 .codeBlockLines {
-  font: inherit;
-  /*rtl:ignore*/
+  font-family: var(--ifm-font-family-monospace);
+  font-size: inherit;
+  line-height: var(--ifm-pre-line-height);
+  white-space: pre;
   float: left;
   min-width: 100%;
   padding: var(--ifm-pre-padding);
