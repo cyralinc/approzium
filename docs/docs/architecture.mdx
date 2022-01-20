@@ -2,6 +2,8 @@
 title: Architecture
 ---
 
+import Image from '@theme/IdealImage';
+
 A system using Approzium for database connection comprises these components:
 
 - **Application** - Application that accesses a database and is running on a cloud platform that provides cloud IAM services. It establishes the database connection using the Approzium SDK.
@@ -12,8 +14,11 @@ A system using Approzium for database connection comprises these components:
 
 Here is the connection sequence for such a system:
 
-<img src="/img/architecture-diagram.png" />
 <br />
+<Image img={require('/img/architecture-diagram.png')} />
+<br />
+<br />
+
 
 1. The SDK initiates connection to the database server. The initial startup sequence varies for different databases but generally includes providing the database user used by the application as well as negotiating the authentication method.
 2. The database server responds with an authentication challenge. Typically, the challenge includes some randomized data that is used by the client to calculate the correct response hash.

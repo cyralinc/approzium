@@ -14,7 +14,8 @@
   --ifm-color-primary-light: #415fb8;
   --ifm-color-primary-lighter: #4664be;
   --ifm-color-primary-lightest: #5f79c7;
-  --ifm-code-font-size: 95%;
+  --ifm-code-font-size: 90%;
+  --ifm-code-border-radius: 0.2rem;
   --ifm-font-family-base: 'Titillium Web', sans-serif;
   --ifm-footer-background-color: var(--ifm-background-color);
 }
@@ -34,23 +35,29 @@ html[data-theme='dark'] {
   padding: 0 var(--ifm-pre-padding);
 }
 
+code {
+  border: 1px solid var(--ifm-font-color-base);
+  border-radius: var(--ifm-code-border-radius);
+  padding: 0.15rem;
+}
+
+div[class^='codeBlockContainer'] {
+  --ifm-code-font-size: 95%;
+}
+
 a[href^="https://approzium.readthedocs.io/"]::after
 {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
   padding-right: 13px;
 }
 
-a {
-  font-weight: 600;
+.toggle_node_modules-\@docusaurus-theme-classic-lib-next-theme-Toggle-styles-module {
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
-code {
-  border: 1px solid var(--ifm-font-color-base);
-  color: var(--ifm-font-color-base);
-  border-radius: 0.2rem;
-  font-size: 0.9rem;
-  padding: 0.15rem;
-  margin: 0.05rem;
+a {
+  font-weight: 600;
 }
 
 .pagination-nav__link {
@@ -84,4 +91,10 @@ code {
 .navbar__item svg,
 .menu__list-item svg {
   display: none;
+}
+
+/* Footer */
+
+.footer {
+  border-top: 1px solid var(--ifm-toc-border-color);
 }

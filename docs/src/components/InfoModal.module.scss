@@ -1,0 +1,91 @@
+.container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem;
+}
+
+.textModal {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px var(--ifm-font-color-base);
+  box-shadow: 2px 2.5px 0px var(--ifm-font-color-base);
+  margin-right: 2rem;
+}
+
+.selectorContainer {
+  display: flex;
+}
+
+.selector {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  font-family: var(--ifm-font-family-base);
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--ifm-font-color-base);
+  padding: 1rem 0px;
+}
+
+.selector:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.selector:hover {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.leftSelector {
+  border-right: solid 1px var(--ifm-font-color-base);
+}
+
+.notSelected {
+  border-bottom: solid 1px var(--ifm-font-color-base);
+  font-weight: 500;
+}
+
+.description {
+  font-family: var(--ifm-font-family-base);
+  font-size: 1.25rem;
+  max-width: 40rem;
+  padding: 2rem;
+}
+
+.codeBlockWrapper {
+  div[class^='codeBlockContainer'] {
+    border-radius: 0;
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 966px) {
+  .container {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .textModal {
+    margin: 0;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 414px) {
+  .container {
+    flex-direction: column;
+    padding: 1.5rem;
+    margin: 0rem;
+  }
+  .textModal {
+    margin: 0;
+    margin-bottom: 1.5rem;
+  }
+  .selector {
+    font-size: 1.25rem;
+  }
+  .description {
+    font-size: 1rem;
+    padding: 1.25rem;
+  }
+}

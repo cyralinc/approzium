@@ -29,10 +29,13 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
+        googleAnalytics: {
+          trackingID: 'UA-172971690-1',
+          anonymizeIP: true, // Should IPs be anonymized?
+        },
       }),
     ],
   ],
-
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -65,26 +68,17 @@ const config = {
         apiKey: '8ce076a38f6bf25b30877ca2251ec1e4',
         indexName: 'prod_APPROZIUM_DOCS',
         appId: '51LSIHDN1A', // Optional, if you run the DocSearch crawler on your own
-        algoliaOptions: {}, // Optional, if provided by Algolia
       },
       footer: {
         style: 'light',
-        copyright: `Copyright © ${new Date().getFullYear()} Cyral, Inc.`,
+        copyright: `Copyright © ${new Date().getFullYear()} <a href="https://cyral.com/">Cyral, Inc.</a>`,
       },
       prism: {
         defaultLanguage: 'python',
       },
     }),
 
-  plugins: [
-    [
-      '@docusaurus/plugin-google-analytics',
-      {
-        trackingID: 'UA-172971690-1',
-        anonymizeIP: true, // Should IPs be anonymized?
-      },
-    ],
-  ],
+  plugins: ['docusaurus-plugin-sass', '@docusaurus/plugin-ideal-image'],
 }
 
 module.exports = config
