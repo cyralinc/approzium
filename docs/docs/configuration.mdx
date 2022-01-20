@@ -6,77 +6,78 @@ title: Configuration
 
 Approzium uses the following precedence order. Each item takes precedence over the item below it:
 
- - command-line flags
- - environment variables
- - config file
- - defaults
+- command-line flags
+- environment variables
+- config file
+- defaults
 
 ## Listener Configuration
 
-| Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
-|--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --host             | APPROZIUM_HOST             | 127.0.0.1  | Set to 0.0.0.0 to listen on all interfaces.                                                                                                                                                                                                                                                                                                                               |
-| --http-port        | APPROZIUM_HTTP_PORT        | 6000       | Port for HTTP(S) API endpoints.                                                                                                                                                                                                                                                                                                                                           |
-| --grpc-port        | APPROZIUM_GRPC_PORT        | 6001       | Port for authenticator endpoint for clients.                                                                                                                                                                                                                                                                                                                              |
+| Name, shorthand | Environment variable | Default   | Description                                  |
+| --------------- | -------------------- | --------- | -------------------------------------------- |
+| --host          | APPROZIUM_HOST       | 127.0.0.1 | Set to 0.0.0.0 to listen on all interfaces.  |
+| --http-port     | APPROZIUM_HTTP_PORT  | 6000      | Port for HTTP(S) API endpoints.              |
+| --grpc-port     | APPROZIUM_GRPC_PORT  | 6001      | Port for authenticator endpoint for clients. |
 
 ## Logging Configuration
 
-| Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
-|--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --log-level        | APPROZIUM_LOG_LEVEL        | info       | Supported selections are "trace", "debug", "info", "warn", "error", "fatal", and "panic". Upper case may be used.                                                                                                                                                                                                                                                         |
-| --log-format       | APPROZIUM_LOG_FORMAT       | text       | Supported selections are "text" and "json".                                                                                                                                                                                                                                                                                                                               |
-| --log-raw          | APPROZIUM_LOG_RAW          | false      | Approzium's logs mask sensitive data. Setting to "true" activates raw logs, so no sensitive values will be masked. For example, if set to "true", the AWS signed_get_caller_identity string will be fully included in logs, presenting an opportunity for a viewer to impersonate another. Should only be set to "true" in environments where logs are carefully guarded. |
+| Name, shorthand | Environment variable | Default | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------- | -------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --log-level     | APPROZIUM_LOG_LEVEL  | info    | Supported selections are "trace", "debug", "info", "warn", "error", "fatal", and "panic". Upper case may be used.                                                                                                                                                                                                                                                         |
+| --log-format    | APPROZIUM_LOG_FORMAT | text    | Supported selections are "text" and "json".                                                                                                                                                                                                                                                                                                                               |
+| --log-raw       | APPROZIUM_LOG_RAW    | false   | Approzium's logs mask sensitive data. Setting to "true" activates raw logs, so no sensitive values will be masked. For example, if set to "true", the AWS signed_get_caller_identity string will be fully included in logs, presenting an opportunity for a viewer to impersonate another. Should only be set to "true" in environments where logs are carefully guarded. |
 
 ## TLS Configuration
 
-| Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
-|--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --disable-tls      | APPROZIUM_DISABLE_TLS      | false      | When false, Approzium comes up as an `"https"` server. When `"true"` disables TLS, and plain "http" is used. Setting to `"true"` means the Approzium authentication server will send database connection information in plain text, making it vulnerable to [man-in-the-middle attacks](https://en.wikipedia.org/wiki/Man-in-the-middle_attack). **Do not set to `"true"` in production environments.** |
-| --tls-cert-path    | APPROZIUM_TLS_CERT_PATH    |            | The path to the TLS certificate the Approzium authentication server has been issued to prove its identity. Curious about how to generate a valid cert? See [this walkthrough](https://itnext.io/practical-guide-to-securing-grpc-connections-with-go-and-tls-part-1-f63058e9d6d1). This certificate would correspond to the `service.pem` generated in the walkthrough. However, ideally this would not be a certificate issued by your own [Certificate Authority (CA)](https://en.wikipedia.org/wiki/Certificate_authority), and instead it might be issued by your company's internal CA and/or a widely recognized one. However, even a self-created CA is better than none. |
-| --tls-key-path     | APPROZIUM_TLS_KEY_PATH     |            | The path to the TLS key the Approzium authentication server can use to prove its identity. In the above walkthrough, this would correspond to the `service.key`.                                                                                                                                                                                                          |
+| Name, shorthand | Environment variable    | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------- | ----------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --disable-tls   | APPROZIUM_DISABLE_TLS   | false   | When false, Approzium comes up as an `"https"` server. When `"true"` disables TLS, and plain "http" is used. Setting to `"true"` means the Approzium authentication server will send database connection information in plain text, making it vulnerable to [man-in-the-middle attacks](https://en.wikipedia.org/wiki/Man-in-the-middle_attack). **Do not set to `"true"` in production environments.**                                                                                                                                                                                                                                                                          |
+| --tls-cert-path | APPROZIUM_TLS_CERT_PATH |         | The path to the TLS certificate the Approzium authentication server has been issued to prove its identity. Curious about how to generate a valid cert? See [this walkthrough](https://itnext.io/practical-guide-to-securing-grpc-connections-with-go-and-tls-part-1-f63058e9d6d1). This certificate would correspond to the `service.pem` generated in the walkthrough. However, ideally this would not be a certificate issued by your own [Certificate Authority (CA)](https://en.wikipedia.org/wiki/Certificate_authority), and instead it might be issued by your company's internal CA and/or a widely recognized one. However, even a self-created CA is better than none. |
+| --tls-key-path  | APPROZIUM_TLS_KEY_PATH  |         | The path to the TLS key the Approzium authentication server can use to prove its identity. In the above walkthrough, this would correspond to the `service.key`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ## Secrets Configuration
 
-| Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
-|--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --secrets-manager  | APPROZIUM_SECRETS_MANAGER  |            | Supported options are "vault" (Hashicorp Vault), "asm" (AWS Secrets Manager), and "local" (Local YAML file)                                                                                                                                                                                                                                                               |
-| --vault-token-path | APPROZIUM_VAULT_TOKEN_PATH |            | Optional, if set it will cause the latest Vault token to always be pulled from the given file. This option takes precedence over --vaulttoken                                                                                                                                                                                                                             |
-| --vault-token      | VAULT_TOKEN                |            | Optional, if set it will be used as the Vault token.                                                                                                                                                                                                                                                                                                                      |
-| --vault-addr       | VAULT_ADDR                 |            | Required if "vault" is set under "secrets-manager".                                                                                                                                                                                                                                                                                                                       |
-| --assume-aws-role  | APPROZIUM_ASSUME_AWS_ROLE  |            | Optional, only valid for AWS Secrets Manager. The role Approzium should assume when retrieving secrets. This parameter is useful for AWS Lambda environments, and for local testing.                                                                                                                                                                                      |
-| --aws-region       | AWS_REGION                 |            | Required if using AWS Secrets Manager as the secrets manager.                                                                                                                                                                                                                                                                                                             |
+| Name, shorthand    | Environment variable       | Default | Description                                                                                                                                                                          |
+| ------------------ | -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| --secrets-manager  | APPROZIUM_SECRETS_MANAGER  |         | Supported options are "vault" (Hashicorp Vault), "asm" (AWS Secrets Manager), and "local" (Local YAML file)                                                                          |
+| --vault-token-path | APPROZIUM_VAULT_TOKEN_PATH |         | Optional, if set it will cause the latest Vault token to always be pulled from the given file. This option takes precedence over --vaulttoken                                        |
+| --vault-token      | VAULT_TOKEN                |         | Optional, if set it will be used as the Vault token.                                                                                                                                 |
+| --vault-addr       | VAULT_ADDR                 |         | Required if "vault" is set under "secrets-manager".                                                                                                                                  |
+| --assume-aws-role  | APPROZIUM_ASSUME_AWS_ROLE  |         | Optional, only valid for AWS Secrets Manager. The role Approzium should assume when retrieving secrets. This parameter is useful for AWS Lambda environments, and for local testing. |
+| --aws-region       | AWS_REGION                 |         | Required if using AWS Secrets Manager as the secrets manager.                                                                                                                        |
 
 ## Misc Flags
 
-| Name, shorthand    | Environment variable       | Default    | Description                                                                                                                                                                                                                                                                                                                                                               |
-|--------------------|----------------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| --config           | APPROZIUM_CONFIG_FILE_PATH | false      | Optional, set it to path containing a YAML config file.                                                                                                                                                                                                                             |
-| --version          |                            | false      | Outputs the current version of Approzium.                                                                                                                                                                                                                                                                                                            |
-| --dev              |                            | false      | Runs Approzium in dev mode, using a local file for storage and with TLS disabled.                                                                                                                                                                                                                                                                                                           |
+| Name, shorthand | Environment variable       | Default | Description                                                                       |
+| --------------- | -------------------------- | ------- | --------------------------------------------------------------------------------- |
+| --config        | APPROZIUM_CONFIG_FILE_PATH | false   | Optional, set it to path containing a YAML config file.                           |
+| --version       |                            | false   | Outputs the current version of Approzium.                                         |
+| --dev           |                            | false   | Runs Approzium in dev mode, using a local file for storage and with TLS disabled. |
 
 Example config file, which can be passed in through `approzium --config=/path/to/config.yaml`:
 
-```
+```yaml
 ---
 listener:
   grpc_port: 6001
-  host: "127.0.0.1"
+  host: '127.0.0.1'
   http_port: 6000
 logging:
   log_format: json
   log_level: info
   log_raw: false
 secrets:
-  secrets_manager: "vault"
-  vault_addr: "https://somewhere:8200"
-  vault_token_path: "/path/to/tokensink.txt"
+  secrets_manager: 'vault'
+  vault_addr: 'https://somewhere:8200'
+  vault_token_path: '/path/to/tokensink.txt'
 tls:
   disable_tls: false
-  tls_cert_path: "/path/to/approzium.pem"
-  tls_key_path: "/path/to/approzium.key"
+  tls_cert_path: '/path/to/approzium.pem'
+  tls_key_path: '/path/to/approzium.key'
 ```
 
 # Approzium Secrets Manager Backends
+
 ## Hashicorp Vault Backend
 
 See our QuickStart section for how to plant a password in Vault for Approzium.
@@ -101,36 +102,31 @@ AWS credentials have to be configured on the system. If you are not sure how to 
 
 Example secrets section:
 
-```
+```yaml
 secrets:
-  secrets_manager: "asm"
-  aws_region: "us-east-1"
+  secrets_manager: 'asm'
+  aws_region: 'us-east-1'
 ```
 
 To plant a password in AWS Secrets Manager for Approzium to use, choose "Other type of secrets", and as the plaintext
 value, place a JSON object like this:
 
-```
+```json
 {
   "dbuser1": {
     "password": "asdfghjkl",
-    "iam_arns": [
-      "arn:aws:iam::accountid:role/rolename1",
-      "arn:aws:iam::accountid:role/rolename2"
-    ]
+    "iam_arns": ["arn:aws:iam::accountid:role/rolename1", "arn:aws:iam::accountid:role/rolename2"]
   }
 }
 ```
 
 The fields in this JSON object represent:
 
-```
+```json
 {
   "<database_user_name>": {
     "password": "<database_password_that_should_never_be_shared>",
-    "iam_arns": [
-      "<the_iam_arns_of_callers_who_should_be_allowed_access_via_this_database_user>"
-    ]
+    "iam_arns": ["<the_iam_arns_of_callers_who_should_be_allowed_access_via_this_database_user>"]
   }
 }
 ```
@@ -145,17 +141,17 @@ This schema is as follows: `approzium/<postgres-host-name>@<postgres-port>`.
 
 Note the Secret ARN, and use it to create an IAM policy like:
 
-```
+```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "secretsmanager:GetSecretValue",
-            "Resource": "arn:aws:secretsmanager:us-east-1:0123456789012:secret:approzium/postgres-host@5432"
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:0123456789012:secret:approzium/postgres-host@5432"
+    }
+  ]
 }
 ```
 

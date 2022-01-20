@@ -6,15 +6,19 @@ import Image from '@theme/IdealImage';
 
 A system using Approzium for database connection comprises these components:
 
-* **Application** - Application that accesses a database and is running on a cloud platform that provides cloud IAM services. It establishes the database connection using the Approzium SDK.
-* **Database** - The database that the service wants to connect to.
-* **IAM Service** - IAM service provided by the cloud platform the service is using. It handles requests such as verifying the service's identity. For example, in AWS, this is called the [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
-* **Secrets Manager** - Secure storage where database credentials are stored. Examples include Hashicorp Vault, AWS Secrets Manager, Google Cloud Secret Manager, Azure Key Vault, and Kubernetes Secrets.
-* **Approzium Authenticator** - Approzium service that interfaces with the Approzium SDK and with the secrets manager. This service verifies the service's identity, retrieves the credentials from the secrets manager, and calculates the authentication challenge response.
+- **Application** - Application that accesses a database and is running on a cloud platform that provides cloud IAM services. It establishes the database connection using the Approzium SDK.
+- **Database** - The database that the service wants to connect to.
+- **IAM Service** - IAM service provided by the cloud platform the service is using. It handles requests such as verifying the service's identity. For example, in AWS, this is called the [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
+- **Secrets Manager** - Secure storage where database credentials are stored. Examples include Hashicorp Vault, AWS Secrets Manager, Google Cloud Secret Manager, Azure Key Vault, and Kubernetes Secrets.
+- **Approzium Authenticator** - Approzium service that interfaces with the Approzium SDK and with the secrets manager. This service verifies the service's identity, retrieves the credentials from the secrets manager, and calculates the authentication challenge response.
 
 Here is the connection sequence for such a system:
-<Image img={require('./images/architecture-diagram.png')} />
-<br/>
+
+<br />
+<Image img={require('/img/architecture-diagram.png')} />
+<br />
+<br />
+
 
 1. The SDK initiates connection to the database server. The initial startup sequence varies for different databases but generally includes providing the database user used by the application as well as negotiating the authentication method.
 2. The database server responds with an authentication challenge. Typically, the challenge includes some randomized data that is used by the client to calculate the correct response hash.
@@ -23,6 +27,6 @@ Here is the connection sequence for such a system:
 5. The Approzium Authenticator verifies the application's identity by checking the proof provided by the application with the IAM service.
 6. The Approzium Authenticator obtains the cleartext password for the requested database server from the secrets manager. The password is stored in the secrets manager along with a set of IAM roles allowed to access it, and the authenticator checks that the application's IAM role exists in this set before proceeding.
 7. The Approzium Authenticator uses the cleartext password and the authentication challenge data to calculate the authentication response hash expected by the database and sends it to the SDK.
-8. The Approzium SDK simply forwards the authentication response hash to the database. 
+8. The Approzium SDK simply forwards the authentication response hash to the database.
 
 After that, your connection is successfully established! 😄

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import CodeBlock from '@theme/CodeBlock'
-import styles from './styles.module.css'
-
+import styles from './InfoModal.module.scss'
 
 const info = {
-  'observability': {
-    description: 'Approzium provides rich execution context derived from cloud infrastructure metadata services, thus eliminating blind spots in the diagnosis and tracing of complex performance problems within autoscaled microservice environments.',
+  observability: {
+    description:
+      'Approzium provides rich execution context derived from cloud infrastructure metadata services, thus eliminating blind spots in the diagnosis and tracing of complex performance problems within autoscaled microservice environments.',
     codeHighlight: '{15-22}',
   },
-  'security': {
-    description: 'Approzium enables applications to connect to databases without requiring access to credentials, thus preventing leaks through inadvertent application logging, application compromise, or theft of secrets manager API keys.',
+  security: {
+    description:
+      'Approzium enables applications to connect to databases without requiring access to credentials, thus preventing leaks through inadvertent application logging, application compromise, or theft of secrets manager API keys.',
     codeHighlight: '{7-9}',
-  }
+  },
 }
 
 const codeSample = `from approzium import AuthClient
@@ -55,24 +56,28 @@ function InfoModal() {
             className={clsx(styles.selector, styles.leftSelector, {
               [styles.notSelected]: selectedCategory == 'security',
             })}
-            onClick={selectObservability}>
+            onClick={selectObservability}
+          >
             Observability
           </button>
           <button
             className={clsx(styles.selector, {
               [styles.notSelected]: selectedCategory == 'observability',
             })}
-            onClick={selectSecurity}>
+            onClick={selectSecurity}
+          >
             Security
           </button>
         </div>
         <p className={styles.description}>{selectedInfo.description}</p>
       </div>
-      <CodeBlock className={'python'} metastring={selectedInfo.codeHighlight} landingPage={true}>
-        {codeSample}
-      </CodeBlock>
+      <div className={styles.codeBlockWrapper}>
+        <CodeBlock className="python" metastring={selectedInfo.codeHighlight}>
+          {codeSample}
+        </CodeBlock>
+      </div>
     </div>
   )
 }
 
-export default InfoModal;
+export default InfoModal

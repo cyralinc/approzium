@@ -3,6 +3,7 @@ title: Quickstart
 ---
 
 This guide will show you how to:
+
 - Deploy the Authenticator.
 - Store database credentials in Vault to be retrieved by the Authenticator.
 - Connect to a Postgres database through the Approzium Python SDK.
@@ -12,7 +13,7 @@ This guide will show you how to:
 - Head to [our latest release](https://github.com/cyralinc/approzium/releases/latest)
 - Choose the appropriate binary for your operating system, and run it with a set of commands like:
 
-```
+```shell
 curl -LO https://github.com/cyralinc/approzium/releases/download/v0.2.0/darwin_amd64.zip
 unzip darwin_amd64.zip
 
@@ -25,8 +26,10 @@ For availability, we recommend running the Authenticator in a long-running envir
 than in a short-lived environment (like in AWS Lambda).
 
 ### Storing Credentials in Vault
+
 The Authenticator expects credentials for a single database user as a secret stored against the database user as the key.
 The secret contains the database password and a set of IAM roles allowed to access the credentials in the following structure.
+
 ```shell
 cat dbuser1-creds.json
 {
@@ -44,11 +47,13 @@ For database access to be granted to a caller, the caller's exact `iam_arn` must
 For assumed roles, either the role ARN or the assumed role ARN may be used to grant access.
 
 Enable Vault KV Version 1 (see [Vault documentation](https://www.vaultproject.io/docs/secrets/kv/kv-v1) for more information).
+
 ```shell
 vault secrets enable -path=approzium -version=1 kv
 ```
 
 Put the secret at path `approzium/<DATABASE_HOST:DATABASE_PORT>` with your database user as the key.
+
 ```shell
 vault write approzium/1.2.3.4:5432 @dbuser1-creds.json
 ```
@@ -56,13 +61,16 @@ vault write approzium/1.2.3.4:5432 @dbuser1-creds.json
 ## SDK Usage
 
 ### Python
+
 Install the SDK in your client.
+
 ```shell
 pip3 install 'approzium[sqllibs]'
 ```
 
 Connect to your database as follows. (Note: TLS should **not** be disabled in production environments,
 see [our Python guide](https://approzium.readthedocs.io/en/latest/api.html#approzium.AuthClient) for how to configure them.)
+
 ```python
 from approzium import AuthClient
 from approzium.psycopg2 import connect
@@ -82,11 +90,11 @@ cur.execute('SELECT 1')
 
 The Approzium Go SDK currently supports MD5 authentication to Postgres.
 
-```
+```shell
 go get github.com/cyralinc/approzium
 ```
 
-```
+```go
 package main
 
 import (

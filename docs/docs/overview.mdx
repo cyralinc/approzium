@@ -1,5 +1,6 @@
 ---
 title: Overview
+slug: /
 ---
 
 import Image from '@theme/IdealImage';
@@ -40,7 +41,7 @@ Approzium is developed by the engineering team at Cyral and is available under t
 ## Overview 
 Approzium comprises two components that are deployed independently -- an SDK that runs as part of the application code, and a standalone service called the Authenticator with which the SDK interacts on behalf of the application.
 
-<Image img={require('./images/overview-diagram.png')} />
+<Image img={require('/img/overview-diagram.png')} />
 
 Together, the SDK and Authenticator provide observability and security benefits to the application. The SDK has the ability to query infrastructure metadata services native to the various cloud platforms, and to orchestration frameworks such as Kubernetes to generate rich execution time context about the application.
 
