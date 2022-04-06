@@ -1,7 +1,10 @@
 name: test
+
 on:
   push:
-    branches: [ '*' ]
+    branches:
+      - '**'
+
 jobs:
   test:
     runs-on: ubuntu-latest
