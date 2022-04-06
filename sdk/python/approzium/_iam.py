@@ -8,7 +8,9 @@ from ec2_metadata import ec2_metadata
 def assume_role(iam_role):
     sts_client = boto3.client("sts")
     response = sts_client.assume_role(
-        DurationSeconds=3600, RoleArn=iam_role, RoleSessionName="Service1",
+        DurationSeconds=3600,
+        RoleArn=iam_role,
+        RoleSessionName="Service1",
     )
     return response
 

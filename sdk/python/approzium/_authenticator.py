@@ -46,7 +46,11 @@ class AuthClient(object):
     """
 
     def __init__(
-        self, server_address, disable_tls=False, tls_config=None, iam_role=None,
+        self,
+        server_address,
+        disable_tls=False,
+        tls_config=None,
+        iam_role=None,
     ):
         self.server_address = server_address
 
@@ -157,7 +161,9 @@ class AuthClient(object):
             salt = auth_info
             if len(salt) != 4:
                 raise Exception("salt not right size")
-            request = authenticator_pb2.PGMD5HashRequest(salt=salt,)
+            request = authenticator_pb2.PGMD5HashRequest(
+                salt=salt,
+            )
             response = self._execute_request(
                 request, "GetPGMD5Hash", dbhost, dbport, dbuser
             )
@@ -182,7 +188,9 @@ class AuthClient(object):
             salt = auth_info
             if len(salt) != 20:
                 raise Exception("salt not right size")
-            request = authenticator_pb2.MYSQLSHA1HashRequest(salt=salt,)
+            request = authenticator_pb2.MYSQLSHA1HashRequest(
+                salt=salt,
+            )
             response = self._execute_request(
                 request, "GetMYSQLSHA1Hash", dbhost, dbport, dbuser
             )
