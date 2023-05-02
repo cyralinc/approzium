@@ -1,11 +1,11 @@
 name: lint
 
 on:
-  push:
-    branches:
-      - '**'
+  pull_request:
     paths:
-      - sdk/**
+      - './sdk'
+    branches:
+      - main
 
 jobs:
   lint:
