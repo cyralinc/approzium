@@ -9,22 +9,4 @@ on:
 
 jobs:
   test-build:
-    name: Test Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: yarn
-          cache-dependency-path: docs/yarn.lock
-      - name: Run install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install --frozen-lockfile
-          dir: docs
-      - name: Run build
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: build
-          dir: docs
+    uses: ./.github/workflows/reusable-docsbuild.yml
