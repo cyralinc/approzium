@@ -34,12 +34,17 @@ jobs:
         with:
           node-version: 18
           cache: yarn
-      - name: Install dependencies
-        working-directory: ./docs
-        run: yarn install --frozen-lockfile
-      - name: Build website
-        working-directory: ./docs
-        run: yarn build
+          cache-dependency-path: docs/yarn.lock
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install --frozen-lockfile
+          dir: docs
+      - name: Run build
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build
+          dir: docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
