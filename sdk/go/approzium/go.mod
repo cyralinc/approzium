@@ -8,5 +8,5 @@ require (
 	github.com/cyralinc/pq v1.7.1-0.20200716225830-f72d68bb8972
 	github.com/lib/pq v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
-	google.golang.org/grpc v1.30.0
+	google.golang.org/grpc v1.53.0
 )
